@@ -49,3 +49,20 @@ Copy `.env.example` to `.env` and configure:
 - `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
 
 Environment variables must be prefixed with `VITE_` to be accessible in the frontend.
+
+## Deployment
+
+Continuous Delivery via GitHub Actions. On push to `main`, the app is built and deployed to Digital Ocean (Droplet + Nginx).
+
+### GitHub Secrets Required
+
+Configure in: Repository → Settings → Secrets and variables → Actions
+
+| Secret | Description |
+|--------|-------------|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase publishable key |
+| `SSH_PRIVATE_KEY` | Private SSH key for server access |
+| `REMOTE_HOST` | Server IP or hostname |
+| `REMOTE_USER` | SSH username (e.g., `root`) |
+| `DEPLOY_PATH` | Nginx web root (e.g., `/var/www/fitness-coach`) |
