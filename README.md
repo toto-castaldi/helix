@@ -4,12 +4,16 @@ Applicazione web ottimizzata per l'utilizzo su smartphone.
 E' un assistente AI al lavoro di un Coach nell'ambito del fitness.
 Il coach viene assistito nell'ambito del lavoro in palestra come Personal Trainer e come Istruttore di Pilates.
 
-## Tech Stack
+Produzione
+
+https://fca.toto-castaldi.com/
+
+# Tech Stack
 
 - **Frontend**: React + Vite + TypeScript
 - **Backend**: Supabase
 
-## Sviluppo
+# Sviluppo
 
 ```bash
 # Installare dipendenze
