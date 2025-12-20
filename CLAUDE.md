@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Fitness Coach Assistant - A smartphone-optimized web application that serves as an AI assistant for fitness coaches. The application assists coaches in their gym work as Personal Trainers and Pilates Instructors.
 
+## Rules
+
+- **Never execute git commands.** The user handles all git operations (commit, push, pull, etc.) manually.
+
 ## Tech Stack
 
 - **Frontend**: React 19 + Vite + TypeScript
