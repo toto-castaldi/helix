@@ -22,4 +22,4 @@ npm run dev
 
 # TO-DO
 
-- solo uno specifico account google può entrare ! Configurato sul server al momento della build
+- foto in anagrafica clienti

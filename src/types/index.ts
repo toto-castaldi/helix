@@ -30,6 +30,12 @@ export interface GoalHistory {
   ended_at: string | null
 }
 
+export interface GoalInsert {
+  client_id: string
+  goal: string
+  started_at?: string
+}
+
 export interface Exercise {
   id: string
   user_id: string | null

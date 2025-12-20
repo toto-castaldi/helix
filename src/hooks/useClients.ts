@@ -89,7 +89,7 @@ export function useClients() {
     return true
   }
 
-  const getClient = async (id: string): Promise<Client | null> => {
+  const getClient = useCallback(async (id: string): Promise<Client | null> => {
     const { data, error: fetchError } = await supabase
       .from('clients')
       .select('*')
@@ -102,7 +102,7 @@ export function useClients() {
     }
 
     return data
-  }
+  }, [])
 
   return {
     clients,
