@@ -33,60 +33,51 @@
 
 ---
 
-## Milestone 2: Sessioni (struttura base)
+## Milestone 2: Sessioni
 
 ### 2.1 Database
-- [ ] Migration: tabella `sessions`
-- [ ] Migration: tabella `session_exercises`
-- [ ] RLS policies
 
-### 2.2 Types
-- [ ] Tipi TypeScript per sessioni
+- [x] Migration `006_sessions.sql`:
+  - Tabella `sessions` (id, client_id, gym_id, session_date, status, notes, created_at, updated_at)
+  - Tabella `session_exercises` (id, session_id, exercise_id, order_index, sets, reps, weight_kg, duration_seconds, notes)
+  - RLS policies per entrambe le tabelle
+  - Trigger updated_at per sessions
+  - Indici per performance
 
-### 2.3 Hook
-- [ ] `useSessions.ts` con CRUD
+### 2.2 Hook
 
-### 2.4 Componenti & Pagine
-- [ ] Componenti sessione
-- [ ] Pagina lista sessioni
-- [ ] Pagina dettaglio/edit sessione
+- [x] Creare `useSessions.ts` con:
+  - `fetchSessions()` - lista sessioni con filtri opzionali
+  - `getSession(id)` - sessione singola con client, gym, exercises
+  - `createSession()`, `updateSession()`, `deleteSession()`
+  - `addExercise()`, `updateExercise()`, `removeExercise()`, `reorderExercises()`
+
+### 2.3 Componenti
+
+- [x] `SessionForm.tsx` - Form creazione/modifica sessione
+- [x] `SessionCard.tsx` - Card per lista sessioni
+- [x] `SessionExerciseCard.tsx` - Card esercizio con controlli inline
+- [x] `ExercisePicker.tsx` - Dialog selezione esercizio da catalogo
+
+### 2.4 Pagine
+
+- [x] `Sessions.tsx` - Lista sessioni con filtri
+- [x] `SessionDetail.tsx` - Dettaglio sessione con CRUD esercizi
+- [x] Aggiungere route `/sessions` in App.tsx
+- [x] Aggiungere route `/sessions/:id` in App.tsx
+- [x] Aggiungere bottone navigazione in Layout.tsx
+
+### 2.5 Test & Build
+
+- [x] Verificare build senza errori
+- [X] Test manuale funzionalità
 
 ---
 
 ## Milestone 3: AI Planning
 
-### 3.1 Integrazione LLM
-
-- [ ] Configurazione API (ChatGPT / Claude)
-- [ ] Edge Function per generazione piano
-
-### 3.2 Chat Interface
-
-- [ ] UI chat per pianificazione
-- [ ] Creazione sessione da proposta AI
-
 ---
 
 ## Milestone 4: Live Coaching
 
-### 4.1 Dashboard Live
-
-- [ ] Vista clienti con sessioni programmate
-- [ ] Cambio rapido tra clienti
-
-### 4.2 Gestione Esercizio
-
-- [ ] Vista esercizio corrente + prossimo
-- [ ] Modifica al volo (reps/serie/peso)
-- [ ] Segna completato
-
-### 4.3 Fine Sessione
-
-- [ ] Cambio stato sessione (da_svolgere → svolta)
-
 ---
-
-## Stato Corrente
-
-**Completata**: Milestone 1 - Palestre
-**Prossima**: Milestone 2 - Sessioni

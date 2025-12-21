@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom'
-import { Home, Users, Building2, Dumbbell, LogOut } from 'lucide-react'
+import { Users, Dumbbell, CalendarDays, Building2, LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
@@ -44,8 +44,8 @@ export function Layout() {
               )
             }
           >
-            <Home className="h-5 w-5" />
-            <span>Home</span>
+            <Dumbbell className="h-5 w-5" />
+            <span>Esercizi</span>
           </NavLink>
           <NavLink
             to="/clients"
@@ -60,6 +60,18 @@ export function Layout() {
             <span>Clienti</span>
           </NavLink>
           <NavLink
+            to="/sessions"
+            className={({ isActive }) =>
+              cn(
+                "flex flex-col items-center gap-1 px-3 py-2 text-xs",
+                isActive ? "text-primary" : "text-muted-foreground"
+              )
+            }
+          >
+            <CalendarDays className="h-5 w-5" />
+            <span>Sessioni</span>
+          </NavLink>
+          <NavLink
             to="/gyms"
             className={({ isActive }) =>
               cn(
@@ -70,18 +82,6 @@ export function Layout() {
           >
             <Building2 className="h-5 w-5" />
             <span>Palestre</span>
-          </NavLink>
-          <NavLink
-            to="/exercises"
-            className={({ isActive }) =>
-              cn(
-                "flex flex-col items-center gap-1 px-3 py-2 text-xs",
-                isActive ? "text-primary" : "text-muted-foreground"
-              )
-            }
-          >
-            <Dumbbell className="h-5 w-5" />
-            <span>Esercizi</span>
           </NavLink>
         </div>
       </nav>

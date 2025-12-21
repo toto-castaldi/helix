@@ -95,3 +95,63 @@ export interface GymInsert {
 }
 
 export interface GymUpdate extends Partial<GymInsert> {}
+
+// Sessions
+
+export type SessionStatus = 'planned' | 'completed'
+
+export interface Session {
+  id: string
+  client_id: string
+  gym_id: string | null
+  session_date: string
+  status: SessionStatus
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface SessionInsert {
+  client_id: string
+  gym_id?: string | null
+  session_date: string
+  status?: SessionStatus
+  notes?: string | null
+}
+
+export interface SessionUpdate extends Partial<Omit<SessionInsert, 'client_id'>> {}
+
+export interface SessionExercise {
+  id: string
+  session_id: string
+  exercise_id: string
+  order_index: number
+  sets: number | null
+  reps: number | null
+  weight_kg: number | null
+  duration_seconds: number | null
+  notes: string | null
+}
+
+export interface SessionExerciseInsert {
+  session_id: string
+  exercise_id: string
+  order_index?: number
+  sets?: number | null
+  reps?: number | null
+  weight_kg?: number | null
+  duration_seconds?: number | null
+  notes?: string | null
+}
+
+export interface SessionExerciseUpdate extends Partial<Omit<SessionExerciseInsert, 'session_id' | 'exercise_id'>> {}
+
+export interface SessionExerciseWithDetails extends SessionExercise {
+  exercise?: Exercise
+}
+
+export interface SessionWithDetails extends Session {
+  client?: Client
+  gym?: Gym | null
+  exercises?: SessionExerciseWithDetails[]
+}

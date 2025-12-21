@@ -6,6 +6,17 @@ Applicazione mobile-first per fitness coach che gestiscono più clienti contempo
 
 ---
 
+### Clienti
+
+Un cliente ha un nome e cognome. Una data di nascità e età in anni. Una descrizione e una serie di obiettivi.
+L'ultimo obiettivo è quello attuale e i precedenti sono storici.
+L'obiettivo è descritto da un testo e una data.
+
+### Esercizi
+
+Un esercizio ha un nome, una descrizione, un serie di passi descritti in blocchi che contengono a loro volta un'immagine e una descrizione.
+Ad un esercizio possono essere associati una serie di tag che ne descrivono delle caratteristiche e li rendono facilmente cercabili.
+
 ### Palestre
 
 Una palestra ha un indirizzo, un nome e una descrizione estesa dove si indicano anche le attrezzature.
@@ -15,6 +26,32 @@ Una palestra ha un indirizzo, un nome e una descrizione estesa dove si indicano 
 Le sessioni di allenamento possono essere anche inserite manualmente visto che i clienti li seguo da tempo.
 In generale il coach ha pieno controllo delle sessioni tramite un CRUD.
 Una sessione è legata ad un cliente, una palestra ad ha una data. Contiene una serie di esercizi e uno stato (da svolgere o svolta).
+
+Esempio di sessione : 
+Cliente : Mario Rossi
+Data : 20 Dicembre 2025
+Palestra : Fit Active Milano 1
+Stato : svolta
+Esercizi :
+01 - Cyclette a ritmo moderato - 4 min
+02 - Circonduzioni anche e ginocchia - 2 min
+03 - Cat-cow (quadrupedia) - 2 min  
+04 - Rotazioni busto da seduto - 1 min
+05 - Shoulder rolls - 1 min
+06 - Squat a corpo libero - 3 serie × 15 ripetizioni
+07 - Distensioni su panca piana con manubri - 3 kg - 3 serie × 12 ripetizioni
+08 - Stacchi rumeni con kettlebell - 12 kg - 3 serie × 12 ripetizioni
+09 - Dead bug - 3 serie × 10 ripetizioni per lato  
+10 - Plank laterale - 3 serie × 30 sec per lato
+11 - Stretching flessori dell'anca - 1 min per lato  
+
+In una sessione un determinato esercizio può essere configurato con :
+- durata in minuti o secondi
+- serie, ripetizioni e peso
+- serie, ripetizioni
+- serie e durata in minuti o secondi
+
+Un esercizio deve essere prima censito 
 
 ## Stato Attuale
 
