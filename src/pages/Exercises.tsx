@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { Plus, X, Search } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { ExerciseForm } from '@/components/exercises/ExerciseForm'
 import { ExerciseCard } from '@/components/exercises/ExerciseCard'
+import { ExerciseFilterBar } from '@/components/exercises/ExerciseFilterBar'
 import { useExercises } from '@/hooks/useExercises'
 import { useFilteredExercises } from '@/hooks/useFilteredExercises'
 import type { ExerciseWithDetails, ExerciseInsert, ExerciseBlockInsert } from '@/types'
@@ -147,42 +146,14 @@ export function Exercises() {
 
       {/* Search and Filter */}
       {!showForm && !editingExercise && (
-        <div className="space-y-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cerca esercizi..."
-              className="pl-9"
-            />
-          </div>
-
-          {allTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {allTags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={selectedTags.includes(tag) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => toggleTag(tag)}
-                >
-                  {tag}
-                </Badge>
-              ))}
-              {selectedTags.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 text-xs"
-                  onClick={clearTags}
-                >
-                  Rimuovi filtri
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
+        <ExerciseFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          allTags={allTags}
+          selectedTags={selectedTags}
+          onToggleTag={toggleTag}
+          onClearTags={clearTags}
+        />
       )}
 
       {/* Create Form */}

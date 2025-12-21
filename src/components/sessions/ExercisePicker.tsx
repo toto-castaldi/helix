@@ -1,8 +1,8 @@
-import { Search, Plus, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { ExerciseFilterBar } from '@/components/exercises/ExerciseFilterBar'
 import { useFilteredExercises } from '@/hooks/useFilteredExercises'
 import type { ExerciseWithDetails } from '@/types'
 
@@ -32,40 +32,16 @@ export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerP
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cerca esercizio..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-            autoFocus
-          />
-        </div>
-        {allTags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {allTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant={selectedTags.includes(tag) ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => toggleTag(tag)}
-              >
-                {tag}
-              </Badge>
-            ))}
-            {selectedTags.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 text-xs"
-                onClick={clearTags}
-              >
-                Rimuovi filtri
-              </Button>
-            )}
-          </div>
-        )}
+        <ExerciseFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          allTags={allTags}
+          selectedTags={selectedTags}
+          onToggleTag={toggleTag}
+          onClearTags={clearTags}
+          searchPlaceholder="Cerca esercizio..."
+          autoFocus
+        />
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto space-y-2 pb-4">
         {filteredExercises.length === 0 ? (
