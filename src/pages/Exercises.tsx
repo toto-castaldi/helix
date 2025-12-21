@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { ExerciseForm } from '@/components/exercises/ExerciseForm'
 import { ExerciseCard } from '@/components/exercises/ExerciseCard'
 import { useExercises } from '@/hooks/useExercises'
+import { useFilteredExercises } from '@/hooks/useFilteredExercises'
 import type { ExerciseWithDetails, ExerciseInsert, ExerciseBlockInsert } from '@/types'
 
 export function Exercises() {
@@ -18,30 +19,22 @@ export function Exercises() {
     updateExercise,
     deleteExercise,
     uploadImage,
-    getAllTags
   } = useExercises()
+
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedTags,
+    toggleTag,
+    clearTags,
+    allTags,
+    filteredExercises,
+  } = useFilteredExercises(exercises)
 
   const [showForm, setShowForm] = useState(false)
   const [editingExercise, setEditingExercise] = useState<ExerciseWithDetails | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<ExerciseWithDetails | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-
-  const allTags = getAllTags()
-
-  const filteredExercises = exercises.filter(ex => {
-    const matchesSearch = !searchQuery ||
-      ex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ex.description?.toLowerCase().includes(searchQuery.toLowerCase())
-
-    const matchesTags = selectedTags.length === 0 ||
-      selectedTags.every(tag =>
-        ex.tags?.some(t => t.tag === tag)
-      )
-
-    return matchesSearch && matchesTags
-  })
 
   const handleCreate = async (
     data: ExerciseInsert,
@@ -126,14 +119,6 @@ export function Exercises() {
     setEditingExercise(null)
   }
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    )
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -190,7 +175,7 @@ export function Exercises() {
                   variant="ghost"
                   size="sm"
                   className="h-6 text-xs"
-                  onClick={() => setSelectedTags([])}
+                  onClick={clearTags}
                 >
                   Rimuovi filtri
                 </Button>

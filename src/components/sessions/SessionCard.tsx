@@ -2,6 +2,7 @@ import { Calendar, User, Building2, Edit2, Trash2, ChevronRight } from 'lucide-r
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { formatDate } from '@/lib/utils'
 import type { SessionWithDetails } from '@/types'
 
 interface SessionCardProps {
@@ -9,16 +10,6 @@ interface SessionCardProps {
   onEdit: (session: SessionWithDetails) => void
   onDelete: (session: SessionWithDetails) => void
   onView: (session: SessionWithDetails) => void
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('it-IT', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
 }
 
 export function SessionCard({ session, onEdit, onDelete, onView }: SessionCardProps) {
@@ -43,7 +34,7 @@ export function SessionCard({ session, onEdit, onDelete, onView }: SessionCardPr
             {/* Date */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-3 w-3" />
-              <span>{formatDate(session.session_date)}</span>
+              <span>{formatDate(session.session_date, 'short')}</span>
             </div>
 
             {/* Gym */}

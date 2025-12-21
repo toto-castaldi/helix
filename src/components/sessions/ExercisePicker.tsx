@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react'
 import { Search, Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useFilteredExercises } from '@/hooks/useFilteredExercises'
 import type { ExerciseWithDetails } from '@/types'
 
 interface ExercisePickerProps {
@@ -13,39 +13,15 @@ interface ExercisePickerProps {
 }
 
 export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerProps) {
-  const [search, setSearch] = useState('')
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-
-  const allTags = useMemo(() => {
-    const tagSet = new Set<string>()
-    exercises.forEach(ex => {
-      ex.tags?.forEach(t => tagSet.add(t.tag))
-    })
-    return Array.from(tagSet).sort()
-  }, [exercises])
-
-  const filteredExercises = useMemo(() => {
-    return exercises.filter(ex => {
-      const matchesSearch = !search.trim() ||
-        ex.name.toLowerCase().includes(search.toLowerCase()) ||
-        ex.description?.toLowerCase().includes(search.toLowerCase())
-
-      const matchesTags = selectedTags.length === 0 ||
-        selectedTags.every(tag =>
-          ex.tags?.some(t => t.tag === tag)
-        )
-
-      return matchesSearch && matchesTags
-    })
-  }, [exercises, search, selectedTags])
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    )
-  }
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedTags,
+    toggleTag,
+    clearTags,
+    allTags,
+    filteredExercises,
+  } = useFilteredExercises(exercises)
 
   return (
     <Card className="absolute inset-x-0 top-0 z-50 mx-4 mt-4 max-h-[80vh] overflow-hidden flex flex-col shadow-lg">
@@ -60,8 +36,8 @@ export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerP
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Cerca esercizio..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
             autoFocus
           />
@@ -83,7 +59,7 @@ export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerP
                 variant="ghost"
                 size="sm"
                 className="h-6 text-xs"
-                onClick={() => setSelectedTags([])}
+                onClick={clearTags}
               >
                 Rimuovi filtri
               </Button>

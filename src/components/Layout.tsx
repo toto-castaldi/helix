@@ -11,7 +11,7 @@ export function Layout() {
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-bold">Fitness Coach</h1>
+          <h1 className="text-lg font-bold">Fitness Coach Assistant</h1>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground hidden sm:inline">
               {user?.email}

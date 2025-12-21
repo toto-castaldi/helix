@@ -12,17 +12,8 @@ import { useSessions } from '@/hooks/useSessions'
 import { useClients } from '@/hooks/useClients'
 import { useGyms } from '@/hooks/useGyms'
 import { useExercises } from '@/hooks/useExercises'
+import { formatDate } from '@/lib/utils'
 import type { SessionWithDetails, SessionInsert, SessionExerciseUpdate, SessionExerciseWithDetails, ExerciseWithDetails } from '@/types'
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('it-IT', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 
 export function SessionDetail() {
   const { id } = useParams<{ id: string }>()

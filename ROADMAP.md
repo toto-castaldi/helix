@@ -33,7 +33,7 @@
 
 ---
 
-## Milestone 2: Sessioni
+## Milestone 2: Sessioni ✅
 
 ### 2.1 Database
 
