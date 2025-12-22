@@ -78,6 +78,26 @@ Il coach autenticato ha una pagina di configurazione accessibile da menù in alt
 Gestisce chiavi API OpenAI e Antrophic.
 Gestisce logout.
 
+## Versioning
+
+La versione dell'app viene generata automaticamente ad ogni push su main.
+
+### Formato versione
+
+`YYYY.MM.DD.HHMM` (es: 2025.12.22.1648)
+
+### Dove viene mostrata
+
+- **Menu utente**: nel dropdown in alto a destra, voce "Versione X.X.X.X"
+- **README.md**: aggiornato automaticamente dalla GitHub Action
+
+### Meccanismo
+
+1. La GitHub Action genera la versione basata su timestamp UTC
+2. Aggiorna README.md con la nuova versione
+3. Committa con `[skip ci]` per evitare loop
+4. Passa `VITE_APP_VERSION` al build
+
 
 ## Stato Attuale
 

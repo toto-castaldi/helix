@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { Users, Dumbbell, CalendarDays, Building2, LogOut, Settings, User } from 'lucide-react'
+import { Users, Dumbbell, CalendarDays, Building2, LogOut, Settings, User, Info } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
+
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'dev'
 
 export function Layout() {
   const { user, signOut } = useAuth()
@@ -63,6 +65,10 @@ export function Layout() {
                   <Settings className="h-4 w-4" />
                   Impostazioni
                 </button>
+                <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground border-t">
+                  <Info className="h-4 w-4" />
+                  <span>Versione {APP_VERSION}</span>
+                </div>
                 <button
                   onClick={handleSignOut}
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent text-left text-destructive"

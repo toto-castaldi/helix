@@ -12,6 +12,31 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate version
+        id: version
+        run: |
+          VERSION=$(date -u +'%Y.%m.%d.%H%M')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
+
+      - name: Update README with version
+        run: |
+          sed -i 's/\*\*Versione:\*\* .*/\*\*Versione:\*\* ${{ steps.version.outputs.version }}/' README.md
+          if ! grep -q "Versione:" README.md; then
+            echo "" >> README.md
+            echo "**Versione:** ${{ steps.version.outputs.version }}" >> README.md
+          fi
+
+      - name: Commit version update
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git diff --staged --quiet || git commit -m "chore: update version to ${{ steps.version.outputs.version }} [skip ci]"
+          git push || true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,6 +52,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_APP_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@v5.1.0
