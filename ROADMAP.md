@@ -190,7 +190,10 @@ Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat co
 
 - [X] Devops: GitHub Action per deploy Edge Functions
 - [X] Devops: Push automatico migrazioni (da valutare)
+- [ ] UI : la creazione/modifica di una sessione non ha il tasto di salvataggio come in tutte le altre pagine 
 
 # Idee
 
 - [ ] AI : introdurre nuovi provider e modelli per la pianificazione AI
+- [ ] Clienti : storico peso
+- [ ] Clienti : altezza
