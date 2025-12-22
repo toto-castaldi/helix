@@ -182,7 +182,71 @@ Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat co
 
 ---
 
-## Milestone 4: Live Coaching
+## Milestone 4: Progressive Web App
+
+Obiettivo: Trasformare l'applicazione in una PWA installabile su Android con supporto offline.
+
+### 4.1 Setup Plugin PWA
+
+- [x] Installare `vite-plugin-pwa`
+- [x] Configurare `vite.config.ts` con VitePWA plugin
+- [x] Configurare strategia di caching (NetworkFirst per API, CacheFirst per assets)
+
+### 4.2 Web App Manifest
+
+- [x] Configurare manifest in VitePWA:
+  - Nome: "Fitness Coach Assistant"
+  - Short name: "FCA"
+  - Theme color e background color
+  - Display: standalone
+  - Orientation: portrait
+  - Start URL e scope
+
+### 4.3 Icone PWA
+
+- [x] Generare icone da `icon-256.ico` (upscalate):
+  - 192x192 (Android standard)
+  - 512x512 (Android standard)
+  - 512x512 maskable
+- [x] Generare favicon.ico
+
+### 4.4 Meta Tag e HTML
+
+- [x] Aggiornare `index.html`:
+  - Title: "Fitness Coach Assistant"
+  - Meta description
+  - Meta theme-color
+
+### 4.5 Service Worker e Caching
+
+- [x] Configurare Workbox precaching per assets statici
+- [x] Configurare runtime caching per API Supabase:
+  - Auth: NetworkOnly
+  - Data API: NetworkFirst con fallback cache
+  - Storage (immagini): CacheFirst
+- [x] Gestire aggiornamento service worker con prompt utente (`PWAUpdatePrompt.tsx`)
+
+### 4.6 Offline Support
+
+- [x] Mostrare indicatore stato connessione (`OfflineIndicator.tsx`)
+- [x] Cache dati essenziali (clienti, sessioni giorno, esercizi) - gestito da Workbox runtime caching
+
+### 4.7 Installazione PWA
+
+- [x] Creare componente `InstallPrompt.tsx`
+- [x] Gestire evento `beforeinstallprompt`
+- [x] Salvare stato installazione in localStorage
+
+### 4.8 Test & Build
+
+- [x] Verificare build senza errori
+- [ ] Testare installazione su Android (Chrome)
+- [ ] Verificare Lighthouse PWA score >= 90
+- [ ] Testare funzionamento offline
+
+---
+
+## Milestone 5: Live Coaching
 
 ---
 
@@ -197,3 +261,4 @@ Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat co
 - [ ] AI : introdurre nuovi provider e modelli per la pianificazione AI
 - [ ] Clienti : storico peso
 - [ ] Clienti : altezza
+- [ ] Sessioni : export in markdown di una sessione in modo avere fallback durante allenamento 

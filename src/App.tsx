@@ -10,27 +10,35 @@ import { Sessions } from '@/pages/Sessions'
 import { SessionDetail } from '@/pages/SessionDetail'
 import { Planning } from '@/pages/Planning'
 import { Settings } from '@/pages/Settings'
+import { InstallPrompt } from '@/components/pwa/InstallPrompt'
+import { OfflineIndicator } from '@/components/pwa/OfflineIndicator'
+import { PWAUpdatePrompt } from '@/components/pwa/PWAUpdatePrompt'
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthGuard>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Exercises />} />
-            <Route path="/clients" element={<Clients />} />
-            <Route path="/clients/:id" element={<ClientDetail />} />
-            <Route path="/gyms" element={<Gyms />} />
-            <Route path="/exercise/:id" element={<ExerciseDetail />} />
-            <Route path="/sessions" element={<Sessions />} />
-            <Route path="/sessions/:id" element={<SessionDetail />} />
-            <Route path="/planning" element={<Planning />} />
-            <Route path="/planning/:clientId" element={<Planning />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-        </Routes>
-      </AuthGuard>
-    </BrowserRouter>
+    <>
+      <OfflineIndicator />
+      <BrowserRouter>
+        <AuthGuard>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Exercises />} />
+              <Route path="/clients" element={<Clients />} />
+              <Route path="/clients/:id" element={<ClientDetail />} />
+              <Route path="/gyms" element={<Gyms />} />
+              <Route path="/exercise/:id" element={<ExerciseDetail />} />
+              <Route path="/sessions" element={<Sessions />} />
+              <Route path="/sessions/:id" element={<SessionDetail />} />
+              <Route path="/planning" element={<Planning />} />
+              <Route path="/planning/:clientId" element={<Planning />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+          </Routes>
+        </AuthGuard>
+      </BrowserRouter>
+      <InstallPrompt />
+      <PWAUpdatePrompt />
+    </>
   )
 }
 

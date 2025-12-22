@@ -2,7 +2,7 @@
 
 ## Vision
 
-Applicazione mobile-first per fitness coach che gestiscono più clienti contemporaneamente in palestra. Il coach pianifica gli allenamenti con supporto AI e li esegue in tempo reale, modificando esercizi al volo in base alle performance del cliente.
+Applicazione mobile-first e PWA per fitness coach che gestiscono più clienti contemporaneamente in palestra. Il coach pianifica gli allenamenti con supporto AI e li esegue in tempo reale, modificando esercizi al volo in base alle performance del cliente.
 
 ## Concetti chiavi
 
@@ -164,19 +164,44 @@ FINE LEZIONE
 
 ---
 
+## Progressive Web App
+
+L'applicazione è disponibile come PWA installabile su dispositivi Android.
+
+### Piattaforma Target
+
+- **Android** (Chrome): installazione nativa tramite prompt automatico
+- Browser desktop: utilizzo via web standard
+
+### Assets
+
+- Icona base: `icon-256.ico` (nella root del progetto, upscalata per 512x512)
+- Icone generate: 192x192, 512x512 (standard + maskable)
+
+### Funzionalità PWA
+
+- Installazione da browser Chrome su Android
+- Caching offline per consultazione dati
+- Aggiornamento automatico service worker
+
+---
+
 ## Note Tecniche
 
 ### Mobile-First
+
 - Touch-friendly: bottoni grandi, swipe gestures
-- Offline-capable: localStorage per recovery
+- Offline-capable: service worker con Workbox
 - Fast: minimal re-renders, ottimizzazione liste
 
 ### Performance
+
 - Lazy loading pagine
 - Virtualizzazione liste lunghe
 - Debounce modifiche frequenti
 
 ### Sicurezza
+
 - RLS su tutte le nuove tabelle
 - Validazione input con Zod
 - Rate limiting su Edge Functions AI
