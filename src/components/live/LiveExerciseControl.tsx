@@ -57,6 +57,13 @@ export function LiveExerciseControl({
           {exercise.exercise?.name}
         </h3>
 
+        {/* Notes - if present */}
+        {exercise.notes && (
+          <p className="text-sm text-muted-foreground text-center italic bg-muted/50 rounded-md p-2">
+            {exercise.notes}
+          </p>
+        )}
+
         {/* Controls grid */}
         <div className="grid grid-cols-2 gap-4">
           {/* Sets */}

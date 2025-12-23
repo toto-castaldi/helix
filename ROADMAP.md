@@ -320,4 +320,7 @@ Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durant
 - [ ] AI : introdurre nuovi provider e modelli per la pianificazione AI
 - [ ] Clienti : storico peso
 - [ ] Clienti : altezza
-- [ ] Sessioni : export in markdown di una sessione in modo avere fallback durante allenamento 
+- [ ] Sessioni : export in markdown di una sessione in modo avere fallback durante allenamento
+- [ ] Clienti : Età clienti non obbligatoria
+- [x] UI : Cambia ordine dei tasti in basso. Esercizi, Palestre, Clienti e Sessioni
+- [x] UI : Tasto 'live' in alto nella sezione 'sessioni'

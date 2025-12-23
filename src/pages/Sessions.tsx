@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, X, Sparkles } from 'lucide-react'
+import { Plus, X, Sparkles, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { SessionForm } from '@/components/sessions/SessionForm'
@@ -58,6 +58,10 @@ export function Sessions() {
         <h1 className="text-2xl font-bold">Sessioni</h1>
         {!showForm && (
           <div className="flex gap-2">
+            <Button size="sm" variant="default" onClick={() => navigate('/live')}>
+              <Play className="h-4 w-4 mr-2" />
+              Live
+            </Button>
             <Button size="sm" variant="outline" onClick={() => navigate('/planning')}>
               <Sparkles className="h-4 w-4 mr-2" />
               Pianifica AI

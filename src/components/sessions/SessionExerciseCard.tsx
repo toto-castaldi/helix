@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import type { SessionExerciseWithDetails, SessionExerciseUpdate } from '@/types'
 
 interface SessionExerciseCardProps {
@@ -229,6 +230,17 @@ export function SessionExerciseCard({
                 = {formatDuration(exercise.duration_seconds)}
               </p>
             )}
+
+            {/* Notes */}
+            <div className="space-y-1">
+              <Label className="text-xs">Note</Label>
+              <Textarea
+                placeholder="es: focus sulla fase eccentrica..."
+                value={exercise.notes || ''}
+                onChange={(e) => onUpdate(exercise.id, { notes: e.target.value || null })}
+                className="min-h-[60px] text-sm"
+              />
+            </div>
           </div>
 
           {/* Remove button */}

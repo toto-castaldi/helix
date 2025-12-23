@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { Users, Dumbbell, CalendarDays, Building2, LogOut, Settings, User, Info, Play } from 'lucide-react'
+import { Users, Dumbbell, CalendarDays, Building2, LogOut, Settings, User, Info } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
@@ -103,6 +103,18 @@ export function Layout() {
             <span>Esercizi</span>
           </NavLink>
           <NavLink
+            to="/gyms"
+            className={({ isActive }) =>
+              cn(
+                "flex flex-col items-center gap-1 px-3 py-2 text-xs",
+                isActive ? "text-primary" : "text-muted-foreground"
+              )
+            }
+          >
+            <Building2 className="h-5 w-5" />
+            <span>Palestre</span>
+          </NavLink>
+          <NavLink
             to="/clients"
             className={({ isActive }) =>
               cn(
@@ -125,30 +137,6 @@ export function Layout() {
           >
             <CalendarDays className="h-5 w-5" />
             <span>Sessioni</span>
-          </NavLink>
-          <NavLink
-            to="/live"
-            className={({ isActive }) =>
-              cn(
-                "flex flex-col items-center gap-1 px-3 py-2 text-xs",
-                isActive ? "text-primary" : "text-muted-foreground"
-              )
-            }
-          >
-            <Play className="h-5 w-5" />
-            <span>Live</span>
-          </NavLink>
-          <NavLink
-            to="/gyms"
-            className={({ isActive }) =>
-              cn(
-                "flex flex-col items-center gap-1 px-3 py-2 text-xs",
-                isActive ? "text-primary" : "text-muted-foreground"
-              )
-            }
-          >
-            <Building2 className="h-5 w-5" />
-            <span>Palestre</span>
           </NavLink>
         </div>
       </nav>
