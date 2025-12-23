@@ -94,6 +94,8 @@ export function SessionDetail() {
         weight_kg: null,
         duration_seconds: null,
         notes: null,
+        completed: false,
+        completed_at: null,
         exercise: exercise,
       }
 

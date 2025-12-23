@@ -27,6 +27,10 @@ Le sessioni di allenamento possono essere anche inserite manualmente visto che i
 In generale il coach ha pieno controllo delle sessioni tramite un CRUD.
 Una sessione è legata ad un cliente, una palestra ad ha una data. Contiene una serie di esercizi e uno stato (da svolgere o svolta).
 
+Una sessione può avere due stati :
+pianificata
+completa
+
 Esempio di sessione : 
 Cliente : Mario Rossi
 Data : 20 Dicembre 2025
@@ -130,18 +134,17 @@ La versione dell'app viene generata automaticamente ad ogni push su main.
 
 ### Obiettivo
 
-Permettere al coach di gestire più clienti contemporaneamente durante una sessione in palestra, con pianificazione AI e modifica esercizi in tempo reale.
+Permettere al coach di gestire più clienti contemporaneamente durante una sessione in palestra. Il coach dice che esercizio fare di volta in volta e può modifica in tempo reale la sessione (per esempio il cliente NON riesce a finire una serie allora il coach cambia peso o numero ripetizioni).
 
 ### Flusso Utente
 
 ```
-PRIMA DELLA LEZIONE
-├── Seleziona clienti per la nuova sessione
-├── tramite chat con LLM (l'applicazione è configurata per usare ChatGPT o Claud tramite API) si crea nuova sessione basandoci su : storico sessioni precenti + scheda cliente + obiettivo
-└── una volta concordata la lezione viene creata una nuova sessione
+INIZIO LEZIONE
+├── Seleziona data di allenamento
+└── i clienti che hanno in quella data una sessione pianificata vengono selezionate
 
 DURANTE LA LEZIONE
-├── Dashboard con tutti i clienti che hanno una sessione di allenamento programmata
+├── Dashboard con tutti i clienti selezionati al passo precedente
 ├── Per ogni cliente:
 │   ├── Visualizza esercizio corrente + prossimo
 │   ├── Modifica al volo (reps/serie/peso)
@@ -149,7 +152,7 @@ DURANTE LA LEZIONE
 └── Cambio rapido tra clienti (swipe/tap)
 
 FINE LEZIONE
-└── La sessione cambia stato, da pianifica a eseguita
+└── Le sessioni dei clienti cambiano stato da pianifica a eseguito
 ```
 
 #### Vista Cliente Singolo

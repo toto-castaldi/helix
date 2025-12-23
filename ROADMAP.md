@@ -37,7 +37,7 @@
 
 ### 2.1 Database
 
-- [x] Migration `006_sessions.sql`:
+- [x] Migration :
   - Tabella `sessions` (id, client_id, gym_id, session_date, status, notes, created_at, updated_at)
   - Tabella `session_exercises` (id, session_id, exercise_id, order_index, sets, reps, weight_kg, duration_seconds, notes)
   - RLS policies per entrambe le tabelle
@@ -80,7 +80,7 @@ Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat co
 
 ### 3.1 Database
 
-- [x] Migration `007_ai_planning.sql`:
+- [x] Migration :
   - Tabella `ai_conversations` (id, user_id, client_id, created_at, updated_at)
   - Tabella `ai_messages` (id, conversation_id, role, content, created_at)
   - Tabella `ai_generated_plans` (id, conversation_id, session_id, plan_json, accepted, created_at)
@@ -154,7 +154,7 @@ Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat co
 
 ### 3.8 Configurazione AI per Coach
 
-- [x] Migration `008_coach_ai_settings.sql`:
+- [x] Migration :
   - Tabella `coach_ai_settings` (user_id, openai_api_key, anthropic_api_key, preferred_provider, preferred_model)
   - RLS policies
 - [x] Creare `useAISettings.ts` hook per CRUD settings
@@ -172,7 +172,7 @@ Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat co
 ### 3.9 Test & Build
 
 - [x] Verificare build senza errori
-- [x] Applicare migration `007_ai_planning.sql`
+- [x] Applicare migration 
 - [x] Deploy Edge Function `ai-chat`
 - [X] Test manuale flusso completo:
   - [X] Selezione cliente
@@ -240,21 +240,80 @@ Obiettivo: Trasformare l'applicazione in una PWA installabile su Android con sup
 ### 4.8 Test & Build
 
 - [x] Verificare build senza errori
-- [ ] Testare installazione su Android (Chrome)
-- [ ] Verificare Lighthouse PWA score >= 90
-- [ ] Testare funzionamento offline
+- [X] Testare installazione su Android (Chrome)
 
 ---
 
 ## Milestone 5: Live Coaching
 
+Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durante una sessione in palestra, modificando esercizi al volo in base alle performance.
+
+### 5.1 Database
+
+- [x] Migration `00000000000001_live_coaching.sql`:
+  - Aggiungere a `session_exercises`: campo `completed` (boolean DEFAULT false), `completed_at` (timestamp)
+  - Aggiungere a `sessions`: campo `current_exercise_index` (integer DEFAULT 0)
+  - Indici per performance su campi completed
+
+### 5.2 Types
+
+- [x] Aggiungere/estendere tipi TypeScript:
+  - Estendere `SessionExercise` con `completed`, `completed_at`
+  - Estendere `Session` con `current_exercise_index`
+
+### 5.3 Hook
+
+- [x] Creare `useLiveCoaching.ts` con:
+  - `fetchSessionsForDate(date)` - fetch sessioni pianificate per una data
+  - `getCurrentExercise/getNextExercise` - esercizio corrente e prossimo
+  - `completeExercise(sessionId, exerciseId)` - segna completato e avanza
+  - `skipExercise(sessionId)` - salta senza completare
+  - `updateExerciseOnTheFly(sessionId, exerciseId, updates)` - modifica al volo
+  - `finishSession(sessionId)` - cambia stato da planned a completed
+  - `finishAllSessions()` - completa tutte le sessioni
+
+### 5.4 Componenti
+
+- [x] `LiveDashboard.tsx` - Dashboard multi-cliente con swipe
+- [x] `LiveClientCard.tsx` - Card cliente con esercizio corrente, prossimo e progress
+- [x] `LiveExerciseControl.tsx` - Controlli inline (serie, reps, peso, durata) con Completa/Salta
+
+### 5.5 Pagine
+
+- [x] `LiveCoaching.tsx` - Pagina principale:
+  - Step 1: Selezione data → mostra clienti con sessioni pianificate
+  - Step 2: Dashboard live → gestione multi-cliente
+  - Step 3: Fine lezione → riepilogo e conferma
+- [x] Aggiungere route `/live` in App.tsx
+- [x] Aggiungere bottone "Live" in Layout.tsx (bottom nav)
+
+### 5.6 UX Mobile
+
+- [x] Swipe orizzontale per cambio cliente
+- [x] Indicatori cliente (dots)
+- [x] Bottoni grandi per azioni principali
+- [x] Animazioni fluide transizione tra clienti
+
+### 5.7 Test & Build
+
+- [x] Verificare build senza errori
+- [x] Applicare migration `00000000000001_live_coaching.sql`
+- [x] Test manuale flusso completo:
+  - [x] Selezione data
+  - [x] Visualizzazione clienti con sessioni pianificate
+  - [x] Modifica esercizi al volo
+  - [x] Completamento esercizi
+  - [x] Cambio cliente swipe
+  - [x] Fine sessione e cambio stato
+
 ---
 
 ## Debiti tecnici
 
-- [X] Devops: GitHub Action per deploy Edge Functions
-- [X] Devops: Push automatico migrazioni (da valutare)
-- [ ] UI : la creazione/modifica di una sessione non ha il tasto di salvataggio come in tutte le altre pagine 
+- [x] Devops: GitHub Action per deploy Edge Functions
+- [x] Devops: Push automatico migrazioni (da valutare)
+- [ ] UI : la creazione/modifica di una sessione non ha il tasto di salvataggio come in tutte le altre pagine
+- [ ] PWA : funziona offline da ripulire 
 
 # Idee
 

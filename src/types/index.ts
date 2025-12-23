@@ -107,6 +107,7 @@ export interface Session {
   session_date: string
   status: SessionStatus
   notes: string | null
+  current_exercise_index: number
   created_at: string
   updated_at: string
 }
@@ -119,7 +120,9 @@ export interface SessionInsert {
   notes?: string | null
 }
 
-export interface SessionUpdate extends Partial<Omit<SessionInsert, 'client_id'>> {}
+export interface SessionUpdate extends Partial<Omit<SessionInsert, 'client_id'>> {
+  current_exercise_index?: number
+}
 
 export interface SessionExercise {
   id: string
@@ -131,6 +134,8 @@ export interface SessionExercise {
   weight_kg: number | null
   duration_seconds: number | null
   notes: string | null
+  completed: boolean
+  completed_at: string | null
 }
 
 export interface SessionExerciseInsert {
@@ -144,7 +149,10 @@ export interface SessionExerciseInsert {
   notes?: string | null
 }
 
-export interface SessionExerciseUpdate extends Partial<Omit<SessionExerciseInsert, 'session_id' | 'exercise_id'>> {}
+export interface SessionExerciseUpdate extends Partial<Omit<SessionExerciseInsert, 'session_id' | 'exercise_id'>> {
+  completed?: boolean
+  completed_at?: string | null
+}
 
 export interface SessionExerciseWithDetails extends SessionExercise {
   exercise?: Exercise

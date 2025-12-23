@@ -99,8 +99,8 @@ Tables:
 - `exercise_blocks` - Step-by-step exercise instructions with images
 - `exercise_tags` - Exercise categorization tags
 - `gyms` - Coach's gyms (name, address, description)
-- `sessions` - Training sessions (client_id, gym_id, session_date, status: planned/completed)
-- `session_exercises` - Exercises in a session (exercise_id, order_index, sets, reps, weight_kg, duration_seconds)
+- `sessions` - Training sessions (client_id, gym_id, session_date, status: planned/completed, current_exercise_index)
+- `session_exercises` - Exercises in a session (exercise_id, order_index, sets, reps, weight_kg, duration_seconds, completed, completed_at)
 - `ai_conversations` - AI chat sessions (user_id, client_id, title)
 - `ai_messages` - Messages in AI conversations (conversation_id, role, content)
 - `ai_generated_plans` - AI-generated training plans (conversation_id, session_id, plan_json, accepted)

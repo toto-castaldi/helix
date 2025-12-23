@@ -9,6 +9,7 @@ import { ExerciseDetail } from '@/pages/ExerciseDetail'
 import { Sessions } from '@/pages/Sessions'
 import { SessionDetail } from '@/pages/SessionDetail'
 import { Planning } from '@/pages/Planning'
+import { LiveCoaching } from '@/pages/LiveCoaching'
 import { Settings } from '@/pages/Settings'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
 import { OfflineIndicator } from '@/components/pwa/OfflineIndicator'
@@ -31,6 +32,7 @@ function App() {
               <Route path="/sessions/:id" element={<SessionDetail />} />
               <Route path="/planning" element={<Planning />} />
               <Route path="/planning/:clientId" element={<Planning />} />
+              <Route path="/live" element={<LiveCoaching />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Routes>
