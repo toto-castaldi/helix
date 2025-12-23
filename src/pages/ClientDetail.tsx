@@ -208,10 +208,12 @@ export function ClientDetail() {
               <User className="h-6 w-6 text-primary" />
             </div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span>{displayAge} anni</span>
-              </div>
+              {displayAge && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span>{displayAge} anni</span>
+                </div>
+              )}
               {client.physical_notes && (
                 <div className="flex items-start gap-2 text-sm text-muted-foreground mt-2">
                   <FileText className="h-4 w-4 mt-0.5 shrink-0" />

@@ -56,10 +56,12 @@ export function ClientCard({ client, onEdit, onDelete }: ClientCardProps) {
               <h3 className="font-semibold">
                 {client.last_name} {client.first_name}
               </h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-3 w-3" />
-                <span>{displayAge} anni</span>
-              </div>
+              {displayAge && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  <span>{displayAge} anni</span>
+                </div>
+              )}
               {client.current_goal && (
                 <p className="text-sm text-primary mt-1 line-clamp-1">
                   {client.current_goal}

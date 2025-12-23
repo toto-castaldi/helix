@@ -14,12 +14,6 @@ const clientSchema = z.object({
   age_years: z.string().optional(),
   physical_notes: z.string().optional(),
 }).refine(
-  (data) => data.birth_date || data.age_years,
-  {
-    message: 'Inserisci data di nascita o età',
-    path: ['birth_date'],
-  }
-).refine(
   (data) => !data.age_years || (parseInt(data.age_years) > 0 && parseInt(data.age_years) <= 120),
   {
     message: 'Età non valida',

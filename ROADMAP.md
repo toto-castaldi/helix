@@ -321,7 +321,7 @@ Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durant
 - [ ] Clienti : storico peso
 - [ ] Clienti : altezza
 - [ ] Sessioni : export in markdown di una sessione in modo avere fallback durante allenamento
-- [ ] Clienti : Età clienti non obbligatoria
+- [x] Clienti : Età clienti non obbligatoria
 - [x] UI : Cambia ordine dei tasti in basso. Esercizi, Palestre, Clienti e Sessioni
 - [x] UI : Tasto 'live' in alto nella sezione 'sessioni'
 - [ ] Live : posso cancellare un esercizio da una sessione durante il live
