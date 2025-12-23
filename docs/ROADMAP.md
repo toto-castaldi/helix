@@ -326,3 +326,4 @@ Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durant
 - [x] UI : Tasto 'live' in alto nella sezione 'sessioni'
 - [ ] Live : posso cancellare un esercizio da una sessione durante il live
 - [ ] Live : posso aggiungere un esercizio durente il live
+- [ ] Clienti : Email, Telefono, Indirizzo

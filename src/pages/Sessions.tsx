@@ -54,7 +54,7 @@ export function Sessions() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <h1 className="text-2xl font-bold">Sessioni</h1>
         {!showForm && (
           <div className="flex gap-2">
