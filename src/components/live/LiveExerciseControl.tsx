@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import type { SessionExerciseWithDetails, SessionExerciseUpdate } from '@/types'
 
 interface LiveExerciseControlProps {
@@ -57,12 +58,13 @@ export function LiveExerciseControl({
           {exercise.exercise?.name}
         </h3>
 
-        {/* Notes - if present */}
-        {exercise.notes && (
-          <p className="text-sm text-muted-foreground text-center italic bg-muted/50 rounded-md p-2">
-            {exercise.notes}
-          </p>
-        )}
+        {/* Notes - editable */}
+        <Textarea
+          placeholder="Note per questo esercizio..."
+          value={exercise.notes || ''}
+          onChange={(e) => onUpdate({ notes: e.target.value || null })}
+          className="min-h-[50px] text-sm resize-none"
+        />
 
         {/* Controls grid */}
         <div className="grid grid-cols-2 gap-4">
