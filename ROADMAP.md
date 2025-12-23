@@ -74,7 +74,7 @@
 
 ---
 
-## Milestone 3: AI Planning
+## Milestone 3: AI Planning ✅
 
 Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat con LLM (ChatGPT o Claude), basandosi su storico sessioni, scheda cliente e obiettivo.
 
@@ -182,7 +182,7 @@ Obiettivo: Permettere al coach di creare sessioni di allenamento tramite chat co
 
 ---
 
-## Milestone 4: Progressive Web App
+## Milestone 4: Progressive Web App ✅
 
 Obiettivo: Trasformare l'applicazione in una PWA installabile su Android con supporto offline.
 
@@ -244,7 +244,7 @@ Obiettivo: Trasformare l'applicazione in una PWA installabile su Android con sup
 
 ---
 
-## Milestone 5: Live Coaching
+## Milestone 5: Live Coaching ✅
 
 Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durante una sessione in palestra, modificando esercizi al volo in base alle performance.
 

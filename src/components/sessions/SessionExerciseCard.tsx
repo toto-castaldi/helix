@@ -55,7 +55,7 @@ export function SessionExerciseCard({
   }
 
   return (
-    <Card>
+    <Card className={exercise.skipped ? 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800' : ''}>
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           {/* Move buttons */}
