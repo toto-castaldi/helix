@@ -2,22 +2,26 @@ import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { LiveClientCard } from './LiveClientCard'
-import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDetails } from '@/types'
+import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDetails, ExerciseWithDetails } from '@/types'
 
 interface LiveDashboardProps {
   sessions: SessionWithDetails[]
+  catalogExercises: ExerciseWithDetails[]
   getCurrentExercise: (sessionId: string) => SessionExerciseWithDetails | null
   isSessionComplete: (sessionId: string) => boolean
   onUpdateExercise: (sessionId: string, exerciseId: string, updates: SessionExerciseUpdate) => void
+  onChangeExercise: (sessionId: string, exerciseId: string, newExercise: ExerciseWithDetails) => void
   onCompleteExercise: (sessionId: string, exerciseId: string) => void
   onSkipExercise: (sessionId: string, exerciseId: string) => void
 }
 
 export function LiveDashboard({
   sessions,
+  catalogExercises,
   getCurrentExercise,
   isSessionComplete,
   onUpdateExercise,
+  onChangeExercise,
   onCompleteExercise,
   onSkipExercise,
 }: LiveDashboardProps) {
@@ -92,8 +96,12 @@ export function LiveDashboard({
         <LiveClientCard
           session={currentSession}
           isComplete={complete}
+          catalogExercises={catalogExercises}
           onUpdateExercise={(exerciseId, updates) =>
             onUpdateExercise(currentSession.id, exerciseId, updates)
+          }
+          onChangeExercise={(exerciseId, newExercise) =>
+            onChangeExercise(currentSession.id, exerciseId, newExercise)
           }
           onCompleteExercise={() =>
             exercise && onCompleteExercise(currentSession.id, exercise.id)

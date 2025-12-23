@@ -1,14 +1,18 @@
-import { Minus, Plus, Check, SkipForward } from 'lucide-react'
+import { useState } from 'react'
+import { Minus, Plus, Check, SkipForward, RefreshCw } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { SessionExerciseWithDetails, SessionExerciseUpdate } from '@/types'
+import { ExercisePicker } from '@/components/sessions/ExercisePicker'
+import type { SessionExerciseWithDetails, SessionExerciseUpdate, ExerciseWithDetails } from '@/types'
 
 interface LiveExerciseControlProps {
   exercise: SessionExerciseWithDetails
+  catalogExercises?: ExerciseWithDetails[]
   onUpdate: (updates: SessionExerciseUpdate) => void
+  onChangeExercise?: (newExercise: ExerciseWithDetails) => void
   onComplete: () => void
   onSkip: () => void
   hideActions?: boolean
@@ -16,11 +20,14 @@ interface LiveExerciseControlProps {
 
 export function LiveExerciseControl({
   exercise,
+  catalogExercises = [],
   onUpdate,
+  onChangeExercise,
   onComplete,
   onSkip,
   hideActions = false,
 }: LiveExerciseControlProps) {
+  const [showPicker, setShowPicker] = useState(false)
   const handleNumberChange = (
     field: 'sets' | 'reps' | 'weight_kg' | 'duration_seconds',
     delta: number
@@ -51,10 +58,20 @@ export function LiveExerciseControl({
   return (
     <Card className="border-2 border-primary">
       <CardContent className="p-4 space-y-4">
-        {/* Exercise name - large and prominent */}
-        <h3 className="text-xl font-bold text-center">
-          {exercise.exercise?.name}
-        </h3>
+        {/* Exercise name - clickable to change */}
+        <button
+          type="button"
+          onClick={() => onChangeExercise && setShowPicker(true)}
+          className={`w-full text-center ${onChangeExercise ? 'hover:text-primary transition-colors cursor-pointer group' : ''}`}
+          disabled={!onChangeExercise}
+        >
+          <h3 className="text-xl font-bold inline-flex items-center justify-center gap-2">
+            {exercise.exercise?.name}
+            {onChangeExercise && (
+              <RefreshCw className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            )}
+          </h3>
+        </button>
 
         {/* Notes - editable */}
         <Textarea
@@ -218,6 +235,18 @@ export function LiveExerciseControl({
               Completato
             </Button>
           </div>
+        )}
+
+        {/* Exercise Picker Modal */}
+        {showPicker && onChangeExercise && (
+          <ExercisePicker
+            exercises={catalogExercises}
+            onSelect={(newExercise) => {
+              onChangeExercise(newExercise)
+              setShowPicker(false)
+            }}
+            onClose={() => setShowPicker(false)}
+          />
         )}
       </CardContent>
     </Card>

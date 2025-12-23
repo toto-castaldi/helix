@@ -125,6 +125,24 @@ export function SessionDetail() {
     updateExercise(exerciseId, updates)
   }
 
+  // Change exercise to a different one from catalog
+  const handleChangeExercise = (exerciseId: string, newExercise: ExerciseWithDetails) => {
+    if (!session?.exercises) return
+
+    // Update local state immediately with new exercise
+    setSession({
+      ...session,
+      exercises: session.exercises.map(ex =>
+        ex.id === exerciseId
+          ? { ...ex, exercise_id: newExercise.id, exercise: newExercise }
+          : ex
+      ),
+    })
+
+    // Save to DB in background
+    updateExercise(exerciseId, { exercise_id: newExercise.id })
+  }
+
   // Optimistic update for remove
   const handleRemoveExercise = (exerciseId: string) => {
     if (!session?.exercises) return
@@ -312,7 +330,9 @@ export function SessionDetail() {
                 index={index}
                 isFirst={index === 0}
                 isLast={index === session.exercises!.length - 1}
+                catalogExercises={catalogExercises}
                 onUpdate={handleUpdateExercise}
+                onChangeExercise={handleChangeExercise}
                 onRemove={handleRemoveExercise}
                 onMoveUp={handleMoveUp}
                 onMoveDown={handleMoveDown}

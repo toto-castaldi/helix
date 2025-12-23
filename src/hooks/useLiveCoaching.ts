@@ -4,6 +4,7 @@ import type {
   SessionWithDetails,
   SessionExerciseUpdate,
   SessionExerciseWithDetails,
+  ExerciseWithDetails,
 } from '@/types'
 
 export function useLiveCoaching() {
@@ -72,6 +73,44 @@ export function useLiveCoaching() {
       const { error: updateError } = await supabase
         .from('session_exercises')
         .update(updates)
+        .eq('id', exerciseId)
+
+      if (updateError) {
+        setError(updateError.message)
+        return false
+      }
+
+      return true
+    },
+    []
+  )
+
+  // Change exercise to a different one from catalog (optimistic update)
+  const changeExercise = useCallback(
+    async (
+      sessionId: string,
+      exerciseId: string,
+      newExercise: ExerciseWithDetails
+    ): Promise<boolean> => {
+      // Optimistic update
+      setSessions((prev) =>
+        prev.map((session) =>
+          session.id === sessionId
+            ? {
+                ...session,
+                exercises: session.exercises?.map((ex) =>
+                  ex.id === exerciseId
+                    ? { ...ex, exercise_id: newExercise.id, exercise: newExercise }
+                    : ex
+                ),
+              }
+            : session
+        )
+      )
+
+      const { error: updateError } = await supabase
+        .from('session_exercises')
+        .update({ exercise_id: newExercise.id })
         .eq('id', exerciseId)
 
       if (updateError) {
@@ -378,6 +417,7 @@ export function useLiveCoaching() {
     error,
     fetchSessionsForDate,
     updateExerciseOnTheFly,
+    changeExercise,
     completeExercise,
     skipExercise,
     previousExercise,

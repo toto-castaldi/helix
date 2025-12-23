@@ -1,18 +1,22 @@
-import { ChevronUp, ChevronDown, Trash2, Minus, Plus } from 'lucide-react'
+import { useState } from 'react'
+import { ChevronUp, ChevronDown, Trash2, Minus, Plus, RefreshCw } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import type { SessionExerciseWithDetails, SessionExerciseUpdate } from '@/types'
+import { ExercisePicker } from './ExercisePicker'
+import type { SessionExerciseWithDetails, SessionExerciseUpdate, ExerciseWithDetails } from '@/types'
 
 interface SessionExerciseCardProps {
   exercise: SessionExerciseWithDetails
   index: number
   isFirst: boolean
   isLast: boolean
+  catalogExercises: ExerciseWithDetails[]
   onUpdate: (id: string, updates: SessionExerciseUpdate) => void
+  onChangeExercise: (id: string, newExercise: ExerciseWithDetails) => void
   onRemove: (id: string) => void
   onMoveUp: (id: string) => void
   onMoveDown: (id: string) => void
@@ -23,11 +27,14 @@ export function SessionExerciseCard({
   index,
   isFirst,
   isLast,
+  catalogExercises,
   onUpdate,
+  onChangeExercise,
   onRemove,
   onMoveUp,
   onMoveDown,
 }: SessionExerciseCardProps) {
+  const [showPicker, setShowPicker] = useState(false)
   const handleNumberChange = (
     field: 'sets' | 'reps' | 'weight_kg' | 'duration_seconds',
     delta: number
@@ -89,8 +96,15 @@ export function SessionExerciseCard({
 
           {/* Content */}
           <div className="flex-1 space-y-3">
-            {/* Exercise name */}
-            <h4 className="font-semibold">{exercise.exercise?.name}</h4>
+            {/* Exercise name - clickable to change */}
+            <button
+              type="button"
+              onClick={() => setShowPicker(true)}
+              className="flex items-center gap-2 text-left hover:text-primary transition-colors group"
+            >
+              <h4 className="font-semibold">{exercise.exercise?.name}</h4>
+              <RefreshCw className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
 
             {/* Controls grid */}
             <div className="grid grid-cols-2 gap-3">
@@ -265,6 +279,18 @@ export function SessionExerciseCard({
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
         </div>
+
+        {/* Exercise Picker Modal */}
+        {showPicker && (
+          <ExercisePicker
+            exercises={catalogExercises}
+            onSelect={(newExercise) => {
+              onChangeExercise(exercise.id, newExercise)
+              setShowPicker(false)
+            }}
+            onClose={() => setShowPicker(false)}
+          />
+        )}
       </CardContent>
     </Card>
   )

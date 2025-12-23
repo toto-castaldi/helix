@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LiveDashboard } from '@/components/live'
 import { useLiveCoaching } from '@/hooks/useLiveCoaching'
+import { useExercises } from '@/hooks/useExercises'
 
 type Step = 'select-date' | 'live' | 'summary'
 
@@ -24,12 +25,15 @@ export function LiveCoaching() {
     error,
     fetchSessionsForDate,
     updateExerciseOnTheFly,
+    changeExercise,
     completeExercise,
     skipExercise,
     replanSession,
     getCurrentExercise,
     isSessionComplete,
   } = useLiveCoaching()
+
+  const { exercises: catalogExercises } = useExercises()
 
   // Fetch sessions when date changes
   useEffect(() => {
@@ -215,9 +219,11 @@ export function LiveCoaching() {
           <LiveDashboard
             key={selectedDate}
             sessions={liveSessions}
+            catalogExercises={catalogExercises}
             getCurrentExercise={getCurrentExercise}
             isSessionComplete={isSessionComplete}
             onUpdateExercise={updateExerciseOnTheFly}
+            onChangeExercise={changeExercise}
             onCompleteExercise={completeExercise}
             onSkipExercise={skipExercise}
           />

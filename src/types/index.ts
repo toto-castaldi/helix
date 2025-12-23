@@ -150,7 +150,7 @@ export interface SessionExerciseInsert {
   notes?: string | null
 }
 
-export interface SessionExerciseUpdate extends Partial<Omit<SessionExerciseInsert, 'session_id' | 'exercise_id'>> {
+export interface SessionExerciseUpdate extends Partial<Omit<SessionExerciseInsert, 'session_id'>> {
   completed?: boolean
   completed_at?: string | null
   skipped?: boolean

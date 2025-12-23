@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { LiveExerciseControl } from './LiveExerciseControl'
-import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDetails } from '@/types'
+import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDetails, ExerciseWithDetails } from '@/types'
 
 interface LiveClientCardProps {
   session: SessionWithDetails
   isComplete: boolean
+  catalogExercises: ExerciseWithDetails[]
   onUpdateExercise: (exerciseId: string, updates: SessionExerciseUpdate) => void
+  onChangeExercise: (exerciseId: string, newExercise: ExerciseWithDetails) => void
   onCompleteExercise: () => void
   onSkipExercise: (exerciseId: string) => void
 }
@@ -17,7 +19,9 @@ interface LiveClientCardProps {
 export function LiveClientCard({
   session,
   isComplete,
+  catalogExercises,
   onUpdateExercise,
+  onChangeExercise,
   onCompleteExercise,
   onSkipExercise,
 }: LiveClientCardProps) {
@@ -89,7 +93,9 @@ export function LiveClientCard({
                     /* Current exercise - full controls */
                     <LiveExerciseControl
                       exercise={exercise}
+                      catalogExercises={catalogExercises}
                       onUpdate={(updates) => onUpdateExercise(exercise.id, updates)}
+                      onChangeExercise={(newExercise) => onChangeExercise(exercise.id, newExercise)}
                       onComplete={onCompleteExercise}
                       onSkip={() => onSkipExercise(exercise.id)}
                     />
@@ -121,7 +127,9 @@ export function LiveClientCard({
                       <div className="p-3">
                         <LiveExerciseControl
                           exercise={exercise}
+                          catalogExercises={catalogExercises}
                           onUpdate={(updates) => onUpdateExercise(exercise.id, updates)}
+                          onChangeExercise={(newExercise) => onChangeExercise(exercise.id, newExercise)}
                           onComplete={() => setExpandedExerciseId(null)}
                           onSkip={() => setExpandedExerciseId(null)}
                           hideActions
