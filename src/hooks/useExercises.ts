@@ -38,10 +38,10 @@ export function useExercises() {
       return
     }
 
-    // Fetch blocks and tags for all exercises
+    // Fetch blocks, tags and session references for all exercises
     const exerciseIds = exercisesData.map(e => e.id)
 
-    const [blocksResult, tagsResult] = await Promise.all([
+    const [blocksResult, tagsResult, sessionsResult] = await Promise.all([
       supabase
         .from('exercise_blocks')
         .select('*')
@@ -50,11 +50,16 @@ export function useExercises() {
       supabase
         .from('exercise_tags')
         .select('*')
+        .in('exercise_id', exerciseIds),
+      supabase
+        .from('session_exercises')
+        .select('exercise_id')
         .in('exercise_id', exerciseIds)
     ])
 
     const blocksMap = new Map<string, typeof blocksResult.data>()
     const tagsMap = new Map<string, typeof tagsResult.data>()
+    const sessionsCountMap = new Map<string, number>()
 
     blocksResult.data?.forEach(block => {
       const existing = blocksMap.get(block.exercise_id) || []
@@ -66,10 +71,16 @@ export function useExercises() {
       tagsMap.set(tag.exercise_id, [...existing, tag])
     })
 
+    sessionsResult.data?.forEach(ref => {
+      const count = sessionsCountMap.get(ref.exercise_id) || 0
+      sessionsCountMap.set(ref.exercise_id, count + 1)
+    })
+
     const exercisesWithDetails: ExerciseWithDetails[] = exercisesData.map(exercise => ({
       ...exercise,
       blocks: blocksMap.get(exercise.id) || [],
-      tags: tagsMap.get(exercise.id) || []
+      tags: tagsMap.get(exercise.id) || [],
+      sessionsCount: sessionsCountMap.get(exercise.id) || 0
     }))
 
     setExercises(exercisesWithDetails)

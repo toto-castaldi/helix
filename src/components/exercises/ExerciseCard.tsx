@@ -94,13 +94,15 @@ export function ExerciseCard({ exercise, onEdit, onDelete, onClick }: ExerciseCa
             >
               <Edit2 className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDeleteClick}
-            >
-              <Trash2 className="h-4 w-4 text-destructive" />
-            </Button>
+            {!exercise.sessionsCount && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleDeleteClick}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            )}
           </div>
         </div>
 

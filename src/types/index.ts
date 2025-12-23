@@ -80,6 +80,7 @@ export interface ExerciseUpdate extends Partial<ExerciseInsert> {}
 export interface ExerciseWithDetails extends Exercise {
   blocks?: ExerciseBlock[]
   tags?: ExerciseTag[]
+  sessionsCount?: number
 }
 
 export interface Gym {
