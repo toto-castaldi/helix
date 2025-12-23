@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Plus, X, Sparkles, Play } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Plus, X, Sparkles, Play, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { SessionForm } from '@/components/sessions/SessionForm'
@@ -12,6 +12,9 @@ import type { SessionInsert, SessionWithDetails } from '@/types'
 
 export function Sessions() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const exerciseFilter = searchParams.get('exercise')
+
   const { sessions, loading, error, createSession, deleteSession } = useSessions()
   const { clients } = useClients()
   const { gyms } = useGyms()
@@ -19,6 +22,28 @@ export function Sessions() {
   const [showForm, setShowForm] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<SessionWithDetails | null>(null)
+
+  // Filter sessions by exercise if query param is present
+  const filteredSessions = useMemo(() => {
+    if (!exerciseFilter) return sessions
+    return sessions.filter(session =>
+      session.exercises?.some(ex => ex.exercise_id === exerciseFilter)
+    )
+  }, [sessions, exerciseFilter])
+
+  // Get exercise name for filter display
+  const filterExerciseName = useMemo(() => {
+    if (!exerciseFilter || filteredSessions.length === 0) return null
+    for (const session of filteredSessions) {
+      const ex = session.exercises?.find(e => e.exercise_id === exerciseFilter)
+      if (ex?.exercise?.name) return ex.exercise.name
+    }
+    return null
+  }, [exerciseFilter, filteredSessions])
+
+  const clearFilter = () => {
+    setSearchParams({})
+  }
 
   const handleCreate = async (data: SessionInsert) => {
     setIsSubmitting(true)
@@ -69,6 +94,17 @@ export function Sessions() {
             <Button size="sm" onClick={() => setShowForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Nuova
+            </Button>
+          </div>
+        )}
+        {exerciseFilter && (
+          <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm flex-1">
+              Filtro: <strong>{filterExerciseName || 'esercizio'}</strong>
+            </span>
+            <Button size="sm" variant="ghost" onClick={clearFilter}>
+              <X className="h-4 w-4" />
             </Button>
           </div>
         )}
@@ -133,13 +169,19 @@ export function Sessions() {
       {/* Session List */}
       {!showForm && (
         <div className="space-y-3">
-          {sessions.length === 0 ? (
+          {filteredSessions.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <p>Nessuna sessione ancora.</p>
-              <p className="text-sm">Crea la tua prima sessione per iniziare.</p>
+              {exerciseFilter ? (
+                <p>Nessuna sessione con questo esercizio.</p>
+              ) : (
+                <>
+                  <p>Nessuna sessione ancora.</p>
+                  <p className="text-sm">Crea la tua prima sessione per iniziare.</p>
+                </>
+              )}
             </div>
           ) : (
-            sessions.map((session) => (
+            filteredSessions.map((session) => (
               <SessionCard
                 key={session.id}
                 session={session}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Calendar } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -94,6 +94,15 @@ export function ExerciseDetail() {
           ))}
         </div>
       )}
+
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => navigate(`/sessions?exercise=${id}`)}
+      >
+        <Calendar className="h-4 w-4 mr-2" />
+        Vedi sessioni con questo esercizio
+      </Button>
 
       {exercise.blocks && exercise.blocks.length > 0 ? (
         <div className="space-y-4">

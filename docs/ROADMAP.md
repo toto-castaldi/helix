@@ -319,7 +319,9 @@ Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durant
 - [x] UI : Tasto 'live' in alto nella sezione 'sessioni'
 - [x] Devops : Backup db prima di ogni deploy
 - [x] Clienti : Mostra prima nome e poi cognome (in lista)
-- [x] Clienti : specificare se Maschio o femmina e va in contesto per AI
+- [x] Clienti : specificare se Maschio o femmina e va in contesto 
+per AI
+- [x] Esercizi : da dettaglio esercizio, vedi sessioni che lo usano
 - [ ] UI : la creazione/modifica di una sessione non ha il tasto di salvataggio come in tutte le altre pagine
 - [ ] PWA : funziona offline da ripulire 
 - [ ] AI : introdurre nuovi provider e modelli per la pianificazione AI
@@ -331,4 +333,5 @@ Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durant
 - [ ] Clienti : Email, Telefono, Indirizzo
 - [ ] Live : Durante live posso vedere come è fatto un esercizio
 - [ ] UI : Gli esercizi sono tanti. Interfaccia migliorata con scroll
-- [ ] Sessioni : filro per cliente
+- [ ] Sessioni : filtro per cliente
+- [ ] Esercizi : se un tag non ha più referenze (al salvataggio faccio controllo), viene eliminato

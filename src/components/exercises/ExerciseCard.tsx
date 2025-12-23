@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Dumbbell, Edit2, Trash2, Tag, Image } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -14,10 +15,16 @@ interface ExerciseCardProps {
 }
 
 export function ExerciseCard({ exercise, onEdit, onDelete, onClick }: ExerciseCardProps) {
+  const navigate = useNavigate()
   const titleRef = useRef<HTMLHeadingElement>(null)
 
   const handleCardClick = () => {
     onClick?.(exercise)
+  }
+
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    navigate(`/sessions?exercise=${exercise.id}`)
   }
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -50,7 +57,11 @@ export function ExerciseCard({ exercise, onEdit, onDelete, onClick }: ExerciseCa
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="rounded-full bg-primary/10 p-2">
+            <div
+              className="rounded-full bg-primary/10 p-2 cursor-pointer hover:bg-primary/20 active:bg-primary/30 transition-colors"
+              onClick={handleIconClick}
+              title="Vedi sessioni con questo esercizio"
+            >
               <Dumbbell className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
