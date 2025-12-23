@@ -26,8 +26,6 @@ export function LiveCoaching() {
     updateExerciseOnTheFly,
     completeExercise,
     skipExercise,
-    finishSession,
-    finishAllSessions,
     replanSession,
     getCurrentExercise,
     isSessionComplete,
@@ -50,11 +48,6 @@ export function LiveCoaching() {
       }
       setStep('live')
     }
-  }
-
-  const handleFinishAll = async () => {
-    await finishAllSessions()
-    setStep('summary')
   }
 
   const handleBackToSessions = () => {
@@ -183,11 +176,19 @@ export function LiveCoaching() {
 
   // Step 2: Live Dashboard
   if (step === 'live') {
-    const activeSessions = sessions.filter((s) => s.status === 'planned')
+    // Show all sessions (both planned and just-completed during this live session)
+    const liveSessions = sessions
 
-    // If all sessions completed during live, go directly to summary
-    if (activeSessions.length === 0) {
+    // If ALL sessions are completed, go to summary
+    const allCompleted = liveSessions.length > 0 && liveSessions.every((s) => s.status === 'completed')
+    if (allCompleted) {
       setStep('summary')
+      return null
+    }
+
+    // If no sessions at all, go back to select
+    if (liveSessions.length === 0) {
+      setStep('select-date')
       return null
     }
 
@@ -206,22 +207,19 @@ export function LiveCoaching() {
               month: 'short',
             })}
           </h1>
-          <Button size="sm" variant="outline" onClick={handleFinishAll}>
-            Termina Tutto
-          </Button>
+          <div className="w-16" /> {/* Spacer for alignment */}
         </div>
 
         {/* Dashboard */}
         <div className="flex-1 overflow-hidden">
           <LiveDashboard
             key={selectedDate}
-            sessions={activeSessions}
+            sessions={liveSessions}
             getCurrentExercise={getCurrentExercise}
             isSessionComplete={isSessionComplete}
             onUpdateExercise={updateExerciseOnTheFly}
             onCompleteExercise={completeExercise}
             onSkipExercise={skipExercise}
-            onFinishSession={finishSession}
           />
         </div>
       </div>

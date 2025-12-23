@@ -85,12 +85,15 @@ export function useLiveCoaching() {
   )
 
   // Complete exercise and advance to next (optimistic update)
+  // Auto-completes session if this was the last exercise
   const completeExercise = useCallback(
     async (sessionId: string, exerciseId: string): Promise<boolean> => {
       const session = sessions.find((s) => s.id === sessionId)
       if (!session) return false
 
       const completedAt = new Date().toISOString()
+      const newIndex = session.current_exercise_index + 1
+      const isLastExercise = newIndex >= (session.exercises?.length || 0)
 
       // Optimistic update - mark exercise as completed
       setSessions((prev) =>
@@ -103,7 +106,8 @@ export function useLiveCoaching() {
                     ? { ...ex, completed: true, completed_at: completedAt }
                     : ex
                 ),
-                current_exercise_index: s.current_exercise_index + 1,
+                current_exercise_index: newIndex,
+                status: isLastExercise ? 'completed' as const : s.status,
               }
             : s
         )
@@ -120,10 +124,17 @@ export function useLiveCoaching() {
         return false
       }
 
-      // Update session current_exercise_index
+      // Update session current_exercise_index (and status if last exercise)
+      const sessionUpdate: { current_exercise_index: number; status?: string } = {
+        current_exercise_index: newIndex,
+      }
+      if (isLastExercise) {
+        sessionUpdate.status = 'completed'
+      }
+
       const { error: sessionError } = await supabase
         .from('sessions')
-        .update({ current_exercise_index: session.current_exercise_index + 1 })
+        .update(sessionUpdate)
         .eq('id', sessionId)
 
       if (sessionError) {
@@ -137,23 +148,39 @@ export function useLiveCoaching() {
   )
 
   // Skip exercise without completing (just advance index)
+  // Auto-completes session if this was the last exercise
   const skipExercise = useCallback(
     async (sessionId: string): Promise<boolean> => {
       const session = sessions.find((s) => s.id === sessionId)
       if (!session) return false
 
+      const newIndex = session.current_exercise_index + 1
+      const isLastExercise = newIndex >= (session.exercises?.length || 0)
+
       // Optimistic update
       setSessions((prev) =>
         prev.map((s) =>
           s.id === sessionId
-            ? { ...s, current_exercise_index: s.current_exercise_index + 1 }
+            ? {
+                ...s,
+                current_exercise_index: newIndex,
+                status: isLastExercise ? 'completed' as const : s.status,
+              }
             : s
         )
       )
 
+      // Update session current_exercise_index (and status if last exercise)
+      const sessionUpdate: { current_exercise_index: number; status?: string } = {
+        current_exercise_index: newIndex,
+      }
+      if (isLastExercise) {
+        sessionUpdate.status = 'completed'
+      }
+
       const { error: updateError } = await supabase
         .from('sessions')
-        .update({ current_exercise_index: session.current_exercise_index + 1 })
+        .update(sessionUpdate)
         .eq('id', sessionId)
 
       if (updateError) {

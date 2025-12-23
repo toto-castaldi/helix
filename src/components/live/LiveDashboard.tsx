@@ -11,7 +11,6 @@ interface LiveDashboardProps {
   onUpdateExercise: (sessionId: string, exerciseId: string, updates: SessionExerciseUpdate) => void
   onCompleteExercise: (sessionId: string, exerciseId: string) => void
   onSkipExercise: (sessionId: string) => void
-  onFinishSession: (sessionId: string) => void
 }
 
 export function LiveDashboard({
@@ -21,7 +20,6 @@ export function LiveDashboard({
   onUpdateExercise,
   onCompleteExercise,
   onSkipExercise,
-  onFinishSession,
 }: LiveDashboardProps) {
   const [currentClientIndex, setCurrentClientIndex] = useState(0)
 
@@ -101,7 +99,6 @@ export function LiveDashboard({
             exercise && onCompleteExercise(currentSession.id, exercise.id)
           }
           onSkipExercise={() => onSkipExercise(currentSession.id)}
-          onFinishSession={() => onFinishSession(currentSession.id)}
         />
       </div>
     </div>

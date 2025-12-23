@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react'
-import { CheckCircle2, Circle } from 'lucide-react'
+import { CheckCircle2, Circle, SkipForward } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { LiveExerciseControl } from './LiveExerciseControl'
 import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDetails } from '@/types'
@@ -12,7 +11,6 @@ interface LiveClientCardProps {
   onUpdateExercise: (updates: SessionExerciseUpdate) => void
   onCompleteExercise: () => void
   onSkipExercise: () => void
-  onFinishSession: () => void
 }
 
 export function LiveClientCard({
@@ -21,7 +19,6 @@ export function LiveClientCard({
   onUpdateExercise,
   onCompleteExercise,
   onSkipExercise,
-  onFinishSession,
 }: LiveClientCardProps) {
   const totalExercises = session.exercises?.length || 0
   const currentIndex = session.current_exercise_index
@@ -70,31 +67,14 @@ export function LiveClientCard({
       </CardHeader>
 
       <CardContent className="flex-1 overflow-y-auto pb-4">
-        {isComplete ? (
-          /* Session complete state */
-          <div className="flex flex-col items-center justify-center gap-4 text-center py-8">
-            <CheckCircle2 className="h-16 w-16 text-green-500" />
-            <div>
-              <h3 className="text-xl font-semibold">Sessione Completata!</h3>
-              <p className="text-muted-foreground">
-                Tutti gli esercizi sono stati eseguiti
-              </p>
-            </div>
-            <Button
-              size="lg"
-              onClick={onFinishSession}
-              className="mt-4"
-            >
-              Chiudi Sessione
-            </Button>
-          </div>
-        ) : session.exercises && session.exercises.length > 0 ? (
+        {session.exercises && session.exercises.length > 0 ? (
           /* Vertical list of all exercises */
           <div className="space-y-3">
             {session.exercises.map((exercise, index) => {
-              const isCurrent = index === currentIndex
-              const isCompleted = exercise.completed || index < currentIndex
-              const isFuture = index > currentIndex
+              const isCurrent = !isComplete && index === currentIndex
+              const isCompleted = exercise.completed
+              const isSkipped = !exercise.completed && index < currentIndex
+              const isFuture = index > currentIndex && !isComplete
 
               return (
                 <div
@@ -110,17 +90,21 @@ export function LiveClientCard({
                       onSkip={onSkipExercise}
                     />
                   ) : (
-                    /* Completed or future exercise - compact view */
+                    /* Completed, skipped, or future exercise - compact view */
                     <div
                       className={`rounded-lg p-3 flex items-center gap-3 ${
                         isCompleted
                           ? 'bg-green-50 dark:bg-green-950/30'
+                          : isSkipped
+                          ? 'bg-orange-50 dark:bg-orange-950/30'
                           : 'bg-muted/30'
                       }`}
                     >
                       {/* Status icon */}
                       {isCompleted ? (
                         <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      ) : isSkipped ? (
+                        <SkipForward className="h-5 w-5 text-orange-500 flex-shrink-0" />
                       ) : (
                         <Circle className="h-5 w-5 text-muted-foreground/50 flex-shrink-0" />
                       )}
@@ -129,6 +113,7 @@ export function LiveClientCard({
                       <div className="flex-1 min-w-0">
                         <p className={`font-medium truncate ${
                           isCompleted ? 'text-green-700 dark:text-green-400' :
+                          isSkipped ? 'text-orange-700 dark:text-orange-400' :
                           isFuture ? 'text-muted-foreground' : ''
                         }`}>
                           {exercise.exercise?.name}
