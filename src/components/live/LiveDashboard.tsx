@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { LiveClientCard } from './LiveClientCard'
@@ -7,90 +7,56 @@ import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDeta
 interface LiveDashboardProps {
   sessions: SessionWithDetails[]
   getCurrentExercise: (sessionId: string) => SessionExerciseWithDetails | null
-  getNextExercise: (sessionId: string) => SessionExerciseWithDetails | null
   isSessionComplete: (sessionId: string) => boolean
   onUpdateExercise: (sessionId: string, exerciseId: string, updates: SessionExerciseUpdate) => void
   onCompleteExercise: (sessionId: string, exerciseId: string) => void
   onSkipExercise: (sessionId: string) => void
-  onPreviousExercise: (sessionId: string) => void
   onFinishSession: (sessionId: string) => void
 }
 
 export function LiveDashboard({
   sessions,
   getCurrentExercise,
-  getNextExercise,
   isSessionComplete,
   onUpdateExercise,
   onCompleteExercise,
   onSkipExercise,
-  onPreviousExercise,
   onFinishSession,
 }: LiveDashboardProps) {
   const [currentClientIndex, setCurrentClientIndex] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const touchStartX = useRef<number | null>(null)
-  const touchEndX = useRef<number | null>(null)
 
-  const minSwipeDistance = 50
+  // Ensure index is within bounds
+  const safeIndex = Math.min(currentClientIndex, sessions.length - 1)
+  const currentSession = sessions[safeIndex]
 
-  // Handle touch events for swipe
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchEndX.current = null
-    touchStartX.current = e.targetTouches[0].clientX
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX
-  }
-
-  const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return
-
-    const distance = touchStartX.current - touchEndX.current
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
-
-    if (isLeftSwipe && currentClientIndex < sessions.length - 1) {
-      setCurrentClientIndex((prev) => prev + 1)
-    }
-    if (isRightSwipe && currentClientIndex > 0) {
-      setCurrentClientIndex((prev) => prev - 1)
-    }
-
-    touchStartX.current = null
-    touchEndX.current = null
-  }
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft' && currentClientIndex > 0) {
-        setCurrentClientIndex((prev) => prev - 1)
-      }
-      if (e.key === 'ArrowRight' && currentClientIndex < sessions.length - 1) {
-        setCurrentClientIndex((prev) => prev + 1)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentClientIndex, sessions.length])
-
-  const currentSession = sessions[currentClientIndex]
   if (!currentSession) return null
+
+  const exercise = getCurrentExercise(currentSession.id)
+  const complete = isSessionComplete(currentSession.id)
+
+  const goToPrevious = () => {
+    if (safeIndex > 0) {
+      setCurrentClientIndex(safeIndex - 1)
+    }
+  }
+
+  const goToNext = () => {
+    if (safeIndex < sessions.length - 1) {
+      setCurrentClientIndex(safeIndex + 1)
+    }
+  }
 
   return (
     <div className="h-full flex flex-col">
       {/* Client tabs/indicators */}
       {sessions.length > 1 && (
-        <div className="flex items-center justify-center gap-2 py-3 bg-muted/30">
+        <div className="flex items-center justify-center gap-2 py-3 bg-muted/30 flex-shrink-0">
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            disabled={currentClientIndex === 0}
-            onClick={() => setCurrentClientIndex((prev) => prev - 1)}
+            disabled={safeIndex === 0}
+            onClick={goToPrevious}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -101,10 +67,10 @@ export function LiveDashboard({
               <button
                 key={session.id}
                 onClick={() => setCurrentClientIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentClientIndex
+                className={`h-2 rounded-full transition-all ${
+                  index === safeIndex
                     ? 'bg-primary w-6'
-                    : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                    : 'bg-muted-foreground/30 hover:bg-muted-foreground/50 w-2'
                 }`}
                 title={`${session.client?.first_name} ${session.client?.last_name}`}
               />
@@ -115,63 +81,29 @@ export function LiveDashboard({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            disabled={currentClientIndex === sessions.length - 1}
-            onClick={() => setCurrentClientIndex((prev) => prev + 1)}
+            disabled={safeIndex === sessions.length - 1}
+            onClick={goToNext}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       )}
 
-      {/* Swipeable area */}
-      <div
-        ref={containerRef}
-        className="flex-1 overflow-hidden"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div
-          className="h-full flex transition-transform duration-300 ease-out"
-          style={{ transform: `translateX(-${currentClientIndex * 100}%)` }}
-        >
-          {sessions.map((session) => {
-            const exercise = getCurrentExercise(session.id)
-            const next = getNextExercise(session.id)
-            const complete = isSessionComplete(session.id)
-
-            return (
-              <div key={session.id} className="h-full w-full flex-shrink-0 p-4">
-                <LiveClientCard
-                  session={session}
-                  currentExercise={exercise}
-                  nextExercise={next}
-                  isComplete={complete}
-                  onUpdateExercise={(updates) =>
-                    exercise && onUpdateExercise(session.id, exercise.id, updates)
-                  }
-                  onCompleteExercise={() =>
-                    exercise && onCompleteExercise(session.id, exercise.id)
-                  }
-                  onSkipExercise={() => onSkipExercise(session.id)}
-                  onPreviousExercise={() => onPreviousExercise(session.id)}
-                  onFinishSession={() => onFinishSession(session.id)}
-                />
-              </div>
-            )
-          })}
-        </div>
+      {/* Current client card */}
+      <div className="flex-1 overflow-hidden p-4">
+        <LiveClientCard
+          session={currentSession}
+          isComplete={complete}
+          onUpdateExercise={(updates) =>
+            exercise && onUpdateExercise(currentSession.id, exercise.id, updates)
+          }
+          onCompleteExercise={() =>
+            exercise && onCompleteExercise(currentSession.id, exercise.id)
+          }
+          onSkipExercise={() => onSkipExercise(currentSession.id)}
+          onFinishSession={() => onFinishSession(currentSession.id)}
+        />
       </div>
-
-      {/* Client name bar */}
-      {sessions.length > 1 && (
-        <div className="text-center py-2 text-sm text-muted-foreground border-t">
-          {currentSession.client?.first_name} {currentSession.client?.last_name}
-          <span className="ml-2 text-xs">
-            ({currentClientIndex + 1}/{sessions.length})
-          </span>
-        </div>
-      )}
     </div>
   )
 }

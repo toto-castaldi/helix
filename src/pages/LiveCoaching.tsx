@@ -26,12 +26,10 @@ export function LiveCoaching() {
     updateExerciseOnTheFly,
     completeExercise,
     skipExercise,
-    previousExercise,
     finishSession,
     finishAllSessions,
     replanSession,
     getCurrentExercise,
-    getNextExercise,
     isSessionComplete,
   } = useLiveCoaching()
 
@@ -118,9 +116,9 @@ export function LiveCoaching() {
                   </span>
                 </div>
 
-                {/* Client list */}
+                {/* Client list - show planned first, then completed */}
                 <div className="space-y-2">
-                  {sessions.map((session) => (
+                  {[...plannedSessions, ...completedSessions].map((session, index) => (
                     <div
                       key={session.id}
                       className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
@@ -146,7 +144,7 @@ export function LiveCoaching() {
                         </Button>
                       ) : (
                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                          Pianificata
+                          {index + 1}° cliente
                         </span>
                       )}
                     </div>
@@ -216,14 +214,13 @@ export function LiveCoaching() {
         {/* Dashboard */}
         <div className="flex-1 overflow-hidden">
           <LiveDashboard
+            key={selectedDate}
             sessions={activeSessions}
             getCurrentExercise={getCurrentExercise}
-            getNextExercise={getNextExercise}
             isSessionComplete={isSessionComplete}
             onUpdateExercise={updateExerciseOnTheFly}
             onCompleteExercise={completeExercise}
             onSkipExercise={skipExercise}
-            onPreviousExercise={previousExercise}
             onFinishSession={finishSession}
           />
         </div>

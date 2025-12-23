@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { useRef, useEffect } from 'react'
+import { CheckCircle2, Circle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -7,30 +8,35 @@ import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDeta
 
 interface LiveClientCardProps {
   session: SessionWithDetails
-  currentExercise: SessionExerciseWithDetails | null
-  nextExercise: SessionExerciseWithDetails | null
   isComplete: boolean
   onUpdateExercise: (updates: SessionExerciseUpdate) => void
   onCompleteExercise: () => void
   onSkipExercise: () => void
-  onPreviousExercise: () => void
   onFinishSession: () => void
 }
 
 export function LiveClientCard({
   session,
-  currentExercise,
-  nextExercise,
   isComplete,
   onUpdateExercise,
   onCompleteExercise,
   onSkipExercise,
-  onPreviousExercise,
   onFinishSession,
 }: LiveClientCardProps) {
   const totalExercises = session.exercises?.length || 0
   const currentIndex = session.current_exercise_index
   const progressPercent = totalExercises > 0 ? (currentIndex / totalExercises) * 100 : 0
+  const currentExerciseRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to current exercise when index changes
+  useEffect(() => {
+    if (currentExerciseRef.current) {
+      currentExerciseRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }, [currentIndex])
 
   const formatExercisePreview = (exercise: SessionExerciseWithDetails): string => {
     const parts: string[] = []
@@ -47,7 +53,7 @@ export function LiveClientCard({
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 flex-shrink-0">
         {/* Client name */}
         <CardTitle className="text-xl">
           {session.client?.first_name} {session.client?.last_name}
@@ -63,10 +69,10 @@ export function LiveClientCard({
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col gap-4">
+      <CardContent className="flex-1 overflow-y-auto pb-4">
         {isComplete ? (
           /* Session complete state */
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center">
+          <div className="flex flex-col items-center justify-center gap-4 text-center py-8">
             <CheckCircle2 className="h-16 w-16 text-green-500" />
             <div>
               <h3 className="text-xl font-semibold">Sessione Completata!</h3>
@@ -82,57 +88,74 @@ export function LiveClientCard({
               Chiudi Sessione
             </Button>
           </div>
-        ) : currentExercise ? (
-          <>
-            {/* Current exercise controls */}
-            <LiveExerciseControl
-              exercise={currentExercise}
-              onUpdate={onUpdateExercise}
-              onComplete={onCompleteExercise}
-              onSkip={onSkipExercise}
-            />
+        ) : session.exercises && session.exercises.length > 0 ? (
+          /* Vertical list of all exercises */
+          <div className="space-y-3">
+            {session.exercises.map((exercise, index) => {
+              const isCurrent = index === currentIndex
+              const isCompleted = exercise.completed || index < currentIndex
+              const isFuture = index > currentIndex
 
-            {/* Next exercise preview */}
-            {nextExercise && (
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Prossimo
-                </p>
-                <p className="font-medium">{nextExercise.exercise?.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {formatExercisePreview(nextExercise)}
-                </p>
-              </div>
-            )}
+              return (
+                <div
+                  key={exercise.id}
+                  ref={isCurrent ? currentExerciseRef : null}
+                >
+                  {isCurrent ? (
+                    /* Current exercise - full controls */
+                    <LiveExerciseControl
+                      exercise={exercise}
+                      onUpdate={onUpdateExercise}
+                      onComplete={onCompleteExercise}
+                      onSkip={onSkipExercise}
+                    />
+                  ) : (
+                    /* Completed or future exercise - compact view */
+                    <div
+                      className={`rounded-lg p-3 flex items-center gap-3 ${
+                        isCompleted
+                          ? 'bg-green-50 dark:bg-green-950/30'
+                          : 'bg-muted/30'
+                      }`}
+                    >
+                      {/* Status icon */}
+                      {isCompleted ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-muted-foreground/50 flex-shrink-0" />
+                      )}
 
-            {/* Navigation between exercises */}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={currentIndex === 0}
-                onClick={onPreviousExercise}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Precedente
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                {currentIndex + 1} / {totalExercises}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={!nextExercise}
-                onClick={onSkipExercise}
-              >
-                Successivo
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </div>
-          </>
+                      {/* Exercise info */}
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium truncate ${
+                          isCompleted ? 'text-green-700 dark:text-green-400' :
+                          isFuture ? 'text-muted-foreground' : ''
+                        }`}>
+                          {exercise.exercise?.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatExercisePreview(exercise)}
+                        </p>
+                        {exercise.notes && (
+                          <p className="text-xs text-muted-foreground italic mt-1">
+                            {exercise.notes}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Index */}
+                      <span className="text-sm text-muted-foreground flex-shrink-0">
+                        {index + 1}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         ) : (
           /* No exercises state */
-          <div className="flex-1 flex items-center justify-center text-center text-muted-foreground">
+          <div className="flex-1 flex items-center justify-center text-center text-muted-foreground py-8">
             <p>Nessun esercizio in questa sessione</p>
           </div>
         )}
