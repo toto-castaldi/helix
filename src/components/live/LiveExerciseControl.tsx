@@ -45,10 +45,6 @@ export function LiveExerciseControl({
     return `${seconds}s`
   }
 
-  // Determine which fields to show based on exercise configuration
-  const hasWeight = exercise.weight_kg !== null && exercise.weight_kg !== undefined
-  const hasDuration = exercise.duration_seconds !== null && exercise.duration_seconds !== undefined
-  const hasSetsReps = (exercise.sets !== null || exercise.reps !== null)
 
   return (
     <Card className="border-2 border-primary">
@@ -133,76 +129,72 @@ export function LiveExerciseControl({
           </div>
 
           {/* Weight */}
-          {(hasWeight || hasSetsReps) && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Peso (kg)</Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-12 w-12"
-                  onClick={() => handleNumberChange('weight_kg', -0.5)}
-                >
-                  <Minus className="h-5 w-5" />
-                </Button>
-                <Input
-                  type="number"
-                  step="0.5"
-                  value={exercise.weight_kg || ''}
-                  onChange={(e) => handleInputChange('weight_kg', e.target.value)}
-                  className="h-12 text-center text-lg font-semibold"
-                  min="0"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-12 w-12"
-                  onClick={() => handleNumberChange('weight_kg', 0.5)}
-                >
-                  <Plus className="h-5 w-5" />
-                </Button>
-              </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Peso (kg)</Label>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-12 w-12"
+                onClick={() => handleNumberChange('weight_kg', -0.5)}
+              >
+                <Minus className="h-5 w-5" />
+              </Button>
+              <Input
+                type="number"
+                step="0.5"
+                value={exercise.weight_kg || ''}
+                onChange={(e) => handleInputChange('weight_kg', e.target.value)}
+                className="h-12 text-center text-lg font-semibold"
+                min="0"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-12 w-12"
+                onClick={() => handleNumberChange('weight_kg', 0.5)}
+              >
+                <Plus className="h-5 w-5" />
+              </Button>
             </div>
-          )}
+          </div>
 
           {/* Duration */}
-          {(hasDuration || !hasSetsReps) && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Durata {exercise.duration_seconds ? `(${formatDuration(exercise.duration_seconds)})` : ''}
-              </Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-12 w-12"
-                  onClick={() => handleNumberChange('duration_seconds', -10)}
-                >
-                  <Minus className="h-5 w-5" />
-                </Button>
-                <Input
-                  type="number"
-                  step="10"
-                  value={exercise.duration_seconds || ''}
-                  onChange={(e) => handleInputChange('duration_seconds', e.target.value)}
-                  className="h-12 text-center text-lg font-semibold"
-                  min="0"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-12 w-12"
-                  onClick={() => handleNumberChange('duration_seconds', 10)}
-                >
-                  <Plus className="h-5 w-5" />
-                </Button>
-              </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">
+              Durata {exercise.duration_seconds ? `(${formatDuration(exercise.duration_seconds)})` : ''}
+            </Label>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-12 w-12"
+                onClick={() => handleNumberChange('duration_seconds', -10)}
+              >
+                <Minus className="h-5 w-5" />
+              </Button>
+              <Input
+                type="number"
+                step="10"
+                value={exercise.duration_seconds || ''}
+                onChange={(e) => handleInputChange('duration_seconds', e.target.value)}
+                className="h-12 text-center text-lg font-semibold"
+                min="0"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-12 w-12"
+                onClick={() => handleNumberChange('duration_seconds', 10)}
+              >
+                <Plus className="h-5 w-5" />
+              </Button>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Action buttons */}
