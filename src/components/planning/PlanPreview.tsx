@@ -6,8 +6,8 @@ import type { TrainingPlan, Gym } from '@/types'
 
 interface PlanPreviewProps {
   plan: TrainingPlan
-  gyms: Gym[]
-  onAccept: (gymId?: string) => void
+  selectedGym: Gym | null
+  onAccept: () => void
   onReject: () => void
   onContinueChat: () => void
   loading?: boolean
@@ -15,21 +15,12 @@ interface PlanPreviewProps {
 
 export function PlanPreview({
   plan,
-  gyms,
+  selectedGym,
   onAccept,
   onReject,
   onContinueChat,
   loading,
 }: PlanPreviewProps) {
-  // Try to match gym by name
-  const matchedGym = plan.gym_name
-    ? gyms.find(g => g.name.toLowerCase() === plan.gym_name?.toLowerCase())
-    : null
-
-  const handleAccept = () => {
-    onAccept(matchedGym?.id)
-  }
-
   return (
     <Card className="border-primary/50 bg-primary/5">
       <CardHeader className="pb-2">
@@ -40,13 +31,10 @@ export function PlanPreview({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Gym */}
-        {plan.gym_name && (
+        {selectedGym && (
           <div className="flex items-center gap-2 text-sm">
             <Building2 className="h-4 w-4 text-muted-foreground" />
-            <span>{plan.gym_name}</span>
-            {!matchedGym && (
-              <span className="text-xs text-amber-600">(palestra non trovata)</span>
-            )}
+            <span>{selectedGym.name}</span>
           </div>
         )}
 
@@ -77,7 +65,7 @@ export function PlanPreview({
         {/* Actions */}
         <div className="flex flex-wrap gap-2 pt-2">
           <Button
-            onClick={handleAccept}
+            onClick={onAccept}
             disabled={loading}
             className="flex-1"
           >

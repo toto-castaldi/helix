@@ -11,21 +11,21 @@ import type { AIMessage, TrainingPlan, Client, Gym, CoachAISettings, AIProvider 
 
 interface AIChatInterfaceProps {
   client: Client
+  selectedGym: Gym | null
   messages: AIMessage[]
   currentPlan: TrainingPlan | null
-  gyms: Gym[]
   sending: boolean
   onSendMessage: (content: string, settings: CoachAISettings | null) => void
-  onAcceptPlan: (gymId?: string) => void
+  onAcceptPlan: () => void
   onRejectPlan: () => void
   onBack: () => void
 }
 
 export function AIChatInterface({
   client,
+  selectedGym,
   messages,
   currentPlan,
-  gyms,
   sending,
   onSendMessage,
   onAcceptPlan,
@@ -235,7 +235,7 @@ export function AIChatInterface({
         {currentPlan && (
           <PlanPreview
             plan={currentPlan}
-            gyms={gyms}
+            selectedGym={selectedGym}
             onAccept={onAcceptPlan}
             onReject={onRejectPlan}
             onContinueChat={handleContinueChat}
