@@ -74,6 +74,8 @@ interface SessionExercise {
 interface Gym {
   id: string
   name: string
+  address: string | null
+  description: string | null
 }
 
 interface Session {
@@ -118,19 +120,27 @@ function formatExerciseDetails(exercise: SessionExercise): string {
   return parts.length > 0 ? ` - ${parts.join(", ")}` : ""
 }
 
+interface GenerateClientCardOptions {
+  includeName?: boolean
+}
+
 function generateClientCard(
   client: Client,
   goals: GoalHistory[],
-  sessions: Session[]
+  sessions: Session[],
+  options: GenerateClientCardOptions = {}
 ): string {
+  const { includeName = true } = options
   const displayAge = client.birth_date
     ? calculateAge(client.birth_date)
     : client.age_years
 
   let md = ""
 
-  // Nome
-  md += `# ${client.first_name} ${client.last_name}\n\n`
+  // Nome (opzionale)
+  if (includeName) {
+    md += `# ${client.first_name} ${client.last_name}\n\n`
+  }
 
   // Dati anagrafici
   md += `## Dati Anagrafici\n\n`
@@ -175,7 +185,14 @@ function generateClientCard(
       const gymName = session.gym?.name || "Nessuna palestra"
 
       md += `### ${sessionDate} - ${status}\n\n`
-      md += `**Palestra**: ${gymName}\n\n`
+      md += `**Palestra**: ${gymName}\n`
+      if (session.gym?.address) {
+        md += `**Indirizzo**: ${session.gym.address}\n`
+      }
+      if (session.gym?.description) {
+        md += `**Dettagli**: ${session.gym.description}\n`
+      }
+      md += "\n"
 
       if (session.exercises && session.exercises.length > 0) {
         const sortedExercises = [...session.exercises].sort(
@@ -207,8 +224,15 @@ function generateClientCard(
   return md
 }
 
-function buildSystemPrompt(clientCard: string, exercises: string[], gyms: Array<{ id: string; name: string }>): string {
-  const gymList = gyms.map(g => g.name).join(", ") || "Nessuna palestra registrata"
+function buildSystemPrompt(clientCard: string, exercises: string[], gyms: Array<{ id: string; name: string; address: string | null; description: string | null }>): string {
+  const gymList = gyms.length > 0
+    ? gyms.map(g => {
+        let info = `- **${g.name}**`
+        if (g.address) info += ` - ${g.address}`
+        if (g.description) info += ` (${g.description})`
+        return info
+      }).join("\n")
+    : "Nessuna palestra registrata"
   const exerciseList = exercises.slice(0, 50).join(", ") // Limit to avoid token overflow
 
   return `Sei un assistente esperto per personal trainer e istruttori di pilates. Aiuti i coach a pianificare sessioni di allenamento per i loro clienti.
@@ -425,14 +449,15 @@ Deno.serve(async (req: Request) => {
     // Fetch available gyms
     const { data: gyms } = await supabase
       .from("gyms")
-      .select("id, name")
+      .select("id, name, address, description")
       .order("name")
 
-    // Generate client card markdown
+    // Generate client card markdown (senza nome per contesto AI)
     const clientCard = generateClientCard(
       client as Client,
       (goals || []) as GoalHistory[],
-      (sessions || []) as Session[]
+      (sessions || []) as Session[],
+      { includeName: false }
     )
 
     // Build system prompt with client card

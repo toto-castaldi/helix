@@ -121,10 +121,12 @@ Located in `supabase/functions/`:
 
 ### Client Card Format
 
-Both `ai-chat` and `client-export` generate the same markdown structure:
+Both `ai-chat` and `client-export` generate markdown with an `includeName` option:
+- `client-export`: includes name (for client card export)
+- `ai-chat`: excludes name (for AI context privacy)
 
 ```markdown
-# Nome Cognome
+# Nome Cognome  ← solo con includeName=true
 
 ## Dati Anagrafici
 - **Eta**: X anni
@@ -141,6 +143,8 @@ Both `ai-chat` and `client-export` generate the same markdown structure:
 ## Sessioni
 ### DD/MM/YYYY - Completata
 **Palestra**: Nome Palestra
+**Indirizzo**: Via Example 123
+**Dettagli**: Descrizione palestra
 
 1. ✓ Nome Esercizio - 3 serie, 12 reps, 10 kg
 2. X Nome Esercizio Saltato - 2 serie, 10 reps
@@ -148,6 +152,7 @@ Both `ai-chat` and `client-export` generate the same markdown structure:
 
 ### DD/MM/YYYY - Pianificata
 **Palestra**: Nome Palestra
+**Indirizzo**: Via Example 123
 
 1. Nome Esercizio - 3 serie, 12 reps, 10 kg
 ```

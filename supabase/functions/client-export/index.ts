@@ -41,6 +41,8 @@ interface SessionExercise {
 interface Gym {
   id: string
   name: string
+  address: string | null
+  description: string | null
 }
 
 interface Session {
@@ -89,20 +91,28 @@ function formatExerciseDetails(exercise: SessionExercise): string {
   return parts.length > 0 ? ` - ${parts.join(", ")}` : ""
 }
 
+interface GenerateMarkdownOptions {
+  includeName?: boolean
+}
+
 function generateMarkdown(
   client: Client,
   goals: GoalHistory[],
   sessions: Session[],
-  selectedGym: Gym | null
+  selectedGym: Gym | null,
+  options: GenerateMarkdownOptions = {}
 ): string {
+  const { includeName = true } = options
   const displayAge = client.birth_date
     ? calculateAge(client.birth_date)
     : client.age_years
 
   let md = ""
 
-  // Nome
-  md += `# ${client.first_name} ${client.last_name}\n\n`
+  // Nome (opzionale)
+  if (includeName) {
+    md += `# ${client.first_name} ${client.last_name}\n\n`
+  }
 
   // Dati anagrafici
   md += `## Dati Anagrafici\n\n`
@@ -147,7 +157,14 @@ function generateMarkdown(
       const gymName = session.gym?.name || "Nessuna palestra"
 
       md += `### ${sessionDate} - ${status}\n\n`
-      md += `**Palestra**: ${gymName}\n\n`
+      md += `**Palestra**: ${gymName}\n`
+      if (session.gym?.address) {
+        md += `**Indirizzo**: ${session.gym.address}\n`
+      }
+      if (session.gym?.description) {
+        md += `**Dettagli**: ${session.gym.description}\n`
+      }
+      md += "\n"
 
       if (session.exercises && session.exercises.length > 0) {
         const sortedExercises = [...session.exercises].sort(
