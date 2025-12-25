@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,13 @@ export function ExerciseFilterBar({
   searchPlaceholder = 'Cerca esercizi...',
   autoFocus = false,
 }: ExerciseFilterBarProps) {
+  const hasFilters = searchQuery.trim() || selectedTags.length > 0
+
+  const handleClearAll = () => {
+    onSearchChange('')
+    onClearTags()
+  }
+
   return (
     <div className="space-y-3">
       <div className="relative">
@@ -37,8 +44,19 @@ export function ExerciseFilterBar({
         />
       </div>
 
-      {allTags.length > 0 && (
+      {(allTags.length > 0 || hasFilters) && (
         <div className="flex flex-wrap gap-2">
+          {hasFilters && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="h-6 text-xs"
+              onClick={handleClearAll}
+            >
+              <X className="h-3 w-3 mr-1" />
+              Rimuovi filtri
+            </Button>
+          )}
           {allTags.map((tag) => (
             <Badge
               key={tag}
@@ -49,16 +67,6 @@ export function ExerciseFilterBar({
               {tag}
             </Badge>
           ))}
-          {selectedTags.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 text-xs"
-              onClick={onClearTags}
-            >
-              Rimuovi filtri
-            </Button>
-          )}
         </div>
       )}
     </div>

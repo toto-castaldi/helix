@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Dumbbell, Edit2, Trash2, Tag, Image } from 'lucide-react'
+import { Dumbbell, Edit2, Trash2, Image } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,9 +12,10 @@ interface ExerciseCardProps {
   onEdit: (exercise: ExerciseWithDetails) => void
   onDelete: (exercise: ExerciseWithDetails) => void
   onClick?: (exercise: ExerciseWithDetails) => void
+  onTagClick?: (tag: string) => void
 }
 
-export function ExerciseCard({ exercise, onEdit, onDelete, onClick }: ExerciseCardProps) {
+export function ExerciseCard({ exercise, onEdit, onDelete, onClick, onTagClick }: ExerciseCardProps) {
   const navigate = useNavigate()
   const titleRef = useRef<HTMLHeadingElement>(null)
 
@@ -47,7 +48,6 @@ export function ExerciseCard({ exercise, onEdit, onDelete, onClick }: ExerciseCa
   }
 
   const blocksCount = exercise.blocks?.length || 0
-  const tagsCount = exercise.tags?.length || 0
 
   return (
     <Card
@@ -75,12 +75,6 @@ export function ExerciseCard({ exercise, onEdit, onDelete, onClick }: ExerciseCa
                   <span className="flex items-center gap-1">
                     <Image className="h-3 w-3" />
                     {blocksCount} {blocksCount === 1 ? 'blocco' : 'blocchi'}
-                  </span>
-                )}
-                {tagsCount > 0 && (
-                  <span className="flex items-center gap-1">
-                    <Tag className="h-3 w-3" />
-                    {tagsCount}
                   </span>
                 )}
               </div>
@@ -115,7 +109,15 @@ export function ExerciseCard({ exercise, onEdit, onDelete, onClick }: ExerciseCa
         {exercise.tags && exercise.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {exercise.tags.slice(0, 5).map((tag) => (
-              <Badge key={tag.id} variant="secondary" className="text-xs">
+              <Badge
+                key={tag.id}
+                variant="secondary"
+                className={`text-xs ${onTagClick ? 'cursor-pointer hover:bg-secondary/80' : ''}`}
+                onClick={onTagClick ? (e) => {
+                  e.stopPropagation()
+                  onTagClick(tag.tag)
+                } : undefined}
+              >
                 {tag.tag}
               </Badge>
             ))}

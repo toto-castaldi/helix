@@ -241,6 +241,7 @@ export function Exercises() {
                 exercise={exercise}
                 onEdit={handleEdit}
                 onDelete={setDeleteConfirm}
+                onTagClick={toggleTag}
               />
             ))
           )}
