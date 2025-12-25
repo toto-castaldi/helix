@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Loader2, User, ArrowLeft, Settings } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Send, Loader2, User, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { AIMessageBubble } from './AIMessageBubble'
 import { PlanPreview } from './PlanPreview'
-import { AISettingsPanel } from './AISettingsPanel'
 import { useAISettings } from '@/hooks/useAISettings'
 import { AI_MODELS } from '@/types'
 import type { AIMessage, TrainingPlan, Client, Gym, CoachAISettings, AIProvider } from '@/types'
@@ -33,7 +33,6 @@ export function AIChatInterface({
   onBack,
 }: AIChatInterfaceProps) {
   const [input, setInput] = useState('')
-  const [showSettings, setShowSettings] = useState(false)
   const [selectedProvider, setSelectedProvider] = useState<AIProvider>('openai')
   const [selectedModel, setSelectedModel] = useState('gpt-4o')
   const [initialized, setInitialized] = useState(false)
@@ -120,11 +119,6 @@ export function AIChatInterface({
 
   return (
     <div className="flex flex-col h-full relative">
-      {/* Settings Panel */}
-      {showSettings && (
-        <AISettingsPanel onClose={() => setShowSettings(false)} />
-      )}
-
       {/* Header */}
       <div className="flex flex-col border-b bg-background sticky top-0 z-10">
         {/* Top row: back, client info, settings */}
@@ -147,14 +141,6 @@ export function AIChatInterface({
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setShowSettings(true)}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
         </div>
 
         {/* Bottom row: Provider and Model selectors */}
@@ -210,12 +196,9 @@ export function AIChatInterface({
           <p className="font-medium">API Key mancante</p>
           <p className="text-xs mt-1">
             Configura la tua API key per {selectedProvider === 'openai' ? 'OpenAI' : 'Anthropic'} nelle{' '}
-            <button
-              className="underline font-medium"
-              onClick={() => setShowSettings(true)}
-            >
+            <Link to="/settings" className="underline font-medium">
               impostazioni
-            </button>
+            </Link>
             .
           </p>
         </div>

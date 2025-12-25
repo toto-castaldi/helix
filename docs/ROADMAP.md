@@ -337,3 +337,4 @@ per AI
 - [ ] Esercizi : se un tag non ha più referenze (al salvataggio faccio controllo), viene eliminato
 - [ ] UI : premo su elimina esercizio e non vedo niente perchè è in alto alla lista
 - [ ] Palestre : rinforzare legame con sessioni e nascondere icona delete se referenziato
+- [ ] Sessioni : come caratteristica un esercizio può avere anche velocità e inclinazione (per es: tapis roultant)

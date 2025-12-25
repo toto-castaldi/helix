@@ -1,6 +1,5 @@
 import { Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ExerciseFilterBar } from '@/components/exercises/ExerciseFilterBar'
 import { useFilteredExercises } from '@/hooks/useFilteredExercises'
@@ -10,9 +9,10 @@ interface ExercisePickerProps {
   exercises: ExerciseWithDetails[]
   onSelect: (exercise: ExerciseWithDetails) => void
   onClose: () => void
+  title?: string
 }
 
-export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerProps) {
+export function ExercisePicker({ exercises, onSelect, onClose, title = 'Seleziona Esercizio' }: ExercisePickerProps) {
   const {
     searchQuery,
     setSearchQuery,
@@ -24,14 +24,14 @@ export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerP
   } = useFilteredExercises(exercises)
 
   return (
-    <Card className="absolute inset-x-0 top-0 z-50 mx-4 mt-4 max-h-[80vh] overflow-hidden flex flex-col shadow-lg">
-      <CardHeader className="pb-2 space-y-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Aggiungi Esercizio</CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h1 className="text-lg font-semibold">{title}</h1>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-5 w-5" />
+        </Button>
+      </div>
+      <div className="p-4 border-b">
         <ExerciseFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -42,8 +42,8 @@ export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerP
           searchPlaceholder="Cerca esercizio..."
           autoFocus
         />
-      </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto space-y-2 pb-4">
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {filteredExercises.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
             {exercises.length === 0
@@ -67,7 +67,15 @@ export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerP
                 {exercise.tags && exercise.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {exercise.tags.map((t) => (
-                      <Badge key={t.id} variant="secondary" className="text-xs">
+                      <Badge
+                        key={t.id}
+                        variant="secondary"
+                        className="text-xs cursor-pointer hover:bg-secondary/80"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleTag(t.tag)
+                        }}
+                      >
                         {t.tag}
                       </Badge>
                     ))}
@@ -78,7 +86,7 @@ export function ExercisePicker({ exercises, onSelect, onClose }: ExercisePickerP
             </div>
           ))
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
