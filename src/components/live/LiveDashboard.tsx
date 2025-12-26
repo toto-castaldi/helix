@@ -2,29 +2,27 @@ import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { LiveClientCard } from './LiveClientCard'
-import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDetails, ExerciseWithDetails } from '@/types'
+import type { SessionWithDetails, SessionExerciseUpdate, ExerciseWithDetails } from '@/types'
 
 interface LiveDashboardProps {
   sessions: SessionWithDetails[]
   catalogExercises: ExerciseWithDetails[]
-  getCurrentExercise: (sessionId: string) => SessionExerciseWithDetails | null
-  isSessionComplete: (sessionId: string) => boolean
   onUpdateExercise: (sessionId: string, exerciseId: string, updates: SessionExerciseUpdate) => void
   onChangeExercise: (sessionId: string, exerciseId: string, newExercise: ExerciseWithDetails) => void
   onCompleteExercise: (sessionId: string, exerciseId: string) => void
   onSkipExercise: (sessionId: string, exerciseId: string) => void
+  onSelectExercise: (sessionId: string, index: number) => void
   onAddExercise: (sessionId: string, exercise: ExerciseWithDetails) => void
 }
 
 export function LiveDashboard({
   sessions,
   catalogExercises,
-  getCurrentExercise,
-  isSessionComplete,
   onUpdateExercise,
   onChangeExercise,
   onCompleteExercise,
   onSkipExercise,
+  onSelectExercise,
   onAddExercise,
 }: LiveDashboardProps) {
   const [currentClientIndex, setCurrentClientIndex] = useState(0)
@@ -34,9 +32,6 @@ export function LiveDashboard({
   const currentSession = sessions[safeIndex]
 
   if (!currentSession) return null
-
-  const exercise = getCurrentExercise(currentSession.id)
-  const complete = isSessionComplete(currentSession.id)
 
   const goToPrevious = () => {
     if (safeIndex > 0) {
@@ -97,7 +92,6 @@ export function LiveDashboard({
       <div className="flex-1 overflow-hidden p-4">
         <LiveClientCard
           session={currentSession}
-          isComplete={complete}
           catalogExercises={catalogExercises}
           onUpdateExercise={(exerciseId, updates) =>
             onUpdateExercise(currentSession.id, exerciseId, updates)
@@ -105,10 +99,11 @@ export function LiveDashboard({
           onChangeExercise={(exerciseId, newExercise) =>
             onChangeExercise(currentSession.id, exerciseId, newExercise)
           }
-          onCompleteExercise={() =>
-            exercise && onCompleteExercise(currentSession.id, exercise.id)
+          onCompleteExercise={(exerciseId) =>
+            onCompleteExercise(currentSession.id, exerciseId)
           }
           onSkipExercise={(exerciseId) => onSkipExercise(currentSession.id, exerciseId)}
+          onSelectExercise={(index) => onSelectExercise(currentSession.id, index)}
           onAddExercise={(newExercise) => onAddExercise(currentSession.id, newExercise)}
         />
       </div>

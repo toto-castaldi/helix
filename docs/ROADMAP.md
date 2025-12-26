@@ -323,13 +323,12 @@ Obiettivo: Permettere al coach di gestire più clienti contemporaneamente durant
 per AI
 - [x] Esercizi : da dettaglio esercizio, vedi sessioni che lo usano
 - [x] export in markdown della scheda cliente in modo avere fallback durante allenamento
+- [x] Live : posso aggiungere un esercizio durente il live
 - [ ] UI : la creazione/modifica di una sessione non ha il tasto di salvataggio come in tutte le altre pagine
 - [ ] PWA : funziona offline da ripulire 
 - [ ] AI : introdurre nuovi provider e modelli per la pianificazione AI
 - [ ] Clienti : storico peso
 - [ ] Clienti : altezza
-- [ ] Live : posso cancellare un esercizio da una sessione durante il live
-- [ ] Live : posso aggiungere un esercizio durente il live
 - [ ] Clienti : Email, Telefono, Indirizzo
 - [ ] Live : Durante live posso vedere come è fatto un esercizio
 - [ ] UI : Gli esercizi sono tanti. Interfaccia migliorata con scroll

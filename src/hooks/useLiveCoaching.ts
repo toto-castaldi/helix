@@ -123,18 +123,56 @@ export function useLiveCoaching() {
     []
   )
 
+  // Select a specific exercise (change current_exercise_index)
+  const selectExercise = useCallback(
+    async (sessionId: string, index: number): Promise<boolean> => {
+      const session = sessions.find((s) => s.id === sessionId)
+      if (!session) return false
+
+      // Clamp index to valid range
+      const maxIndex = (session.exercises?.length || 1) - 1
+      const safeIndex = Math.max(0, Math.min(index, maxIndex))
+
+      // Optimistic update
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === sessionId ? { ...s, current_exercise_index: safeIndex } : s
+        )
+      )
+
+      const { error: updateError } = await supabase
+        .from('sessions')
+        .update({ current_exercise_index: safeIndex })
+        .eq('id', sessionId)
+
+      if (updateError) {
+        setError(updateError.message)
+        return false
+      }
+
+      return true
+    },
+    [sessions]
+  )
+
   // Complete exercise and advance to next (optimistic update)
-  // Auto-completes session if this was the last exercise
+  // Auto-completes session if ALL exercises are completed/skipped
   const completeExercise = useCallback(
     async (sessionId: string, exerciseId: string): Promise<boolean> => {
       const session = sessions.find((s) => s.id === sessionId)
       if (!session) return false
 
       const completedAt = new Date().toISOString()
-      const newIndex = session.current_exercise_index + 1
-      const isLastExercise = newIndex >= (session.exercises?.length || 0)
+      const currentIndex = session.current_exercise_index
+      const maxIndex = (session.exercises?.length || 1) - 1
+      const newIndex = Math.min(currentIndex + 1, maxIndex)
 
-      // Optimistic update - mark exercise as completed
+      // Check if ALL exercises will be completed/skipped after this update
+      const allDone = session.exercises?.every(
+        (ex) => ex.id === exerciseId || ex.completed || ex.skipped
+      )
+
+      // Optimistic update - mark exercise as completed (also clears skipped)
       setSessions((prev) =>
         prev.map((s) =>
           s.id === sessionId
@@ -142,20 +180,20 @@ export function useLiveCoaching() {
                 ...s,
                 exercises: s.exercises?.map((ex) =>
                   ex.id === exerciseId
-                    ? { ...ex, completed: true, completed_at: completedAt }
+                    ? { ...ex, completed: true, skipped: false, completed_at: completedAt }
                     : ex
                 ),
                 current_exercise_index: newIndex,
-                status: isLastExercise ? 'completed' as const : s.status,
+                status: allDone ? 'completed' as const : s.status,
               }
             : s
         )
       )
 
-      // Update exercise as completed
+      // Update exercise as completed (clear skipped flag)
       const { error: exerciseError } = await supabase
         .from('session_exercises')
-        .update({ completed: true, completed_at: completedAt })
+        .update({ completed: true, skipped: false, completed_at: completedAt })
         .eq('id', exerciseId)
 
       if (exerciseError) {
@@ -163,11 +201,11 @@ export function useLiveCoaching() {
         return false
       }
 
-      // Update session current_exercise_index (and status if last exercise)
+      // Update session current_exercise_index (and status if all done)
       const sessionUpdate: { current_exercise_index: number; status?: string } = {
         current_exercise_index: newIndex,
       }
-      if (isLastExercise) {
+      if (allDone) {
         sessionUpdate.status = 'completed'
       }
 
@@ -187,35 +225,43 @@ export function useLiveCoaching() {
   )
 
   // Skip exercise and mark it as skipped
-  // Auto-completes session if this was the last exercise
+  // Auto-completes session if ALL exercises are completed/skipped
   const skipExercise = useCallback(
     async (sessionId: string, exerciseId: string): Promise<boolean> => {
       const session = sessions.find((s) => s.id === sessionId)
       if (!session) return false
 
-      const newIndex = session.current_exercise_index + 1
-      const isLastExercise = newIndex >= (session.exercises?.length || 0)
+      const currentIndex = session.current_exercise_index
+      const maxIndex = (session.exercises?.length || 1) - 1
+      const newIndex = Math.min(currentIndex + 1, maxIndex)
 
-      // Optimistic update - mark exercise as skipped
+      // Check if ALL exercises will be completed/skipped after this update
+      const allDone = session.exercises?.every(
+        (ex) => ex.id === exerciseId || ex.completed || ex.skipped
+      )
+
+      // Optimistic update - mark exercise as skipped (also clears completed)
       setSessions((prev) =>
         prev.map((s) =>
           s.id === sessionId
             ? {
                 ...s,
                 exercises: s.exercises?.map((ex) =>
-                  ex.id === exerciseId ? { ...ex, skipped: true } : ex
+                  ex.id === exerciseId
+                    ? { ...ex, skipped: true, completed: false, completed_at: null }
+                    : ex
                 ),
                 current_exercise_index: newIndex,
-                status: isLastExercise ? 'completed' as const : s.status,
+                status: allDone ? 'completed' as const : s.status,
               }
             : s
         )
       )
 
-      // Update exercise as skipped
+      // Update exercise as skipped (clear completed flag)
       const { error: exerciseError } = await supabase
         .from('session_exercises')
-        .update({ skipped: true })
+        .update({ skipped: true, completed: false, completed_at: null })
         .eq('id', exerciseId)
 
       if (exerciseError) {
@@ -223,11 +269,11 @@ export function useLiveCoaching() {
         return false
       }
 
-      // Update session current_exercise_index (and status if last exercise)
+      // Update session current_exercise_index (and status if all done)
       const sessionUpdate: { current_exercise_index: number; status?: string } = {
         current_exercise_index: newIndex,
       }
-      if (isLastExercise) {
+      if (allDone) {
         sessionUpdate.status = 'completed'
       }
 
@@ -495,6 +541,7 @@ export function useLiveCoaching() {
     fetchSessionsForDate,
     updateExerciseOnTheFly,
     changeExercise,
+    selectExercise,
     completeExercise,
     skipExercise,
     previousExercise,

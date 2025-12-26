@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import { CheckCircle2, Circle, SkipForward, X, Plus } from 'lucide-react'
+import { CheckCircle2, Circle, SkipForward, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -9,30 +9,31 @@ import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDeta
 
 interface LiveClientCardProps {
   session: SessionWithDetails
-  isComplete: boolean
   catalogExercises: ExerciseWithDetails[]
   onUpdateExercise: (exerciseId: string, updates: SessionExerciseUpdate) => void
   onChangeExercise: (exerciseId: string, newExercise: ExerciseWithDetails) => void
-  onCompleteExercise: () => void
+  onCompleteExercise: (exerciseId: string) => void
   onSkipExercise: (exerciseId: string) => void
+  onSelectExercise: (index: number) => void
   onAddExercise: (exercise: ExerciseWithDetails) => void
 }
 
 export function LiveClientCard({
   session,
-  isComplete,
   catalogExercises,
   onUpdateExercise,
   onChangeExercise,
   onCompleteExercise,
   onSkipExercise,
+  onSelectExercise,
   onAddExercise,
 }: LiveClientCardProps) {
   const totalExercises = session.exercises?.length || 0
   const currentIndex = session.current_exercise_index
-  const progressPercent = totalExercises > 0 ? (currentIndex / totalExercises) * 100 : 0
+  // Progress based on completed/skipped exercises
+  const doneCount = session.exercises?.filter(e => e.completed || e.skipped).length || 0
+  const progressPercent = totalExercises > 0 ? (doneCount / totalExercises) * 100 : 0
   const currentExerciseRef = useRef<HTMLDivElement>(null)
-  const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null)
   const [showExercisePicker, setShowExercisePicker] = useState(false)
 
   const handleAddExercise = (exercise: ExerciseWithDetails) => {
@@ -40,15 +41,15 @@ export function LiveClientCard({
     setShowExercisePicker(false)
   }
 
-  // Auto-scroll to current exercise when index changes or when closing expanded
+  // Auto-scroll to current exercise when index changes
   useEffect(() => {
-    if (!expandedExerciseId && currentExerciseRef.current) {
+    if (currentExerciseRef.current) {
       currentExerciseRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       })
     }
-  }, [currentIndex, expandedExerciseId])
+  }, [currentIndex])
 
   const formatExercisePreview = (exercise: SessionExerciseWithDetails): string => {
     const parts: string[] = []
@@ -86,7 +87,7 @@ export function LiveClientCard({
         <div className="space-y-1">
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Progresso</span>
-            <span>{currentIndex}/{totalExercises}</span>
+            <span>{doneCount}/{totalExercises}</span>
           </div>
           <Progress value={progressPercent} className="h-2" />
         </div>
@@ -97,12 +98,9 @@ export function LiveClientCard({
           /* Vertical list of all exercises */
           <div className="space-y-3">
             {session.exercises.map((exercise, index) => {
-              const isCurrent = !isComplete && index === currentIndex
+              const isCurrent = index === currentIndex
               const isCompleted = exercise.completed
               const isSkipped = exercise.skipped
-              const isFuture = index > currentIndex && !isComplete
-              const isExpanded = expandedExerciseId === exercise.id
-              const canExpand = (isCompleted || isSkipped) && !isCurrent
 
               return (
                 <div
@@ -110,63 +108,26 @@ export function LiveClientCard({
                   ref={isCurrent ? currentExerciseRef : null}
                 >
                   {isCurrent ? (
-                    /* Current exercise - full controls */
+                    /* Current/selected exercise - full controls */
                     <LiveExerciseControl
                       exercise={exercise}
                       catalogExercises={catalogExercises}
                       onUpdate={(updates) => onUpdateExercise(exercise.id, updates)}
                       onChangeExercise={(newExercise) => onChangeExercise(exercise.id, newExercise)}
-                      onComplete={onCompleteExercise}
+                      onComplete={() => onCompleteExercise(exercise.id)}
                       onSkip={() => onSkipExercise(exercise.id)}
                     />
-                  ) : isExpanded ? (
-                    /* Expanded exercise for editing - controls with close button */
-                    <div className={`rounded-lg border-2 ${
-                      isCompleted ? 'border-green-300 dark:border-green-700' : 'border-orange-300 dark:border-orange-700'
-                    }`}>
-                      <div className={`flex items-center justify-between p-3 ${
-                        isCompleted ? 'bg-green-50 dark:bg-green-950/30' : 'bg-orange-50 dark:bg-orange-950/30'
-                      }`}>
-                        <div className="flex items-center gap-2">
-                          {isCompleted ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-500" />
-                          ) : (
-                            <SkipForward className="h-5 w-5 text-orange-500" />
-                          )}
-                          <span className="font-medium">{exercise.exercise?.name}</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setExpandedExerciseId(null)}
-                        >
-                          <X className="h-4 w-4 mr-1" />
-                          Chiudi
-                        </Button>
-                      </div>
-                      <div className="p-3">
-                        <LiveExerciseControl
-                          exercise={exercise}
-                          catalogExercises={catalogExercises}
-                          onUpdate={(updates) => onUpdateExercise(exercise.id, updates)}
-                          onChangeExercise={(newExercise) => onChangeExercise(exercise.id, newExercise)}
-                          onComplete={() => setExpandedExerciseId(null)}
-                          onSkip={() => setExpandedExerciseId(null)}
-                          hideActions
-                        />
-                      </div>
-                    </div>
                   ) : (
-                    /* Completed, skipped, or future exercise - compact view */
+                    /* Other exercises - compact view, clickable to select */
                     <div
-                      onClick={canExpand ? () => setExpandedExerciseId(exercise.id) : undefined}
-                      className={`rounded-lg p-3 flex items-center gap-3 ${
+                      onClick={() => onSelectExercise(index)}
+                      className={`rounded-lg p-3 flex items-center gap-3 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all ${
                         isCompleted
                           ? 'bg-green-50 dark:bg-green-950/30'
                           : isSkipped
                           ? 'bg-orange-50 dark:bg-orange-950/30'
                           : 'bg-muted/30'
-                      } ${canExpand ? 'cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all' : ''}`}
+                      }`}
                     >
                       {/* Status icon */}
                       {isCompleted ? (
@@ -182,7 +143,7 @@ export function LiveClientCard({
                         <p className={`font-medium truncate ${
                           isCompleted ? 'text-green-700 dark:text-green-400' :
                           isSkipped ? 'text-orange-700 dark:text-orange-400' :
-                          isFuture ? 'text-muted-foreground' : ''
+                          'text-muted-foreground'
                         }`}>
                           {exercise.exercise?.name}
                         </p>

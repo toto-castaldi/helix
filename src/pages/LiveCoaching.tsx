@@ -18,6 +18,8 @@ export function LiveCoaching() {
     // Default to today
     return new Date().toISOString().split('T')[0]
   })
+  // IDs of sessions selected for this live coaching session
+  const [liveSessionIds, setLiveSessionIds] = useState<string[]>([])
 
   const {
     sessions,
@@ -26,12 +28,11 @@ export function LiveCoaching() {
     fetchSessionsForDate,
     updateExerciseOnTheFly,
     changeExercise,
+    selectExercise,
     completeExercise,
     skipExercise,
     replanSession,
     addExerciseToSession,
-    getCurrentExercise,
-    isSessionComplete,
   } = useLiveCoaching()
 
   const { exercises: catalogExercises } = useExercises()
@@ -45,6 +46,8 @@ export function LiveCoaching() {
 
   const handleStartSession = async () => {
     if (plannedSessions.length > 0) {
+      // Save the IDs of planned sessions for this live coaching session
+      setLiveSessionIds(plannedSessions.map(s => s.id))
       // Reset all planned sessions to start from beginning
       for (const session of plannedSessions) {
         if (session.current_exercise_index > 0) {
@@ -181,8 +184,8 @@ export function LiveCoaching() {
 
   // Step 2: Live Dashboard
   if (step === 'live') {
-    // Show all sessions (both planned and just-completed during this live session)
-    const liveSessions = sessions
+    // Show only sessions that were selected for this live coaching session
+    const liveSessions = sessions.filter(s => liveSessionIds.includes(s.id))
 
     // If ALL sessions are completed, go to summary
     const allCompleted = liveSessions.length > 0 && liveSessions.every((s) => s.status === 'completed')
@@ -221,12 +224,11 @@ export function LiveCoaching() {
             key={selectedDate}
             sessions={liveSessions}
             catalogExercises={catalogExercises}
-            getCurrentExercise={getCurrentExercise}
-            isSessionComplete={isSessionComplete}
             onUpdateExercise={updateExerciseOnTheFly}
             onChangeExercise={changeExercise}
             onCompleteExercise={completeExercise}
             onSkipExercise={skipExercise}
+            onSelectExercise={selectExercise}
             onAddExercise={addExerciseToSession}
           />
         </div>

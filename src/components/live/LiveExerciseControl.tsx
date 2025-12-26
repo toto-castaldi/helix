@@ -15,7 +15,6 @@ interface LiveExerciseControlProps {
   onChangeExercise?: (newExercise: ExerciseWithDetails) => void
   onComplete: () => void
   onSkip: () => void
-  hideActions?: boolean
 }
 
 export function LiveExerciseControl({
@@ -25,7 +24,6 @@ export function LiveExerciseControl({
   onChangeExercise,
   onComplete,
   onSkip,
-  hideActions = false,
 }: LiveExerciseControlProps) {
   const [showPicker, setShowPicker] = useState(false)
   const handleNumberChange = (
@@ -217,25 +215,23 @@ export function LiveExerciseControl({
         </div>
 
         {/* Action buttons */}
-        {!hideActions && (
-          <div className="flex gap-3 pt-2">
-            <Button
-              variant="outline"
-              className="flex-1 h-14"
-              onClick={onSkip}
-            >
-              <SkipForward className="h-5 w-5 mr-2" />
-              Salta
-            </Button>
-            <Button
-              className="flex-[2] h-14 text-lg"
-              onClick={onComplete}
-            >
-              <Check className="h-6 w-6 mr-2" />
-              Completato
-            </Button>
-          </div>
-        )}
+        <div className="flex gap-3 pt-2">
+          <Button
+            variant="outline"
+            className="flex-1 h-14"
+            onClick={onSkip}
+          >
+            <SkipForward className="h-5 w-5 mr-2" />
+            Salta
+          </Button>
+          <Button
+            className="flex-[2] h-14 text-lg"
+            onClick={onComplete}
+          >
+            <Check className="h-6 w-6 mr-2" />
+            Completato
+          </Button>
+        </div>
 
         {/* Exercise Picker Modal */}
         {showPicker && onChangeExercise && (
