@@ -1,9 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
-import { CheckCircle2, Circle, SkipForward, X } from 'lucide-react'
+import { CheckCircle2, Circle, SkipForward, X, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { LiveExerciseControl } from './LiveExerciseControl'
+import { ExercisePicker } from '@/components/sessions/ExercisePicker'
 import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDetails, ExerciseWithDetails } from '@/types'
 
 interface LiveClientCardProps {
@@ -14,6 +15,7 @@ interface LiveClientCardProps {
   onChangeExercise: (exerciseId: string, newExercise: ExerciseWithDetails) => void
   onCompleteExercise: () => void
   onSkipExercise: (exerciseId: string) => void
+  onAddExercise: (exercise: ExerciseWithDetails) => void
 }
 
 export function LiveClientCard({
@@ -24,12 +26,19 @@ export function LiveClientCard({
   onChangeExercise,
   onCompleteExercise,
   onSkipExercise,
+  onAddExercise,
 }: LiveClientCardProps) {
   const totalExercises = session.exercises?.length || 0
   const currentIndex = session.current_exercise_index
   const progressPercent = totalExercises > 0 ? (currentIndex / totalExercises) * 100 : 0
   const currentExerciseRef = useRef<HTMLDivElement>(null)
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null)
+  const [showExercisePicker, setShowExercisePicker] = useState(false)
+
+  const handleAddExercise = (exercise: ExerciseWithDetails) => {
+    onAddExercise(exercise)
+    setShowExercisePicker(false)
+  }
 
   // Auto-scroll to current exercise when index changes or when closing expanded
   useEffect(() => {
@@ -55,12 +64,23 @@ export function LiveClientCard({
   }
 
   return (
+    <>
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2 flex-shrink-0">
-        {/* Client name */}
-        <CardTitle className="text-xl">
-          {session.client?.first_name} {session.client?.last_name}
-        </CardTitle>
+        {/* Client name with add button */}
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-xl">
+            {session.client?.first_name} {session.client?.last_name}
+          </CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowExercisePicker(true)}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Aggiungi
+          </Button>
+        </div>
 
         {/* Progress bar */}
         <div className="space-y-1">
@@ -194,5 +214,15 @@ export function LiveClientCard({
         )}
       </CardContent>
     </Card>
+
+    {showExercisePicker && (
+      <ExercisePicker
+        exercises={catalogExercises}
+        onSelect={handleAddExercise}
+        onClose={() => setShowExercisePicker(false)}
+        title="Aggiungi Esercizio"
+      />
+    )}
+    </>
   )
 }

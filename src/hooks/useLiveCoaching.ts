@@ -381,6 +381,83 @@ export function useLiveCoaching() {
     [sessions]
   )
 
+  // Add a new exercise at current position (becomes the new current exercise)
+  const addExerciseToSession = useCallback(
+    async (
+      sessionId: string,
+      exercise: ExerciseWithDetails
+    ): Promise<boolean> => {
+      const session = sessions.find((s) => s.id === sessionId)
+      if (!session) return false
+
+      const currentIndex = session.current_exercise_index
+
+      // Create new session exercise at current position
+      const { data: newExerciseData, error: insertError } = await supabase
+        .from('session_exercises')
+        .insert({
+          session_id: sessionId,
+          exercise_id: exercise.id,
+          order_index: currentIndex,
+          sets: null,
+          reps: null,
+          weight_kg: null,
+          duration_seconds: null,
+          notes: null,
+          completed: false,
+          skipped: false,
+        })
+        .select()
+        .single()
+
+      if (insertError || !newExerciseData) {
+        setError(insertError?.message || 'Errore durante l\'aggiunta dell\'esercizio')
+        return false
+      }
+
+      // Increment order_index for exercises at current position and after
+      for (const ex of session.exercises || []) {
+        if (ex.order_index >= currentIndex) {
+          await supabase
+            .from('session_exercises')
+            .update({ order_index: ex.order_index + 1 })
+            .eq('id', ex.id)
+        }
+      }
+
+      // Optimistic update - new exercise becomes current
+      const newSessionExercise: SessionExerciseWithDetails = {
+        ...newExerciseData,
+        exercise: exercise,
+      }
+
+      setSessions((prev) =>
+        prev.map((s) => {
+          if (s.id !== sessionId) return s
+
+          // Shift exercises at current position and after
+          const updatedExercises = (s.exercises || []).map((ex) => ({
+            ...ex,
+            order_index: ex.order_index >= currentIndex ? ex.order_index + 1 : ex.order_index,
+          }))
+
+          // Insert new exercise and sort by order_index
+          const allExercises = [...updatedExercises, newSessionExercise].sort(
+            (a, b) => a.order_index - b.order_index
+          )
+
+          return {
+            ...s,
+            exercises: allExercises,
+          }
+        })
+      )
+
+      return true
+    },
+    [sessions]
+  )
+
   // Get current exercise for a session
   const getCurrentExercise = useCallback(
     (sessionId: string): SessionExerciseWithDetails | null => {
@@ -424,6 +501,7 @@ export function useLiveCoaching() {
     finishSession,
     finishAllSessions,
     replanSession,
+    addExerciseToSession,
     getCurrentExercise,
     getNextExercise,
     isSessionComplete,

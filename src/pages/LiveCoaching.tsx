@@ -29,6 +29,7 @@ export function LiveCoaching() {
     completeExercise,
     skipExercise,
     replanSession,
+    addExerciseToSession,
     getCurrentExercise,
     isSessionComplete,
   } = useLiveCoaching()
@@ -226,6 +227,7 @@ export function LiveCoaching() {
             onChangeExercise={changeExercise}
             onCompleteExercise={completeExercise}
             onSkipExercise={skipExercise}
+            onAddExercise={addExerciseToSession}
           />
         </div>
       </div>
