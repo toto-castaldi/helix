@@ -10,6 +10,7 @@ import type { SessionWithDetails, SessionExerciseUpdate, SessionExerciseWithDeta
 interface LiveClientCardProps {
   session: SessionWithDetails
   catalogExercises: ExerciseWithDetails[]
+  onRefreshExercises?: () => void
   onUpdateExercise: (exerciseId: string, updates: SessionExerciseUpdate) => void
   onChangeExercise: (exerciseId: string, newExercise: ExerciseWithDetails) => void
   onCompleteExercise: (exerciseId: string) => void
@@ -21,6 +22,7 @@ interface LiveClientCardProps {
 export function LiveClientCard({
   session,
   catalogExercises,
+  onRefreshExercises,
   onUpdateExercise,
   onChangeExercise,
   onCompleteExercise,
@@ -112,6 +114,7 @@ export function LiveClientCard({
                     <LiveExerciseControl
                       exercise={exercise}
                       catalogExercises={catalogExercises}
+                      onRefreshExercises={onRefreshExercises}
                       onUpdate={(updates) => onUpdateExercise(exercise.id, updates)}
                       onChangeExercise={(newExercise) => onChangeExercise(exercise.id, newExercise)}
                       onComplete={() => onCompleteExercise(exercise.id)}
@@ -181,6 +184,7 @@ export function LiveClientCard({
         exercises={catalogExercises}
         onSelect={handleAddExercise}
         onClose={() => setShowExercisePicker(false)}
+        onRefresh={onRefreshExercises}
         title="Aggiungi Esercizio"
       />
     )}

@@ -15,6 +15,7 @@ interface SessionExerciseCardProps {
   isFirst: boolean
   isLast: boolean
   catalogExercises: ExerciseWithDetails[]
+  onRefreshExercises?: () => void
   onUpdate: (id: string, updates: SessionExerciseUpdate) => void
   onChangeExercise: (id: string, newExercise: ExerciseWithDetails) => void
   onRemove: (id: string) => void
@@ -28,6 +29,7 @@ export function SessionExerciseCard({
   isFirst,
   isLast,
   catalogExercises,
+  onRefreshExercises,
   onUpdate,
   onChangeExercise,
   onRemove,
@@ -289,6 +291,7 @@ export function SessionExerciseCard({
               setShowPicker(false)
             }}
             onClose={() => setShowPicker(false)}
+            onRefresh={onRefreshExercises}
           />
         )}
       </CardContent>

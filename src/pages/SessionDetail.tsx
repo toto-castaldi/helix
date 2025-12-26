@@ -29,7 +29,7 @@ export function SessionDetail() {
   } = useSessions()
   const { clients } = useClients()
   const { gyms } = useGyms()
-  const { exercises: catalogExercises } = useExercises()
+  const { exercises: catalogExercises, refetch: refetchExercises } = useExercises()
 
   const [session, setSession] = useState<SessionWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
@@ -331,6 +331,7 @@ export function SessionDetail() {
                 isFirst={index === 0}
                 isLast={index === session.exercises!.length - 1}
                 catalogExercises={catalogExercises}
+                onRefreshExercises={refetchExercises}
                 onUpdate={handleUpdateExercise}
                 onChangeExercise={handleChangeExercise}
                 onRemove={handleRemoveExercise}
@@ -353,6 +354,7 @@ export function SessionDetail() {
           exercises={catalogExercises}
           onSelect={handleAddExercise}
           onClose={() => setShowExercisePicker(false)}
+          onRefresh={refetchExercises}
         />
       )}
     </div>

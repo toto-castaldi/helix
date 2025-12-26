@@ -12,6 +12,7 @@ import type { SessionExerciseWithDetails, SessionExerciseUpdate, ExerciseWithDet
 interface LiveExerciseControlProps {
   exercise: SessionExerciseWithDetails
   catalogExercises?: ExerciseWithDetails[]
+  onRefreshExercises?: () => void
   onUpdate: (updates: SessionExerciseUpdate) => void
   onChangeExercise?: (newExercise: ExerciseWithDetails) => void
   onComplete: () => void
@@ -21,6 +22,7 @@ interface LiveExerciseControlProps {
 export function LiveExerciseControl({
   exercise,
   catalogExercises = [],
+  onRefreshExercises,
   onUpdate,
   onChangeExercise,
   onComplete,
@@ -271,6 +273,7 @@ export function LiveExerciseControl({
               setShowPicker(false)
             }}
             onClose={() => setShowPicker(false)}
+            onRefresh={onRefreshExercises}
           />
         )}
 

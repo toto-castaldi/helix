@@ -7,6 +7,7 @@ import type { SessionWithDetails, SessionExerciseUpdate, ExerciseWithDetails } f
 interface LiveDashboardProps {
   sessions: SessionWithDetails[]
   catalogExercises: ExerciseWithDetails[]
+  onRefreshExercises?: () => void
   onUpdateExercise: (sessionId: string, exerciseId: string, updates: SessionExerciseUpdate) => void
   onChangeExercise: (sessionId: string, exerciseId: string, newExercise: ExerciseWithDetails) => void
   onCompleteExercise: (sessionId: string, exerciseId: string) => void
@@ -18,6 +19,7 @@ interface LiveDashboardProps {
 export function LiveDashboard({
   sessions,
   catalogExercises,
+  onRefreshExercises,
   onUpdateExercise,
   onChangeExercise,
   onCompleteExercise,
@@ -93,6 +95,7 @@ export function LiveDashboard({
         <LiveClientCard
           session={currentSession}
           catalogExercises={catalogExercises}
+          onRefreshExercises={onRefreshExercises}
           onUpdateExercise={(exerciseId, updates) =>
             onUpdateExercise(currentSession.id, exerciseId, updates)
           }

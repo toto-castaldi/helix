@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -9,10 +10,16 @@ interface ExercisePickerProps {
   exercises: ExerciseWithDetails[]
   onSelect: (exercise: ExerciseWithDetails) => void
   onClose: () => void
+  onRefresh?: () => void
   title?: string
 }
 
-export function ExercisePicker({ exercises, onSelect, onClose, title = 'Seleziona Esercizio' }: ExercisePickerProps) {
+export function ExercisePicker({ exercises, onSelect, onClose, onRefresh, title = 'Seleziona Esercizio' }: ExercisePickerProps) {
+  // Refresh exercises when picker opens
+  useEffect(() => {
+    onRefresh?.()
+  }, [])
+
   const {
     searchQuery,
     setSearchQuery,

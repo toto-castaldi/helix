@@ -35,7 +35,7 @@ export function LiveCoaching() {
     addExerciseToSession,
   } = useLiveCoaching()
 
-  const { exercises: catalogExercises } = useExercises()
+  const { exercises: catalogExercises, refetch: refetchExercises } = useExercises()
 
   // Fetch sessions when date changes
   useEffect(() => {
@@ -224,6 +224,7 @@ export function LiveCoaching() {
             key={selectedDate}
             sessions={liveSessions}
             catalogExercises={catalogExercises}
+            onRefreshExercises={refetchExercises}
             onUpdateExercise={updateExerciseOnTheFly}
             onChangeExercise={changeExercise}
             onCompleteExercise={completeExercise}
