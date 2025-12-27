@@ -4,4 +4,4 @@ Assistente di un Coach nell'ambito del fitness.
 
 https://fca.toto-castaldi.com/
 
-**Versione:** 2025.12.27.2010
+**Versione:** 2025.12.27.2250
