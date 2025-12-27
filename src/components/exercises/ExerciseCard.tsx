@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Dumbbell, Image } from 'lucide-react'
+import { Dumbbell, Eye } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CardActions } from '@/components/shared'
@@ -13,9 +13,10 @@ interface ExerciseCardProps {
   onDelete: (exercise: ExerciseWithDetails) => void
   onClick?: (exercise: ExerciseWithDetails) => void
   onTagClick?: (tag: string) => void
+  onViewBlocks?: (exercise: ExerciseWithDetails) => void
 }
 
-export function ExerciseCard({ exercise, onEdit, onDelete, onClick, onTagClick }: ExerciseCardProps) {
+export function ExerciseCard({ exercise, onEdit, onDelete, onClick, onTagClick, onViewBlocks }: ExerciseCardProps) {
   const navigate = useNavigate()
   const titleRef = useRef<HTMLHeadingElement>(null)
 
@@ -61,10 +62,17 @@ export function ExerciseCard({ exercise, onEdit, onDelete, onClick, onTagClick }
               >{exercise.name}</h3>
               <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                 {blocksCount > 0 && (
-                  <span className="flex items-center gap-1">
-                    <Image className="h-3 w-3" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onViewBlocks?.(exercise)
+                    }}
+                    className={`flex items-center gap-1 ${onViewBlocks ? 'hover:text-primary cursor-pointer' : ''}`}
+                  >
+                    <Eye className="h-3 w-3" />
                     {blocksCount} {blocksCount === 1 ? 'blocco' : 'blocchi'}
-                  </span>
+                  </button>
                 )}
               </div>
             </div>

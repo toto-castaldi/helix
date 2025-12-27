@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { ExerciseForm } from '@/components/exercises/ExerciseForm'
 import { ExerciseCard } from '@/components/exercises/ExerciseCard'
 import { ExerciseFilterBar } from '@/components/exercises/ExerciseFilterBar'
+import { ExerciseDetailModal } from '@/components/live/ExerciseDetailModal'
 import {
   LoadingSpinner,
   ErrorAlert,
@@ -15,6 +17,8 @@ import { useEntityPage } from '@/hooks/useEntityPage'
 import type { ExerciseWithDetails, ExerciseInsert, ExerciseBlockInsert } from '@/types'
 
 export function Exercises() {
+  const [viewingExercise, setViewingExercise] = useState<ExerciseWithDetails | null>(null)
+
   const {
     exercises,
     loading,
@@ -186,10 +190,18 @@ export function Exercises() {
                 onEdit={openEditForm}
                 onDelete={openDeleteConfirm}
                 onTagClick={toggleTag}
+                onViewBlocks={setViewingExercise}
               />
             ))
           )}
         </div>
+      )}
+
+      {viewingExercise && (
+        <ExerciseDetailModal
+          exercise={viewingExercise}
+          onClose={() => setViewingExercise(null)}
+        />
       )}
     </div>
   )
