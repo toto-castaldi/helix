@@ -52,7 +52,7 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
                     <img
                       src={block.image_url}
                       alt={`Step ${index + 1}`}
-                      className="w-full rounded-lg object-cover max-h-64"
+                      className="w-full rounded-lg object-contain max-h-[70vh]"
                     />
                   )}
 

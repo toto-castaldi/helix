@@ -57,6 +57,7 @@ export function Exercises() {
 
   const uploadImagesAndGetUrls = async (
     blocks: ExerciseBlockInsert[],
+    blockIds: string[],
     newImages: { blockId: string; file: File }[]
   ) => {
     const imageUrls: { [blockId: string]: string } = {}
@@ -68,9 +69,9 @@ export function Exercises() {
     }
 
     return blocks.map((block, index) => {
-      const matchingImage = newImages[index]
-      if (matchingImage && imageUrls[matchingImage.blockId]) {
-        return { ...block, image_url: imageUrls[matchingImage.blockId] }
+      const blockId = blockIds[index]
+      if (blockId && imageUrls[blockId]) {
+        return { ...block, image_url: imageUrls[blockId] }
       }
       return block
     })
@@ -79,11 +80,12 @@ export function Exercises() {
   const onSubmitCreate = async (
     data: ExerciseInsert,
     blocks: ExerciseBlockInsert[],
+    blockIds: string[],
     tags: string[],
     newImages: { blockId: string; file: File }[]
   ) => {
     setIsSubmitting(true)
-    const blocksWithUrls = await uploadImagesAndGetUrls(blocks, newImages)
+    const blocksWithUrls = await uploadImagesAndGetUrls(blocks, blockIds, newImages)
     const result = await createExercise(data, blocksWithUrls, tags)
     setIsSubmitting(false)
     if (result) {
@@ -94,12 +96,13 @@ export function Exercises() {
   const onSubmitUpdate = async (
     data: ExerciseInsert,
     blocks: ExerciseBlockInsert[],
+    blockIds: string[],
     tags: string[],
     newImages: { blockId: string; file: File }[]
   ) => {
     if (!editingItem) return
     setIsSubmitting(true)
-    const updatedBlocks = await uploadImagesAndGetUrls(blocks, newImages)
+    const updatedBlocks = await uploadImagesAndGetUrls(blocks, blockIds, newImages)
     const result = await updateExercise(editingItem.id, data, updatedBlocks, tags)
     setIsSubmitting(false)
     if (result) {

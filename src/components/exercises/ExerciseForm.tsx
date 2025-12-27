@@ -33,6 +33,7 @@ interface ExerciseFormProps {
   onSubmit: (
     data: ExerciseInsert,
     blocks: ExerciseBlockInsert[],
+    blockIds: string[],
     tags: string[],
     newImages: { blockId: string; file: File }[]
   ) => Promise<void>
@@ -160,6 +161,8 @@ export function ExerciseForm({ exercise, existingTags = [], onSubmit, onCancel, 
       order_index: index,
     }))
 
+    const blockIds = blocks.map(b => b.id)
+
     const newImages = blocks
       .filter(b => b.file)
       .map(b => ({ blockId: b.id, file: b.file! }))
@@ -170,6 +173,7 @@ export function ExerciseForm({ exercise, existingTags = [], onSubmit, onCancel, 
         description: data.description || null,
       },
       blocksData,
+      blockIds,
       tags,
       newImages
     )
