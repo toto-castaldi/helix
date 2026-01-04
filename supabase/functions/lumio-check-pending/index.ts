@@ -3,7 +3,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-sync-secret",
 }
 
 interface LumioRepository {
@@ -19,7 +19,7 @@ interface LumioRepository {
  * Edge Function to check for pending repository syncs
  * Called by external job/cron service to trigger periodic sync
  *
- * Auth: Requires service_role key in Authorization header
+ * Auth: Requires X-Sync-Secret header matching LUMIO_SYNC_SECRET env var
  *
  * Query params:
  * - minutes: number of minutes since last sync to consider stale (default: 40)
@@ -32,28 +32,35 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // Verify authorization - must be service_role key
-    const authHeader = req.headers.get("Authorization")
-    if (!authHeader) {
+    // Verify authorization via custom secret header
+    const syncSecret = req.headers.get("X-Sync-Secret")
+    const expectedSecret = Deno.env.get("LUMIO_SYNC_SECRET")
+
+    if (!expectedSecret) {
+      console.error("LUMIO_SYNC_SECRET not configured")
       return new Response(
-        JSON.stringify({ error: "Missing authorization header" }),
+        JSON.stringify({ error: "Server misconfigured - LUMIO_SYNC_SECRET not set" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+
+    if (!syncSecret) {
+      return new Response(
+        JSON.stringify({ error: "Missing X-Sync-Secret header" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+
+    if (syncSecret !== expectedSecret) {
+      return new Response(
+        JSON.stringify({ error: "Invalid X-Sync-Secret" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
 
     // Create Supabase client with service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-
-    // Verify the token is the service role key
-    const token = authHeader.replace("Bearer ", "")
-    if (token !== supabaseServiceKey) {
-      return new Response(
-        JSON.stringify({ error: "Invalid authorization - service role key required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
-    }
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Parse query parameters
