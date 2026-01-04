@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { LumioCardViewer } from '@/components/markdown/LumioCardViewer'
-import type { ExerciseWithDetails } from '@/types'
+import { LumioLocalCardViewer } from '@/components/lumio'
+import type { ExerciseWithDetails, LumioLocalCardWithRepository } from '@/types'
 
 export function ExerciseDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [exercise, setExercise] = useState<ExerciseWithDetails | null>(null)
+  const [lumioCard, setLumioCard] = useState<LumioLocalCardWithRepository | null>(null)
   const [loading, setLoading] = useState(true)
   const [cardError, setCardError] = useState(false)
 
@@ -41,6 +43,22 @@ export function ExerciseDetail() {
           .select('*')
           .eq('exercise_id', id)
       ])
+
+      // Fetch lumio card if lumio_card_id is set
+      if (exerciseData.lumio_card_id) {
+        const { data: cardData } = await supabase
+          .from('lumio_cards')
+          .select(`
+            *,
+            repository:lumio_repositories(*)
+          `)
+          .eq('id', exerciseData.lumio_card_id)
+          .single()
+
+        if (cardData) {
+          setLumioCard(cardData as LumioLocalCardWithRepository)
+        }
+      }
 
       setExercise({
         ...exerciseData,
@@ -73,10 +91,11 @@ export function ExerciseDetail() {
     )
   }
 
-  // Show Lumio card if URL is set and no error occurred
-  const showLumioCard = exercise.card_url && !cardError
-  // Show local blocks as fallback
-  const showLocalBlocks = !exercise.card_url || cardError
+  // Priority: lumioCard > card_url > local blocks
+  const showLocalCard = !!lumioCard
+  const showExternalCard = !showLocalCard && exercise.card_url && !cardError
+  const showLocalBlocks = !showLocalCard && (!exercise.card_url || cardError)
+  const showCardContent = showLocalCard || showExternalCard
 
   return (
     <div className="space-y-4">
@@ -87,12 +106,12 @@ export function ExerciseDetail() {
 
       <div>
         <h1 className="text-2xl font-bold">{exercise.name}</h1>
-        {exercise.description && !showLumioCard && (
+        {exercise.description && !showCardContent && (
           <p className="text-muted-foreground mt-1">{exercise.description}</p>
         )}
       </div>
 
-      {exercise.tags && exercise.tags.length > 0 && !showLumioCard && (
+      {exercise.tags && exercise.tags.length > 0 && !showCardContent && (
         <div className="flex flex-wrap gap-2">
           {exercise.tags.map((tag) => (
             <Badge key={tag.id} variant="secondary">
@@ -111,15 +130,20 @@ export function ExerciseDetail() {
         Vedi sessioni con questo esercizio
       </Button>
 
-      {/* Lumio Card View */}
-      {showLumioCard && (
+      {/* Lumio Local Card View (highest priority) */}
+      {showLocalCard && lumioCard && (
+        <LumioLocalCardViewer card={lumioCard} />
+      )}
+
+      {/* Lumio External Card View (second priority) */}
+      {showExternalCard && (
         <LumioCardViewer
           cardUrl={exercise.card_url!}
           onError={() => setCardError(true)}
         />
       )}
 
-      {/* Local Blocks Fallback */}
+      {/* Local Blocks Fallback (lowest priority) */}
       {showLocalBlocks && (
         <>
           {exercise.blocks && exercise.blocks.length > 0 ? (

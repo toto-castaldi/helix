@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, X, GripVertical, Upload, Link, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { Plus, X, GripVertical, Upload, Link, CheckCircle2, AlertCircle, Loader2, FolderGit2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,9 +10,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { FormActions } from '@/components/shared'
+import { LumioCardPicker, LumioCardPreviewInline } from '@/components/lumio'
 import { isValidCardUrl, normalizeCardUrl, fetchLumioCard } from '@/lib/lumio'
 import { useAuth } from '@/hooks/useAuth'
-import type { ExerciseWithDetails, ExerciseInsert, ExerciseBlockInsert } from '@/types'
+import type { ExerciseWithDetails, ExerciseInsert, ExerciseBlockInsert, LumioLocalCardWithRepository } from '@/types'
 
 const exerciseSchema = z.object({
   name: z.string().min(1, 'Nome obbligatorio'),
@@ -63,6 +64,15 @@ export function ExerciseForm({ exercise, existingTags = [], onSubmit, onCancel, 
   const watchedCardUrl = watch('card_url')
   const [cardUrlStatus, setCardUrlStatus] = useState<'idle' | 'testing' | 'valid' | 'invalid'>('idle')
   const [cardUrlError, setCardUrlError] = useState<string | null>(null)
+
+  // Lumio local card state
+  const [selectedCard, setSelectedCard] = useState<LumioLocalCardWithRepository | null>(() => {
+    if (exercise?.lumio_card) {
+      return exercise.lumio_card as LumioLocalCardWithRepository
+    }
+    return null
+  })
+  const [showCardPicker, setShowCardPicker] = useState(false)
 
   const [blocks, setBlocks] = useState<BlockState[]>(() => {
     if (exercise?.blocks && exercise.blocks.length > 0) {
@@ -188,6 +198,15 @@ export function ExerciseForm({ exercise, existingTags = [], onSubmit, onCancel, 
     }
   }
 
+  const handleSelectCard = (card: LumioLocalCardWithRepository) => {
+    setSelectedCard(card)
+    setShowCardPicker(false)
+  }
+
+  const handleRemoveCard = () => {
+    setSelectedCard(null)
+  }
+
   const handleFormSubmit = async (data: ExerciseFormData) => {
     const blocksData: ExerciseBlockInsert[] = blocks.map((block, index) => ({
       image_url: block.file ? null : block.image_url,
@@ -208,7 +227,8 @@ export function ExerciseForm({ exercise, existingTags = [], onSubmit, onCancel, 
       {
         name: data.name,
         description: data.description || null,
-        card_url: normalizedCardUrl || null,
+        card_url: selectedCard ? null : (normalizedCardUrl || null), // Clear card_url if using local card
+        lumio_card_id: selectedCard?.id || null,
       },
       blocksData,
       blockIds,
@@ -243,7 +263,37 @@ export function ExerciseForm({ exercise, existingTags = [], onSubmit, onCancel, 
           />
         </div>
 
-        {/* Lumio Card URL */}
+        {/* Lumio Local Card Selection */}
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <FolderGit2 className="h-4 w-4" />
+            Carta Lumio Locale
+          </Label>
+          {selectedCard ? (
+            <LumioCardPreviewInline
+              card={selectedCard}
+              onRemove={handleRemoveCard}
+            />
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCardPicker(true)}
+              className="w-full"
+            >
+              <FolderGit2 className="h-4 w-4 mr-2" />
+              Seleziona carta dal repository
+            </Button>
+          )}
+          {selectedCard && (
+            <p className="text-xs text-muted-foreground">
+              La carta locale ha precedenza sulla scheda esterna e sui blocchi.
+            </p>
+          )}
+        </div>
+
+        {/* Lumio Card URL (hidden if local card is selected) */}
+        {!selectedCard && (
         <div className="space-y-2">
           <Label htmlFor="card_url" className="flex items-center gap-2">
             <Link className="h-4 w-4" />
@@ -286,7 +336,17 @@ export function ExerciseForm({ exercise, existingTags = [], onSubmit, onCancel, 
             </p>
           )}
         </div>
+        )}
       </div>
+
+      {/* Card Picker Modal */}
+      {showCardPicker && (
+        <LumioCardPicker
+          onSelect={handleSelectCard}
+          onCancel={() => setShowCardPicker(false)}
+          selectedCardId={selectedCard?.id}
+        />
+      )}
 
       {/* Blocks Section */}
       <div className="space-y-3">

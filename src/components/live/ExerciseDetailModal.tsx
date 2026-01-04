@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { LumioCardViewer } from '@/components/markdown/LumioCardViewer'
-import type { ExerciseWithDetails } from '@/types'
+import { LumioLocalCardViewer } from '@/components/lumio'
+import type { ExerciseWithDetails, LumioLocalCardWithRepository } from '@/types'
 
 interface ExerciseDetailModalProps {
   exercise: ExerciseWithDetails
@@ -14,10 +15,14 @@ interface ExerciseDetailModalProps {
 export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalProps) {
   const [cardError, setCardError] = useState(false)
 
-  // Show Lumio card if URL is set and no error occurred
-  const showLumioCard = exercise.card_url && !cardError
-  // Show local blocks as fallback
-  const showLocalBlocks = !exercise.card_url || cardError
+  // Cast lumio_card to include repository data
+  const lumioCard = exercise.lumio_card as LumioLocalCardWithRepository | null
+
+  // Priority: lumioCard > card_url > local blocks
+  const showLocalCard = !!lumioCard
+  const showExternalCard = !showLocalCard && exercise.card_url && !cardError
+  const showLocalBlocks = !showLocalCard && (!exercise.card_url || cardError)
+  const showCardContent = showLocalCard || showExternalCard
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
@@ -31,11 +36,11 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {exercise.description && !showLumioCard && (
+        {exercise.description && !showCardContent && (
           <p className="text-muted-foreground">{exercise.description}</p>
         )}
 
-        {exercise.tags && exercise.tags.length > 0 && !showLumioCard && (
+        {exercise.tags && exercise.tags.length > 0 && !showCardContent && (
           <div className="flex flex-wrap gap-2">
             {exercise.tags.map((tag) => (
               <Badge key={tag.id} variant="secondary">
@@ -45,8 +50,13 @@ export function ExerciseDetailModal({ exercise, onClose }: ExerciseDetailModalPr
           </div>
         )}
 
-        {/* Lumio Card View */}
-        {showLumioCard && (
+        {/* Lumio Local Card View (highest priority) */}
+        {showLocalCard && lumioCard && (
+          <LumioLocalCardViewer card={lumioCard} />
+        )}
+
+        {/* Lumio External Card View (second priority) */}
+        {showExternalCard && (
           <LumioCardViewer
             cardUrl={exercise.card_url!}
             onError={() => setCardError(true)}

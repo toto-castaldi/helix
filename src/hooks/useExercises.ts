@@ -5,7 +5,8 @@ import type {
   ExerciseWithDetails,
   ExerciseInsert,
   ExerciseUpdate,
-  ExerciseBlockInsert
+  ExerciseBlockInsert,
+  LumioLocalCard
 } from '@/types'
 
 export function useExercises() {
@@ -38,10 +39,13 @@ export function useExercises() {
       return
     }
 
-    // Fetch blocks, tags and session references for all exercises
+    // Fetch blocks, tags, session references and lumio cards for all exercises
     const exerciseIds = exercisesData.map(e => e.id)
+    const lumioCardIds = exercisesData
+      .map(e => e.lumio_card_id)
+      .filter((id): id is string => id !== null)
 
-    const [blocksResult, tagsResult, sessionsResult] = await Promise.all([
+    const [blocksResult, tagsResult, sessionsResult, lumioCardsResult] = await Promise.all([
       supabase
         .from('exercise_blocks')
         .select('*')
@@ -54,12 +58,19 @@ export function useExercises() {
       supabase
         .from('session_exercises')
         .select('exercise_id')
-        .in('exercise_id', exerciseIds)
+        .in('exercise_id', exerciseIds),
+      lumioCardIds.length > 0
+        ? supabase
+            .from('lumio_cards')
+            .select('*')
+            .in('id', lumioCardIds)
+        : Promise.resolve({ data: [] as LumioLocalCard[], error: null })
     ])
 
     const blocksMap = new Map<string, typeof blocksResult.data>()
     const tagsMap = new Map<string, typeof tagsResult.data>()
     const sessionsCountMap = new Map<string, number>()
+    const lumioCardsMap = new Map<string, LumioLocalCard>()
 
     blocksResult.data?.forEach(block => {
       const existing = blocksMap.get(block.exercise_id) || []
@@ -76,11 +87,16 @@ export function useExercises() {
       sessionsCountMap.set(ref.exercise_id, count + 1)
     })
 
+    lumioCardsResult.data?.forEach(card => {
+      lumioCardsMap.set(card.id, card as LumioLocalCard)
+    })
+
     const exercisesWithDetails: ExerciseWithDetails[] = exercisesData.map(exercise => ({
       ...exercise,
       blocks: blocksMap.get(exercise.id) || [],
       tags: tagsMap.get(exercise.id) || [],
-      sessionsCount: sessionsCountMap.get(exercise.id) || 0
+      sessionsCount: sessionsCountMap.get(exercise.id) || 0,
+      lumio_card: exercise.lumio_card_id ? lumioCardsMap.get(exercise.lumio_card_id) || null : null
     }))
 
     setExercises(exercisesWithDetails)

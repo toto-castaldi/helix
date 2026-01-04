@@ -23,9 +23,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
         <div className="w-full max-w-sm space-y-6 text-center">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">Fitness Coach Assistant</h1>
-            <p className="text-muted-foreground">
-              Accedi per gestire i tuoi clienti e allenamenti
-            </p>
           </div>
           <LoginButton />
         </div>

@@ -11,6 +11,7 @@ import { SessionDetail } from '@/pages/SessionDetail'
 import { Planning } from '@/pages/Planning'
 import { LiveCoaching } from '@/pages/LiveCoaching'
 import { Settings } from '@/pages/Settings'
+import { Repositories } from '@/pages/Repositories'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
 import { OfflineIndicator } from '@/components/pwa/OfflineIndicator'
 import { PWAUpdatePrompt } from '@/components/pwa/PWAUpdatePrompt'
@@ -34,6 +35,7 @@ function App() {
               <Route path="/planning" element={<Planning />} />
               <Route path="/planning/:clientId" element={<Planning />} />
               <Route path="/live" element={<LiveCoaching />} />
+              <Route path="/repositories" element={<Repositories />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Routes>

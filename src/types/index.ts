@@ -46,6 +46,7 @@ export interface Exercise {
   name: string
   description: string | null
   card_url: string | null
+  lumio_card_id: string | null
   created_at: string
 }
 
@@ -75,6 +76,7 @@ export interface ExerciseInsert {
   name: string
   description?: string | null
   card_url?: string | null
+  lumio_card_id?: string | null
 }
 
 export interface ExerciseUpdate extends Partial<ExerciseInsert> {}
@@ -83,6 +85,7 @@ export interface ExerciseWithDetails extends Exercise {
   blocks?: ExerciseBlock[]
   tags?: ExerciseTag[]
   sessionsCount?: number
+  lumio_card?: LumioLocalCard | null
 }
 
 export interface Gym {
@@ -298,4 +301,71 @@ export interface LumioCard {
   frontmatter: LumioCardFrontmatter
   content: string
   baseUrl: string
+}
+
+// Lumio Repository Types (Local sync)
+
+export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'error'
+
+export interface LumioRepository {
+  id: string
+  user_id: string
+  name: string
+  github_owner: string
+  github_repo: string
+  branch: string
+  access_token: string | null
+  last_commit_hash: string | null
+  last_sync_at: string | null
+  sync_status: SyncStatus
+  sync_error: string | null
+  cards_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface LumioRepositoryInsert {
+  name: string
+  github_owner: string
+  github_repo: string
+  branch?: string
+  access_token?: string | null
+}
+
+export interface LumioRepositoryUpdate extends Partial<LumioRepositoryInsert> {}
+
+// Lumio Local Card Types (synced from repositories)
+
+export interface LumioLocalCardFrontmatter {
+  title?: string
+  tags?: string[]
+  difficulty?: number
+  language?: string
+  [key: string]: unknown
+}
+
+export interface LumioLocalCard {
+  id: string
+  repository_id: string
+  user_id: string
+  file_path: string
+  title: string | null
+  content: string
+  raw_content: string
+  frontmatter: LumioLocalCardFrontmatter | null
+  source_available: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface LumioLocalCardWithRepository extends LumioLocalCard {
+  repository?: LumioRepository
+}
+
+export interface LumioCardImage {
+  id: string
+  card_id: string
+  original_path: string
+  storage_path: string
+  created_at: string
 }

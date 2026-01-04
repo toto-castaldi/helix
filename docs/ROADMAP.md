@@ -441,7 +441,7 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
 
 #### 8.1 Database - Tabelle Nuove
 
-- [ ] Migration `20260104000001_lumio_repositories.sql`:
+- [x] Migration `00000000000006_lumio_repositories.sql`:
   - Tabella `lumio_repositories`:
     - `id` (uuid, PK, default gen_random_uuid())
     - `user_id` (uuid, FK auth.users, NOT NULL)
@@ -460,7 +460,7 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
   - RLS policies per user_id
   - Trigger updated_at
 
-- [ ] Migration `20260104000002_lumio_cards.sql`:
+- [x] Migration `00000000000007_lumio_cards.sql`:
   - Tabella `lumio_cards`:
     - `id` (uuid, PK)
     - `repository_id` (uuid, FK lumio_repositories ON DELETE CASCADE)
@@ -478,7 +478,7 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
   - RLS policies per user_id
   - Trigger updated_at
 
-- [ ] Migration `20260104000003_lumio_card_images.sql`:
+- [x] Migration `00000000000008_lumio_card_images.sql`:
   - Tabella `lumio_card_images`:
     - `id` (uuid, PK)
     - `card_id` (uuid, FK lumio_cards ON DELETE CASCADE)
@@ -488,24 +488,24 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
   - Indice su card_id
   - RLS policies (via join con lumio_cards)
 
-- [ ] Migration `20260104000004_exercise_lumio_card.sql`:
+- [x] Migration `00000000000009_exercise_lumio_card.sql`:
   - Aggiungere a `exercises`: `lumio_card_id` (uuid, FK lumio_cards ON DELETE SET NULL)
   - Nota: quando impostato, ha precedenza su card_url
 
 #### 8.2 Database - Storage Bucket
 
-- [ ] Configurare bucket `lumio-images` in `supabase/config.toml`:
-  - File size limit: 5MB
+- [x] Configurare bucket `lumio-images` in `supabase/config.toml`:
+  - File size limit: 10MB
   - Allowed MIME types: image/jpeg, image/png, image/gif, image/webp
   - Path structure: `{user_id}/{repository_id}/{file_hash}.{ext}`
-- [ ] Migration per creare bucket e policies:
+- [x] Migration per creare bucket e policies (in 00000000000008):
   - SELECT: authenticated users possono leggere proprie immagini
   - INSERT: authenticated users possono inserire in proprio folder
   - DELETE: authenticated users possono eliminare proprie immagini
 
 #### 8.3 Edge Functions - Sync Repository
 
-- [ ] Creare Edge Function `lumio-sync-repo`:
+- [x] Creare Edge Function `lumio-sync-repo`:
   - Input: `{ repositoryId: string, force?: boolean }`
   - Auth: JWT required
   - Logica:
@@ -527,16 +527,16 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
     10. Aggiorna repository con hash, timestamp, status, count
     11. Gestione errori: sync_status = 'error', sync_error = message
   - Output: `{ success: boolean, cardsCount: number, error?: string }`
-- [ ] Aggiungere a `.github/workflows/deploy.yml`
+- [x] Aggiungere a `.github/workflows/deploy.yml`
 
-- [ ] Creare Edge Function `lumio-check-pending`:
+- [x] Creare Edge Function `lumio-check-pending`:
   - Input: nessuno (service_role key)
   - Logica: seleziona repo pending, chiama lumio-sync-repo
-- [ ] Aggiungere a `.github/workflows/deploy.yml`
+- [x] Aggiungere a `.github/workflows/deploy.yml`
 
 #### 8.4 Edge Functions - GitHub API Helper
 
-- [ ] Creare modulo `supabase/functions/_shared/github.ts`:
+- [x] Creare modulo `supabase/functions/_shared/github.ts`:
   - `getLatestCommitHash(owner, repo, branch, token?)`
   - `getRepositoryTree(owner, repo, branch, token?)`
   - `getRawFileContent(owner, repo, path, branch, token?)`
@@ -546,24 +546,24 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
 
 #### 8.5 Edge Functions - Lumio Ignore Parser
 
-- [ ] Creare modulo `supabase/functions/_shared/lumioignore.ts`:
+- [x] Creare modulo `supabase/functions/_shared/lumioignore.ts`:
   - `parseLumioIgnore(content: string)` - ritorna lista pattern
   - `isIgnored(filePath: string, patterns: string[])`
   - Supporto: righe vuote, commenti #, pattern esatti, directory/, wildcard *.ext
 
 #### 8.6 Types TypeScript
 
-- [ ] Aggiungere tipi in `src/types/index.ts`:
+- [x] Aggiungere tipi in `src/types/index.ts`:
   - `SyncStatus = 'pending' | 'syncing' | 'synced' | 'error'`
   - `LumioRepository`, `LumioRepositoryInsert`, `LumioRepositoryUpdate`
   - `LumioCardFrontmatter` (title, tags, difficulty, language)
   - `LumioLocalCard`, `LumioLocalCardWithRepository`
-- [ ] Estendere tipo `Exercise` con `lumio_card_id`
-- [ ] Estendere `ExerciseWithDetails` con `lumio_card?`
+- [x] Estendere tipo `Exercise` con `lumio_card_id`
+- [x] Estendere `ExerciseWithDetails` con `lumio_card?`
 
 #### 8.7 Hooks
 
-- [ ] Creare `src/hooks/useRepositories.ts`:
+- [x] Creare `src/hooks/useRepositories.ts`:
   - `repositories` - lista repository utente
   - `loading`, `error` - stati
   - `fetchRepositories()` - carica lista
@@ -573,7 +573,7 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
   - `syncRepository(id, force?)` - trigger sync manuale
   - `validateGitHubUrl(url, token?)` - verifica accesso
 
-- [ ] Creare `src/hooks/useLumioCards.ts`:
+- [x] Creare `src/hooks/useLumioCards.ts`:
   - `cards` - lista carte filtrate
   - `loading`, `error` - stati
   - `fetchCards(filters?)` - carica con filtri
@@ -583,97 +583,95 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
 
 #### 8.8 Componenti - Gestione Repository
 
-- [ ] Creare `src/components/repositories/RepositoryCard.tsx`:
+- [x] Creare `src/components/repositories/RepositoryCard.tsx`:
   - Mostra: nome, github_owner/repo, branch, stato sync, ultimo sync, carte count
   - Badge "Privato" se ha token
   - Azioni: Modifica, Elimina, Sincronizza
   - Errore sync espandibile
 
-- [ ] Creare `src/components/repositories/RepositoryForm.tsx`:
+- [x] Creare `src/components/repositories/RepositoryForm.tsx`:
   - Campi: Nome, URL GitHub, Branch, Token accesso
   - Parsing automatico owner/repo da URL
-  - Bottone "Verifica accesso" per test connessione
 
-- [ ] Creare `src/components/repositories/RepositoryList.tsx`:
+- [x] Creare `src/components/repositories/RepositoryList.tsx`:
   - Lista RepositoryCard
   - Empty state
   - Header con conteggio carte
 
-- [ ] Creare `src/components/repositories/SyncStatusBadge.tsx`:
+- [x] Creare `src/components/repositories/SyncStatusBadge.tsx`:
   - Badge colorato per stato
-  - Tooltip con dettagli
 
 #### 8.9 Componenti - Selezione Carta
 
-- [ ] Creare `src/components/lumio/LumioCardPicker.tsx`:
+- [x] Creare `src/components/lumio/LumioCardPicker.tsx`:
   - Dialog modale full-screen mobile
   - Filtri: repository, ricerca, tags
-  - Lista carte con scroll (virtuale se tante)
+  - Lista carte con scroll
   - Warning se source_available = false
-  - Footer: Annulla / Seleziona
+  - Footer con conteggio carte
 
-- [ ] Creare `src/components/lumio/LumioCardPickerItem.tsx`:
+- [x] Creare `src/components/lumio/LumioCardPickerItem.tsx`:
   - Titolo (o file_path), repository, tags, preview content
   - Icona warning se non disponibile
 
-- [ ] Creare `src/components/lumio/LumioCardPreviewInline.tsx`:
+- [x] Creare `src/components/lumio/LumioCardPreviewInline.tsx`:
   - Preview compatta per form esercizio
   - Bottoni: Visualizza, Rimuovi
   - Warning se source_available = false
 
-- [ ] Creare `src/components/lumio/LumioLocalCardViewer.tsx`:
+- [x] Creare `src/components/lumio/LumioLocalCardViewer.tsx`:
   - Come LumioCardViewer ma da DB locale
   - Warning banner se source_available = false
   - Mostra metadata frontmatter
 
 #### 8.10 Pagine
 
-- [ ] Creare `src/pages/Repositories.tsx`:
+- [x] Creare `src/pages/Repositories.tsx`:
   - Header: "Repository Lumio", bottone "Aggiungi"
   - RepositoryList
   - Dialog form creazione/modifica
   - Conferma eliminazione
   - Polling stato sync (ogni 5s se syncing)
 
-- [ ] Aggiungere route `/repositories` in `App.tsx`
+- [x] Aggiungere route `/repositories` in `App.tsx`
 
-- [ ] Aggiungere voce menu in `Layout.tsx`:
-  - Icona: FolderGit
+- [x] Aggiungere voce menu in `Layout.tsx`:
+  - Icona: FolderGit2
   - Label: "Repository"
   - Posizione: bottom nav dopo Esercizi
 
 #### 8.11 Modifiche Componenti Esistenti
 
-- [ ] Modificare `src/components/exercises/ExerciseForm.tsx`:
+- [x] Modificare `src/components/exercises/ExerciseForm.tsx`:
   - Sezione "Carta Lumio Locale" sopra "URL Scheda Esterna"
   - Se ha lumio_card_id: mostra LumioCardPreviewInline
   - Bottoni Cambia/Rimuovi
   - Se no carta: bottone "Seleziona carta" → LumioCardPicker
   - Nota: lumio_card_id ha precedenza su card_url
 
-- [ ] Modificare `src/pages/ExerciseDetail.tsx`:
+- [x] Modificare `src/pages/ExerciseDetail.tsx`:
   - Se lumio_card_id: usa LumioLocalCardViewer
   - Warning banner se source_available = false
   - Else if card_url: LumioCardViewer (esistente)
   - Else: blocchi locali
 
-- [ ] Modificare `src/components/live/ExerciseDetailModal.tsx`:
+- [x] Modificare `src/components/live/ExerciseDetailModal.tsx`:
   - Stessa logica per carte locali
 
-- [ ] Modificare `src/hooks/useExercises.ts`:
+- [x] Modificare `src/hooks/useExercises.ts`:
   - Join con lumio_cards in fetch
   - Gestire lumio_card_id in create/update
 
 #### 8.12 Endpoint Sync Periodico
 
-- [ ] Edge Function `lumio-check-pending` esposta per chiamate esterne:
+- [x] Edge Function `lumio-check-pending` esposta per chiamate esterne:
   - Auth: service_role key (header Authorization)
   - Logica: seleziona repo con last_sync_at > threshold, avvia sync
   - Nota: il job esterno (cron service, scheduler, etc.) chiamerà questo endpoint periodicamente
 
 #### 8.13 Lib e Utilities
 
-- [ ] Creare `src/lib/github.ts`:
+- [x] Creare `src/lib/github.ts`:
   - `parseGitHubUrl(url)` - estrae owner, repo, branch
   - `buildGitHubUrl(owner, repo)`
   - `isValidGitHubUrl(url)`
@@ -683,7 +681,7 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
 
 #### 8.14 Test & Build
 
-- [ ] Verificare build senza errori TypeScript
+- [x] Verificare build senza errori TypeScript
 - [ ] Applicare tutte le migrations in ordine
 - [ ] Deploy Edge Functions
 - [ ] Configurare GitHub Action sync
