@@ -41,6 +41,15 @@ La lista esercizi supporta diversi filtri combinabili:
 
 I filtri speciali "Senza tag" e "Senza info" sono mutuamente esclusivi tra loro e rispetto ai tag selezionati.
 
+#### Ordinamento Esercizi
+
+Gli esercizi sono ordinati secondo questa priorità:
+1. **Esercizi in sessioni pianificate**: esercizi assegnati ad almeno una sessione con stato "planned"
+2. **Esercizi non assegnati**: esercizi mai usati in nessuna sessione
+3. **Esercizi solo in sessioni completate**: esercizi usati solo in sessioni già svolte
+
+All'interno di ogni gruppo, l'ordinamento è alfabetico per nome.
+
 #### Carte Lumio
 
 Un esercizio può essere associato a una **carta Lumio**, un documento markdown esterno che descrive l'esercizio in modo dettagliato. Ci sono due modalità:
