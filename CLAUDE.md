@@ -156,6 +156,12 @@ Tables:
 - `ai_generated_plans` - AI-generated training plans (conversation_id, session_id, plan_json, accepted)
 - `coach_ai_settings` - Coach AI configuration (openai_api_key, anthropic_api_key, preferred_provider, preferred_model)
 
+**Milestone 8 - Repository Lumio (da implementare):**
+- `lumio_repositories` - Repository GitHub censiti (user_id, github_owner, github_repo, branch, access_token, sync_status, last_commit_hash)
+- `lumio_cards` - Carte sincronizzate (repository_id, file_path, title, content, frontmatter, source_available)
+- `lumio_card_images` - Immagini delle carte (card_id, original_path, storage_path)
+- `exercises.lumio_card_id` - FK per associare esercizio a carta locale
+
 All tables have Row Level Security (RLS) policies.
 
 ## Edge Functions
@@ -167,6 +173,17 @@ Located in `supabase/functions/`:
 | `ai-chat` | AI planning chat - receives clientId, generates client card internally, calls OpenAI/Anthropic |
 | `client-export` | Generates client card markdown for export (same format used by AI context) |
 | `lumio-card` | Fetches and parses external Lumio markdown cards, resolves image paths |
+
+**Milestone 8 - Repository Lumio (da implementare):**
+
+| Function | Description |
+|----------|-------------|
+| `lumio-sync-repo` | Sincronizza un repository GitHub: fetch carte .md, immagini, salva in DB/Storage |
+| `lumio-check-pending` | Chiamata da cron, controlla repo con sync pending e avvia sync |
+
+**Storage Buckets:**
+- `exercise-images` - Immagini blocchi esercizi (esistente)
+- `lumio-images` - Immagini carte Lumio sincronizzate (Milestone 8, da creare)
 
 ### Client Card Format
 

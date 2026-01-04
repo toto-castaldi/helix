@@ -403,19 +403,337 @@ Obiettivo: Configurare un ambiente di sviluppo locale completo con Supabase CLI,
 - [x] Verificare `supabase start` applica tutte le migrations (5 migrations)
 - [x] Verificare seed data popolato correttamente (15 esercizi + tag)
 - [x] Test login Google OAuth in locale
-- [ ] Test CRUD completo su tutte le entita':
-  - [ ] Clienti
-  - [ ] Esercizi (con upload immagini)
-  - [ ] Palestre
-  - [ ] Sessioni
-- [ ] Test Edge Functions:
-  - [ ] `ai-chat` con provider OpenAI
-  - [ ] `ai-chat` con provider Anthropic
-  - [ ] `client-export`
-- [ ] Test Live Coaching flow completo
+- [x] Test CRUD completo su tutte le entita':
+  - [x] Clienti
+  - [x] Esercizi (con upload immagini)
+  - [x] Palestre
+  - [x] Sessioni
+- [x] Test Edge Functions:
+  - [x] `ai-chat` con provider OpenAI
+  - [x] `ai-chat` con provider Anthropic
+  - [x] `client-export`
+- [x] Test Live Coaching flow completo
 - [x] Verificare `npm run build` funziona
 
 ---
+
+## Milestone 7: Integrazini carte Lumio
+
+- [x] Un esercizio può avere un url di una carta in formato Lumio
+- [x] Se l'esercizio ha url impostato, la sua descrizione viene sostituita dal Markdown della carta
+
+---
+
+### Milestone 8: Repository Carte Lumio Locali
+
+Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lumio, sincronizzarle localmente in FCA, e selezionarle per gli esercizi tramite una UI dedicata invece che inserire URL manuali.
+
+**Decisioni architetturali:**
+
+- Storage: Markdown in DB (campo TEXT), immagini in Supabase Storage
+- Repository: Pubblici e privati (con token accesso)
+- Sync: Manuale (bottone) + automatico (job esterno periodico che chiama Edge Function)
+- Scope: Per utente (ogni coach vede solo i suoi repository)
+- Carte eliminate: Mantenute con warning "sorgente non trovata"
+- .lumioignore: Formato semplificato (lista file/cartelle, uno per riga)
+- UX selezione: Dialog modale con preview carta
+- Provider: Solo GitHub
+
+#### 8.1 Database - Tabelle Nuove
+
+- [ ] Migration `20260104000001_lumio_repositories.sql`:
+  - Tabella `lumio_repositories`:
+    - `id` (uuid, PK, default gen_random_uuid())
+    - `user_id` (uuid, FK auth.users, NOT NULL)
+    - `name` (text, NOT NULL) - nome descrittivo
+    - `github_owner` (text, NOT NULL) - owner del repo
+    - `github_repo` (text, NOT NULL) - nome repository
+    - `branch` (text, NOT NULL, default 'main')
+    - `access_token` (text, nullable) - per repo privati, encrypted
+    - `last_commit_hash` (text, nullable)
+    - `last_sync_at` (timestamptz, nullable)
+    - `sync_status` (text, default 'pending') - 'pending' | 'syncing' | 'synced' | 'error'
+    - `sync_error` (text, nullable)
+    - `cards_count` (integer, default 0)
+    - `created_at`, `updated_at`
+  - Indice UNIQUE su (user_id, github_owner, github_repo)
+  - RLS policies per user_id
+  - Trigger updated_at
+
+- [ ] Migration `20260104000002_lumio_cards.sql`:
+  - Tabella `lumio_cards`:
+    - `id` (uuid, PK)
+    - `repository_id` (uuid, FK lumio_repositories ON DELETE CASCADE)
+    - `user_id` (uuid, FK auth.users) - per RLS efficiente
+    - `file_path` (text, NOT NULL) - percorso nel repo
+    - `title` (text, nullable) - da frontmatter
+    - `content` (text, NOT NULL) - markdown con path immagini risolti
+    - `raw_content` (text, NOT NULL) - markdown originale
+    - `frontmatter` (jsonb, nullable) - frontmatter parsato
+    - `source_available` (boolean, default true)
+    - `created_at`, `updated_at`
+  - Indice UNIQUE su (repository_id, file_path)
+  - Indice GIN su frontmatter per ricerca tags
+  - Indice full-text su title e content
+  - RLS policies per user_id
+  - Trigger updated_at
+
+- [ ] Migration `20260104000003_lumio_card_images.sql`:
+  - Tabella `lumio_card_images`:
+    - `id` (uuid, PK)
+    - `card_id` (uuid, FK lumio_cards ON DELETE CASCADE)
+    - `original_path` (text, NOT NULL) - path nel markdown
+    - `storage_path` (text, NOT NULL) - path in Supabase Storage
+    - `created_at`
+  - Indice su card_id
+  - RLS policies (via join con lumio_cards)
+
+- [ ] Migration `20260104000004_exercise_lumio_card.sql`:
+  - Aggiungere a `exercises`: `lumio_card_id` (uuid, FK lumio_cards ON DELETE SET NULL)
+  - Nota: quando impostato, ha precedenza su card_url
+
+#### 8.2 Database - Storage Bucket
+
+- [ ] Configurare bucket `lumio-images` in `supabase/config.toml`:
+  - File size limit: 5MB
+  - Allowed MIME types: image/jpeg, image/png, image/gif, image/webp
+  - Path structure: `{user_id}/{repository_id}/{file_hash}.{ext}`
+- [ ] Migration per creare bucket e policies:
+  - SELECT: authenticated users possono leggere proprie immagini
+  - INSERT: authenticated users possono inserire in proprio folder
+  - DELETE: authenticated users possono eliminare proprie immagini
+
+#### 8.3 Edge Functions - Sync Repository
+
+- [ ] Creare Edge Function `lumio-sync-repo`:
+  - Input: `{ repositoryId: string, force?: boolean }`
+  - Auth: JWT required
+  - Logica:
+    1. Recupera repository, verifica ownership
+    2. Imposta sync_status = 'syncing'
+    3. Chiama GitHub API per ultimo commit hash
+    4. Se hash uguale e non force, termina
+    5. Fetch tree del repository
+    6. Fetch e parsa `.lumioignore` se esiste
+    7. Filtra file `.md` non ignorati
+    8. Per ogni file .md:
+       - Fetch contenuto raw
+       - Parsa frontmatter YAML
+       - Estrai riferimenti immagini
+       - Fetch e upload immagini in Storage
+       - Sostituisci path con URL Storage
+       - Upsert in lumio_cards
+    9. Marca carte non più presenti: source_available = false
+    10. Aggiorna repository con hash, timestamp, status, count
+    11. Gestione errori: sync_status = 'error', sync_error = message
+  - Output: `{ success: boolean, cardsCount: number, error?: string }`
+- [ ] Aggiungere a `.github/workflows/deploy.yml`
+
+- [ ] Creare Edge Function `lumio-check-pending`:
+  - Input: nessuno (service_role key)
+  - Logica: seleziona repo pending, chiama lumio-sync-repo
+- [ ] Aggiungere a `.github/workflows/deploy.yml`
+
+#### 8.4 Edge Functions - GitHub API Helper
+
+- [ ] Creare modulo `supabase/functions/_shared/github.ts`:
+  - `getLatestCommitHash(owner, repo, branch, token?)`
+  - `getRepositoryTree(owner, repo, branch, token?)`
+  - `getRawFileContent(owner, repo, path, branch, token?)`
+  - `parseGitHubUrl(url)` - estrae owner, repo
+  - `validateGitHubAccess(owner, repo, token?)`
+  - Gestione rate limiting e errori (404, 403)
+
+#### 8.5 Edge Functions - Lumio Ignore Parser
+
+- [ ] Creare modulo `supabase/functions/_shared/lumioignore.ts`:
+  - `parseLumioIgnore(content: string)` - ritorna lista pattern
+  - `isIgnored(filePath: string, patterns: string[])`
+  - Supporto: righe vuote, commenti #, pattern esatti, directory/, wildcard *.ext
+
+#### 8.6 Types TypeScript
+
+- [ ] Aggiungere tipi in `src/types/index.ts`:
+  - `SyncStatus = 'pending' | 'syncing' | 'synced' | 'error'`
+  - `LumioRepository`, `LumioRepositoryInsert`, `LumioRepositoryUpdate`
+  - `LumioCardFrontmatter` (title, tags, difficulty, language)
+  - `LumioLocalCard`, `LumioLocalCardWithRepository`
+- [ ] Estendere tipo `Exercise` con `lumio_card_id`
+- [ ] Estendere `ExerciseWithDetails` con `lumio_card?`
+
+#### 8.7 Hooks
+
+- [ ] Creare `src/hooks/useRepositories.ts`:
+  - `repositories` - lista repository utente
+  - `loading`, `error` - stati
+  - `fetchRepositories()` - carica lista
+  - `createRepository(data)` - crea nuovo
+  - `updateRepository(id, data)` - modifica
+  - `deleteRepository(id)` - elimina (cascade carte)
+  - `syncRepository(id, force?)` - trigger sync manuale
+  - `validateGitHubUrl(url, token?)` - verifica accesso
+
+- [ ] Creare `src/hooks/useLumioCards.ts`:
+  - `cards` - lista carte filtrate
+  - `loading`, `error` - stati
+  - `fetchCards(filters?)` - carica con filtri
+  - Filtri: repositoryId, search, tags, sourceAvailable
+  - `getCard(id)` - carta singola
+  - `allTags` - lista tutti i tag
+
+#### 8.8 Componenti - Gestione Repository
+
+- [ ] Creare `src/components/repositories/RepositoryCard.tsx`:
+  - Mostra: nome, github_owner/repo, branch, stato sync, ultimo sync, carte count
+  - Badge "Privato" se ha token
+  - Azioni: Modifica, Elimina, Sincronizza
+  - Errore sync espandibile
+
+- [ ] Creare `src/components/repositories/RepositoryForm.tsx`:
+  - Campi: Nome, URL GitHub, Branch, Token accesso
+  - Parsing automatico owner/repo da URL
+  - Bottone "Verifica accesso" per test connessione
+
+- [ ] Creare `src/components/repositories/RepositoryList.tsx`:
+  - Lista RepositoryCard
+  - Empty state
+  - Header con conteggio carte
+
+- [ ] Creare `src/components/repositories/SyncStatusBadge.tsx`:
+  - Badge colorato per stato
+  - Tooltip con dettagli
+
+#### 8.9 Componenti - Selezione Carta
+
+- [ ] Creare `src/components/lumio/LumioCardPicker.tsx`:
+  - Dialog modale full-screen mobile
+  - Filtri: repository, ricerca, tags
+  - Lista carte con scroll (virtuale se tante)
+  - Warning se source_available = false
+  - Footer: Annulla / Seleziona
+
+- [ ] Creare `src/components/lumio/LumioCardPickerItem.tsx`:
+  - Titolo (o file_path), repository, tags, preview content
+  - Icona warning se non disponibile
+
+- [ ] Creare `src/components/lumio/LumioCardPreviewInline.tsx`:
+  - Preview compatta per form esercizio
+  - Bottoni: Visualizza, Rimuovi
+  - Warning se source_available = false
+
+- [ ] Creare `src/components/lumio/LumioLocalCardViewer.tsx`:
+  - Come LumioCardViewer ma da DB locale
+  - Warning banner se source_available = false
+  - Mostra metadata frontmatter
+
+#### 8.10 Pagine
+
+- [ ] Creare `src/pages/Repositories.tsx`:
+  - Header: "Repository Lumio", bottone "Aggiungi"
+  - RepositoryList
+  - Dialog form creazione/modifica
+  - Conferma eliminazione
+  - Polling stato sync (ogni 5s se syncing)
+
+- [ ] Aggiungere route `/repositories` in `App.tsx`
+
+- [ ] Aggiungere voce menu in `Layout.tsx`:
+  - Icona: FolderGit
+  - Label: "Repository"
+  - Posizione: bottom nav dopo Esercizi
+
+#### 8.11 Modifiche Componenti Esistenti
+
+- [ ] Modificare `src/components/exercises/ExerciseForm.tsx`:
+  - Sezione "Carta Lumio Locale" sopra "URL Scheda Esterna"
+  - Se ha lumio_card_id: mostra LumioCardPreviewInline
+  - Bottoni Cambia/Rimuovi
+  - Se no carta: bottone "Seleziona carta" → LumioCardPicker
+  - Nota: lumio_card_id ha precedenza su card_url
+
+- [ ] Modificare `src/pages/ExerciseDetail.tsx`:
+  - Se lumio_card_id: usa LumioLocalCardViewer
+  - Warning banner se source_available = false
+  - Else if card_url: LumioCardViewer (esistente)
+  - Else: blocchi locali
+
+- [ ] Modificare `src/components/live/ExerciseDetailModal.tsx`:
+  - Stessa logica per carte locali
+
+- [ ] Modificare `src/hooks/useExercises.ts`:
+  - Join con lumio_cards in fetch
+  - Gestire lumio_card_id in create/update
+
+#### 8.12 Endpoint Sync Periodico
+
+- [ ] Edge Function `lumio-check-pending` esposta per chiamate esterne:
+  - Auth: service_role key (header Authorization)
+  - Logica: seleziona repo con last_sync_at > threshold, avvia sync
+  - Nota: il job esterno (cron service, scheduler, etc.) chiamerà questo endpoint periodicamente
+
+#### 8.13 Lib e Utilities
+
+- [ ] Creare `src/lib/github.ts`:
+  - `parseGitHubUrl(url)` - estrae owner, repo, branch
+  - `buildGitHubUrl(owner, repo)`
+  - `isValidGitHubUrl(url)`
+
+- [ ] Estendere `src/lib/lumio.ts`:
+  - `getCardDisplayTitle(card)` - title o filename
+
+#### 8.14 Test & Build
+
+- [ ] Verificare build senza errori TypeScript
+- [ ] Applicare tutte le migrations in ordine
+- [ ] Deploy Edge Functions
+- [ ] Configurare GitHub Action sync
+- [ ] Test manuale flusso completo:
+  - [ ] Aggiunta repository pubblico
+  - [ ] Sync iniziale, verifica carte
+  - [ ] Aggiunta repository privato con token
+  - [ ] Verifica .lumioignore rispettato
+  - [ ] Verifica immagini in Storage
+  - [ ] Associazione carta a esercizio
+  - [ ] Visualizzazione esercizio con carta locale
+  - [ ] Modifica repo sorgente e re-sync
+  - [ ] Verifica warning carte eliminate
+  - [ ] Test sync automatico
+  - [ ] Test ricerca e filtri picker
+
+#### 8.15 Documentazione
+
+- [ ] Aggiornare `CLAUDE.md`:
+  - Nuove tabelle Database
+  - Nuove Edge Functions
+  - Bucket Storage lumio-images
+
+- [ ] Aggiornare `docs/SPECS.md`:
+  - Sezione "Repository Carte Lumio"
+  - Formato .lumioignore
+  - Flusso sincronizzazione
+
+---
+
+**Ordine implementazione consigliato:**
+
+1. Migrations database (8.1, 8.2)
+2. Moduli shared Edge Functions (8.4, 8.5)
+3. Edge Function sync (8.3)
+4. Types TypeScript (8.6)
+5. Hooks (8.7)
+6. Componenti repository (8.8)
+7. Pagina Repositories (8.10)
+8. Componenti selezione carta (8.9)
+9. Modifiche componenti esistenti (8.11)
+10. Endpoint sync periodico (8.12)
+11. Test e documentazione (8.14, 8.15)
+
+**Rischi identificati:**
+
+- Rate limiting GitHub API → backoff esponenziale
+- Repository grandi → limite carte per repo
+- Token scaduti → gestione errore 401
+- Sync concorrenti → lock con sync_status
 
 ## Task vari
 

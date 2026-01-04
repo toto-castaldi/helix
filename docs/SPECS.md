@@ -31,6 +31,76 @@ Questo stesso formato viene usato come contesto per la pianificazione AI.
 Un esercizio ha un nome, una descrizione, un serie di passi descritti in blocchi che contengono a loro volta un'immagine e una descrizione.
 Ad un esercizio possono essere associati una serie di tag che ne descrivono delle caratteristiche e li rendono facilmente cercabili.
 
+#### Carte Lumio
+
+Un esercizio può essere associato a una **carta Lumio**, un documento markdown esterno che descrive l'esercizio in modo dettagliato. Ci sono due modalità:
+
+1. **URL esterno** (legacy): l'esercizio punta a un URL di una carta markdown su GitHub
+2. **Carta locale**: l'esercizio è collegato a una carta sincronizzata da un repository Lumio
+
+Quando un esercizio ha una carta associata (locale o esterna), la descrizione della carta sostituisce i blocchi locali nella visualizzazione.
+
+### Repository Carte Lumio
+
+I coach possono censire repository GitHub contenenti carte Lumio per sincronizzarle localmente in FCA.
+
+#### Caratteristiche
+
+- **Repository pubblici e privati**: per i repo privati serve un token di accesso GitHub
+- **Sincronizzazione**: manuale (bottone) + automatica (job esterno periodico)
+- **Scope per utente**: ogni coach vede solo i propri repository censiti
+- **Persistenza carte eliminate**: se una carta viene rimossa dal repo sorgente, resta disponibile in FCA con un warning "sorgente non trovata"
+
+#### Struttura Repository
+
+Un repository Lumio contiene:
+- File `.md` (carte esercizio) con frontmatter YAML opzionale
+- Immagini referenziate dalle carte
+- File `.lumioignore` opzionale per escludere file dalla sincronizzazione
+
+#### Formato .lumioignore
+
+Formato semplificato, una riga per pattern:
+```
+# Commenti con #
+README.md
+private/
+*.draft.md
+```
+
+#### Frontmatter Carta
+
+```yaml
+---
+title: Nome Esercizio
+tags:
+  - forza
+  - gambe
+difficulty: 3
+language: it
+---
+```
+
+#### Flusso Sincronizzazione
+
+1. Coach aggiunge repository (URL GitHub + token opzionale)
+2. Sistema verifica accesso e scarica l'albero del repository
+3. Per ogni file `.md` non ignorato:
+   - Fetch contenuto e parse frontmatter
+   - Download immagini referenziate → Supabase Storage
+   - Salvataggio carta in database con path immagini risolti
+4. Aggiornamento contatore carte e timestamp sync
+5. Sync periodico controlla hash ultimo commit → re-sync solo se cambiato
+
+#### Selezione Carta per Esercizio
+
+Nel form esercizio, il coach può:
+1. Aprire un dialog di selezione carte con filtri (repository, ricerca, tags)
+2. Visualizzare preview della carta
+3. Associare la carta all'esercizio
+
+Le carte locali hanno precedenza sull'URL esterno.
+
 ### Palestre
 
 Una palestra ha un indirizzo, un nome e una descrizione estesa dove si indicano anche le attrezzature.
@@ -142,6 +212,7 @@ La versione dell'app viene generata automaticamente ad ogni push su main.
 | Export Scheda Cliente | Export markdown con dati, anamnesi, obiettivi, sessioni (filtrabili per palestra) |
 | Catalogo Esercizi | CRUD con blocchi immagine, tag, ricerca |
 | Dettaglio Esercizio | Visualizzazione step-by-step |
+| Repository Lumio | Sincronizzazione carte da GitHub (pubblici/privati) |
 | Pianificazione AI | Chat con LLM per creare sessioni, contesto = scheda cliente completa |
 | Live Coaching | Gestione multi-cliente in tempo reale con swipe |
 
@@ -152,6 +223,7 @@ La versione dell'app viene generata automaticamente ad ogni push su main.
 - `/clients/:id` - Dettaglio cliente
 - `/exercises` - Catalogo esercizi
 - `/exercise/:id` - Dettaglio esercizio
+- `/repositories` - Repository Lumio
 - `/gyms` - Lista palestre
 - `/sessions` - Lista sessioni
 - `/sessions/:id` - Dettaglio sessione
