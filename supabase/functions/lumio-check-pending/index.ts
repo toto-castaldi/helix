@@ -22,7 +22,7 @@ interface LumioRepository {
  * Auth: Requires service_role key in Authorization header
  *
  * Query params:
- * - hours: number of hours since last sync to consider stale (default: 6)
+ * - minutes: number of minutes since last sync to consider stale (default: 40)
  * - limit: max number of repos to sync per call (default: 10)
  */
 Deno.serve(async (req: Request) => {
@@ -58,12 +58,12 @@ Deno.serve(async (req: Request) => {
 
     // Parse query parameters
     const url = new URL(req.url)
-    const hoursThreshold = parseInt(url.searchParams.get("hours") || "6", 10)
+    const minutesThreshold = parseInt(url.searchParams.get("minutes") || "40", 10)
     const limit = parseInt(url.searchParams.get("limit") || "10", 10)
 
     // Calculate threshold timestamp
     const thresholdDate = new Date()
-    thresholdDate.setHours(thresholdDate.getHours() - hoursThreshold)
+    thresholdDate.setMinutes(thresholdDate.getMinutes() - minutesThreshold)
     const thresholdISO = thresholdDate.toISOString()
 
     // Find repositories that need syncing:
