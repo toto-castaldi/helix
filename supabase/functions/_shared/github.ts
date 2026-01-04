@@ -189,8 +189,13 @@ export async function getRawFileContent(
     }
 
     const data = await response.json()
-    // Content is base64 encoded
-    return atob(data.content.replace(/\n/g, ""))
+    // Content is base64 encoded - decode to UTF-8 properly
+    const binaryString = atob(data.content.replace(/\n/g, ""))
+    const bytes = new Uint8Array(binaryString.length)
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i)
+    }
+    return new TextDecoder("utf-8").decode(bytes)
   }
 
   const response = await fetch(url, { headers })
