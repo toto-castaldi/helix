@@ -69,6 +69,7 @@ I coach possono censire repository GitHub contenenti carte Lumio per sincronizza
 - **Sincronizzazione**: manuale (bottone) + automatica (job esterno periodico)
 - **Scope per utente**: ogni coach vede solo i propri repository censiti
 - **Persistenza carte eliminate**: se una carta viene rimossa dal repo sorgente, resta disponibile in FCA con un warning "sorgente non trovata"
+- **Visualizzazione carte**: cliccando sul contatore carte si apre un elenco con ricerca delle carte presenti nel repository
 
 #### Struttura Repository
 

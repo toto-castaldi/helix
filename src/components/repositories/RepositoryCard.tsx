@@ -10,6 +10,7 @@ interface RepositoryCardProps {
   onEdit: (repository: LumioRepository) => void
   onDelete: (repository: LumioRepository) => void
   onSync: (repository: LumioRepository) => void
+  onViewCards: (repository: LumioRepository) => void
   isSyncing?: boolean
 }
 
@@ -18,6 +19,7 @@ export function RepositoryCard({
   onEdit,
   onDelete,
   onSync,
+  onViewCards,
   isSyncing,
 }: RepositoryCardProps) {
   const githubUrl = `https://github.com/${repository.github_owner}/${repository.github_repo}`
@@ -59,10 +61,17 @@ export function RepositoryCard({
             <GitBranch className="h-3.5 w-3.5" />
             <span>{repository.branch}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => onViewCards(repository)}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+            disabled={repository.cards_count === 0}
+          >
             <FileText className="h-3.5 w-3.5" />
-            <span>{repository.cards_count} carte</span>
-          </div>
+            <span className={repository.cards_count > 0 ? 'underline underline-offset-2' : ''}>
+              {repository.cards_count} carte
+            </span>
+          </button>
           <SyncStatusBadge
             status={repository.sync_status}
             lastSyncAt={repository.last_sync_at}

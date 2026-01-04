@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { RepositoryForm, RepositoryList } from '@/components/repositories'
+import { useEffect, useState } from 'react'
+import { RepositoryForm, RepositoryList, RepositoryCardsDialog } from '@/components/repositories'
 import {
   LoadingSpinner,
   ErrorAlert,
@@ -12,6 +12,7 @@ import { useEntityPage } from '@/hooks/useEntityPage'
 import type { LumioRepository, LumioRepositoryInsert } from '@/types'
 
 export function Repositories() {
+  const [viewingCardsRepo, setViewingCardsRepo] = useState<LumioRepository | null>(null)
   const {
     repositories,
     loading,
@@ -123,6 +124,14 @@ export function Repositories() {
           onEdit={openEditForm}
           onDelete={openDeleteConfirm}
           onSync={onSync}
+          onViewCards={setViewingCardsRepo}
+        />
+      )}
+
+      {viewingCardsRepo && (
+        <RepositoryCardsDialog
+          repository={viewingCardsRepo}
+          onClose={() => setViewingCardsRepo(null)}
         />
       )}
     </div>

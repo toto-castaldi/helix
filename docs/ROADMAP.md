@@ -750,6 +750,7 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
 - [x] Esercizi : nella scheda esercizi di tipo Lumio ci sono dei caratteri accentati errati
 - [x] Esercizi : filtro "Senza info" per trovare esercizi incompleti (senza blocchi, URL Lumio o carta Lumio)
 - [x] Esercizi : ordinamento per priorità (sessioni pianificate > non assegnati > solo completate)
+- [x] Repository : visualizzazione elenco carte cliccando sul contatore
 - [ ] BUG : non riesco a chiamare /lumio/check-pending
 - [ ] Esercizi : eliminare vecchia versione a blocchi...
 - [ ] UI : la creazione/modifica di una sessione non ha il tasto di salvataggio come in tutte le altre pagine

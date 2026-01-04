@@ -8,6 +8,7 @@ interface RepositoryListProps {
   onEdit: (repository: LumioRepository) => void
   onDelete: (repository: LumioRepository) => void
   onSync: (repository: LumioRepository) => void
+  onViewCards: (repository: LumioRepository) => void
 }
 
 export function RepositoryList({
@@ -16,6 +17,7 @@ export function RepositoryList({
   onEdit,
   onDelete,
   onSync,
+  onViewCards,
 }: RepositoryListProps) {
   if (repositories.length === 0) {
     return (
@@ -41,6 +43,7 @@ export function RepositoryList({
             onEdit={onEdit}
             onDelete={onDelete}
             onSync={onSync}
+            onViewCards={onViewCards}
             isSyncing={syncingId === repository.id}
           />
         ))}
