@@ -424,7 +424,7 @@ Obiettivo: Configurare un ambiente di sviluppo locale completo con Supabase CLI,
 
 ---
 
-### Milestone 8: Repository Carte Lumio Locali
+### Milestone 8: Repository Carte Lumio Locali ✅
 
 Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lumio, sincronizzarle localmente in FCA, e selezionarle per gli esercizi tramite una UI dedicata invece che inserire URL manuali.
 
@@ -676,36 +676,36 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
   - `buildGitHubUrl(owner, repo)`
   - `isValidGitHubUrl(url)`
 
-- [ ] Estendere `src/lib/lumio.ts`:
+- [x] Estendere `src/lib/lumio.ts`:
   - `getCardDisplayTitle(card)` - title o filename
 
 #### 8.14 Test & Build
 
 - [x] Verificare build senza errori TypeScript
-- [ ] Applicare tutte le migrations in ordine
-- [ ] Deploy Edge Functions
-- [ ] Configurare GitHub Action sync
-- [ ] Test manuale flusso completo:
-  - [ ] Aggiunta repository pubblico
-  - [ ] Sync iniziale, verifica carte
-  - [ ] Aggiunta repository privato con token
-  - [ ] Verifica .lumioignore rispettato
-  - [ ] Verifica immagini in Storage
-  - [ ] Associazione carta a esercizio
-  - [ ] Visualizzazione esercizio con carta locale
-  - [ ] Modifica repo sorgente e re-sync
-  - [ ] Verifica warning carte eliminate
-  - [ ] Test sync automatico
-  - [ ] Test ricerca e filtri picker
+- [x] Applicare tutte le migrations in ordine
+- [x] Deploy Edge Functions
+- [x] Configurare GitHub Action sync
+- [x] Test manuale flusso completo:
+  - [x] Aggiunta repository pubblico
+  - [x] Sync iniziale, verifica carte
+  - [x] Aggiunta repository privato con token
+  - [x] Verifica .lumioignore rispettato
+  - [x] Verifica immagini in Storage
+  - [x] Associazione carta a esercizio
+  - [x] Visualizzazione esercizio con carta locale
+  - [x] Modifica repo sorgente e re-sync
+  - [x] Verifica warning carte eliminate
+  - [x] Test sync automatico
+  - [x] Test ricerca e filtri picker
 
 #### 8.15 Documentazione
 
-- [ ] Aggiornare `CLAUDE.md`:
+- [x] Aggiornare `CLAUDE.md`:
   - Nuove tabelle Database
   - Nuove Edge Functions
   - Bucket Storage lumio-images
 
-- [ ] Aggiornare `docs/SPECS.md`:
+- [x] Aggiornare `docs/SPECS.md`:
   - Sezione "Repository Carte Lumio"
   - Formato .lumioignore
   - Flusso sincronizzazione

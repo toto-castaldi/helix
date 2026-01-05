@@ -1,4 +1,4 @@
-import type { LumioCard } from '@/types'
+import type { LumioCard, LumioLocalCard } from '@/types'
 
 /**
  * Fetch a Lumio card from an external URL via Edge Function proxy
@@ -116,4 +116,18 @@ export function getLanguageLabel(language: string | undefined): string {
     de: 'Deutsch',
   }
   return language ? languages[language] || language.toUpperCase() : ''
+}
+
+/**
+ * Get display title for a Lumio card
+ * Returns the title from frontmatter if available, otherwise extracts filename from path
+ */
+export function getCardDisplayTitle(card: LumioLocalCard): string {
+  if (card.title) {
+    return card.title
+  }
+
+  // Extract filename from path (e.g., "exercises/squat.md" -> "squat")
+  const filename = card.file_path.split('/').pop() || card.file_path
+  return filename.replace(/\.md$/i, '')
 }
