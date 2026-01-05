@@ -114,32 +114,33 @@ Deno.serve(async (req: Request) => {
 
     for (const repo of repos as LumioRepository[]) {
       try {
-        // Call lumio-sync-repo function internally
-        // We need to create a JWT for the user who owns the repo
-        const { data: { session }, error: sessionError } = await supabase.auth.admin.createSession({
-          userId: repo.user_id,
-        })
-
-        if (sessionError || !session) {
-          results.push({
-            repositoryId: repo.id,
-            name: repo.name,
-            success: false,
-            error: "Failed to create user session",
-          })
-          continue
-        }
-
-        // Call sync function
+        // Call lumio-sync-repo function with service_role key and userId
         const syncUrl = `${supabaseUrl}/functions/v1/lumio-sync-repo`
         const syncResponse = await fetch(syncUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${session.access_token}`,
+            "Authorization": `Bearer ${supabaseServiceKey}`,
+            "apikey": supabaseServiceKey,  // Required for Supabase Gateway auth
           },
-          body: JSON.stringify({ repositoryId: repo.id }),
+          body: JSON.stringify({
+            repositoryId: repo.id,
+            userId: repo.user_id  // Pass userId for service_role auth
+          }),
         })
+
+        // Check HTTP status first
+        if (!syncResponse.ok) {
+          const errorText = await syncResponse.text()
+          console.error(`Sync failed for ${repo.name}: HTTP ${syncResponse.status} - ${errorText}`)
+          results.push({
+            repositoryId: repo.id,
+            name: repo.name,
+            success: false,
+            error: `HTTP ${syncResponse.status}: ${errorText.slice(0, 200)}`,
+          })
+          continue
+        }
 
         const syncResult = await syncResponse.json()
 
@@ -151,11 +152,12 @@ Deno.serve(async (req: Request) => {
             cardsCount: syncResult.cardsCount,
           })
         } else {
+          console.error(`Sync returned failure for ${repo.name}:`, syncResult)
           results.push({
             repositoryId: repo.id,
             name: repo.name,
             success: false,
-            error: syncResult.error,
+            error: syncResult.error || "Unknown sync error",
           })
         }
       } catch (syncError) {

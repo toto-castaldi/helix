@@ -29,6 +29,7 @@ interface LumioCardFrontmatter {
 interface RequestBody {
   repositoryId: string
   force?: boolean
+  userId?: string  // For internal calls with service_role key
 }
 
 interface LumioRepository {
@@ -178,23 +179,34 @@ Deno.serve(async (req: Request) => {
 
     // Create Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Get user from JWT
-    const token = authHeader.replace("Bearer ", "")
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
-
-    if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Invalid token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
-    }
-
-    // Parse request body
+    // Parse request body first to check for userId (internal call)
     const body: RequestBody = await req.json()
-    const { repositoryId, force = false } = body
+    const { repositoryId, force = false, userId: bodyUserId } = body
+
+    // Determine user ID - either from JWT or from body (for internal service_role calls)
+    let userId: string
+
+    const token = authHeader.replace("Bearer ", "")
+
+    // Check if this is a service_role call with userId in body
+    if (bodyUserId && token === supabaseServiceKey) {
+      // Internal call with service_role key
+      userId = bodyUserId
+    } else {
+      // Regular user call - validate JWT
+      const { data: { user }, error: userError } = await supabase.auth.getUser(token)
+
+      if (userError || !user) {
+        return new Response(
+          JSON.stringify({ error: "Invalid token" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      userId = user.id
+    }
 
     if (!repositoryId) {
       return new Response(
@@ -208,7 +220,7 @@ Deno.serve(async (req: Request) => {
       .from("lumio_repositories")
       .select("*")
       .eq("id", repositoryId)
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single()
 
     if (repoError || !repo) {
@@ -372,7 +384,7 @@ Deno.serve(async (req: Request) => {
               // Generate hash for filename
               const hash = await hashBinaryContent(imageData)
               const ext = getExtension(resolvedPath)
-              const storagePath = `${user.id}/${repositoryId}/${hash}.${ext}`
+              const storagePath = `${userId}/${repositoryId}/${hash}.${ext}`
 
               // Upload to storage
               const { error: uploadError } = await supabase.storage
@@ -423,7 +435,7 @@ Deno.serve(async (req: Request) => {
             .upsert(
               {
                 repository_id: repositoryId,
-                user_id: user.id,
+                user_id: userId,
                 file_path: filePath,
                 title,
                 content: processedContent,
