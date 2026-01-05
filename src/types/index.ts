@@ -314,13 +314,16 @@ export interface LumioRepository {
   name: string
   github_owner: string
   github_repo: string
-  branch: string
   access_token: string | null
   last_commit_hash: string | null
   last_sync_at: string | null
   sync_status: SyncStatus
   sync_error: string | null
   cards_count: number
+  last_sync_added: number
+  last_sync_updated: number
+  last_sync_removed: number
+  last_sync_unchanged: number
   created_at: string
   updated_at: string
 }
@@ -329,7 +332,6 @@ export interface LumioRepositoryInsert {
   name: string
   github_owner: string
   github_repo: string
-  branch?: string
   access_token?: string | null
 }
 
@@ -353,6 +355,7 @@ export interface LumioLocalCard {
   title: string | null
   content: string
   raw_content: string
+  content_hash: string | null
   frontmatter: LumioLocalCardFrontmatter | null
   source_available: boolean
   created_at: string

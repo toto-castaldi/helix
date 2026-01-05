@@ -16,7 +16,6 @@ const repositorySchema = z.object({
     (url) => parseGitHubUrl(url) !== null,
     'URL GitHub non valido. Usa il formato: github.com/owner/repo'
   ),
-  branch: z.string().min(1, 'Branch obbligatorio'),
   access_token: z.string().optional(),
 })
 
@@ -52,7 +51,6 @@ export function RepositoryForm({
     defaultValues: {
       name: repository?.name || '',
       github_url: defaultGitHubUrl,
-      branch: repository?.branch || 'main',
       access_token: repository?.access_token || '',
     },
   })
@@ -66,9 +64,6 @@ export function RepositoryForm({
       const parsed = parseGitHubUrl(githubUrl)
       if (parsed) {
         setValue('name', parsed.repo)
-        if (parsed.branch) {
-          setValue('branch', parsed.branch)
-        }
       }
     }
   }, [githubUrl, currentName, repository, setValue])
@@ -83,7 +78,6 @@ export function RepositoryForm({
       name: data.name,
       github_owner: parsed.owner,
       github_repo: parsed.repo,
-      branch: data.branch,
       access_token: data.access_token || null,
     })
   }
@@ -114,18 +108,6 @@ export function RepositoryForm({
         />
         {errors.name && (
           <p className="text-sm text-destructive">{errors.name.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="branch">Branch *</Label>
-        <Input
-          id="branch"
-          {...register('branch')}
-          placeholder="main"
-        />
-        {errors.branch && (
-          <p className="text-sm text-destructive">{errors.branch.message}</p>
         )}
       </div>
 

@@ -36,10 +36,25 @@ interface LumioRepository {
   user_id: string
   github_owner: string
   github_repo: string
-  branch: string
   access_token: string | null
   last_commit_hash: string | null
 }
+
+interface ExistingCard {
+  id: string
+  file_path: string
+  content_hash: string | null
+}
+
+interface SyncStats {
+  added: number
+  updated: number
+  removed: number
+  unchanged: number
+}
+
+// Always use 'main' branch
+const BRANCH = 'main'
 
 /**
  * Parse YAML frontmatter from markdown content
@@ -118,12 +133,23 @@ function resolvePath(cardPath: string, imagePath: string): string {
 }
 
 /**
- * Generate a hash for file content
+ * Generate a hash for binary content (images)
  */
-async function hashContent(data: ArrayBuffer): Promise<string> {
+async function hashBinaryContent(data: ArrayBuffer): Promise<string> {
   const hashBuffer = await crypto.subtle.digest("SHA-256", data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 16)
+}
+
+/**
+ * Generate a hash for text content (cards)
+ */
+async function hashTextContent(text: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(text)
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("")
 }
 
 /**
@@ -201,21 +227,32 @@ Deno.serve(async (req: Request) => {
       .eq("id", repositoryId)
 
     try {
-      // Get latest commit hash
+      // Get latest commit hash (always use 'main' branch)
       const latestHash = await getLatestCommitHash(
         repository.github_owner,
         repository.github_repo,
-        repository.branch,
+        BRANCH,
         repository.access_token
       )
 
-      // Check if already synced
+      // Check if already synced (no changes in repository)
       if (!force && repository.last_commit_hash === latestHash) {
+        // Get current cards count for unchanged stat
+        const { count: cardsCount } = await supabase
+          .from("lumio_cards")
+          .select("*", { count: "exact", head: true })
+          .eq("repository_id", repositoryId)
+          .eq("source_available", true)
+
         await supabase
           .from("lumio_repositories")
           .update({
             sync_status: "synced",
             last_sync_at: new Date().toISOString(),
+            last_sync_added: 0,
+            last_sync_updated: 0,
+            last_sync_removed: 0,
+            last_sync_unchanged: cardsCount || 0,
           })
           .eq("id", repositoryId)
 
@@ -223,17 +260,17 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({
             success: true,
             message: "Already up to date",
-            cardsCount: 0,
+            stats: { added: 0, updated: 0, removed: 0, unchanged: cardsCount || 0 },
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         )
       }
 
-      // Get repository tree
+      // Get repository tree (always use 'main' branch)
       const tree = await getRepositoryTree(
         repository.github_owner,
         repository.github_repo,
-        repository.branch,
+        BRANCH,
         repository.access_token
       )
 
@@ -248,7 +285,7 @@ Deno.serve(async (req: Request) => {
             repository.github_owner,
             repository.github_repo,
             ".lumioignore",
-            repository.branch,
+            BRANCH,
             repository.access_token
           )
           ignorePatterns = parseLumioIgnore(ignoreContent)
@@ -263,9 +300,22 @@ Deno.serve(async (req: Request) => {
         .map((item: GitHubTreeItem) => item.path)
       const mdFiles = filterMarkdownFiles(allFiles, ignorePatterns)
 
-      // Track processed cards
+      // Get existing cards with their hashes for comparison
+      const { data: existingCardsData } = await supabase
+        .from("lumio_cards")
+        .select("id, file_path, content_hash")
+        .eq("repository_id", repositoryId)
+
+      const existingCards = new Map<string, ExistingCard>()
+      if (existingCardsData) {
+        for (const card of existingCardsData) {
+          existingCards.set(card.file_path, card as ExistingCard)
+        }
+      }
+
+      // Track sync statistics
+      const stats: SyncStats = { added: 0, updated: 0, removed: 0, unchanged: 0 }
       const processedCardPaths = new Set<string>()
-      let cardsCount = 0
 
       // Process each markdown file
       for (const filePath of mdFiles) {
@@ -275,15 +325,30 @@ Deno.serve(async (req: Request) => {
             repository.github_owner,
             repository.github_repo,
             filePath,
-            repository.branch,
+            BRANCH,
             repository.access_token
           )
+
+          // Calculate content hash
+          const contentHash = await hashTextContent(rawContent)
+
+          // Check if card exists and hash matches (skip if unchanged)
+          const existingCard = existingCards.get(filePath)
+          if (existingCard && existingCard.content_hash === contentHash) {
+            // Card unchanged - skip processing
+            processedCardPaths.add(filePath)
+            stats.unchanged++
+            continue
+          }
+
+          // Determine if this is an add or update
+          const isNewCard = !existingCard
 
           // Parse frontmatter
           const { frontmatter, content } = parseFrontmatter(rawContent)
           const title = frontmatter.title || filePath.split("/").pop()?.replace(".md", "") || null
 
-          // Extract and process images
+          // Extract and process images (only for new/updated cards)
           const imagePaths = extractImagePaths(rawContent)
           const imageMapping: Record<string, string> = {}
 
@@ -296,12 +361,12 @@ Deno.serve(async (req: Request) => {
                 repository.github_owner,
                 repository.github_repo,
                 resolvedPath,
-                repository.branch,
+                BRANCH,
                 repository.access_token
               )
 
               // Generate hash for filename
-              const hash = await hashContent(imageData)
+              const hash = await hashBinaryContent(imageData)
               const ext = getExtension(resolvedPath)
               const storagePath = `${user.id}/${repositoryId}/${hash}.${ext}`
 
@@ -348,7 +413,7 @@ Deno.serve(async (req: Request) => {
             )
           }
 
-          // Upsert card in database
+          // Upsert card in database with content_hash
           const { data: card, error: cardError } = await supabase
             .from("lumio_cards")
             .upsert(
@@ -359,6 +424,7 @@ Deno.serve(async (req: Request) => {
                 title,
                 content: processedContent,
                 raw_content: rawContent,
+                content_hash: contentHash,
                 frontmatter,
                 source_available: true,
                 updated_at: new Date().toISOString(),
@@ -371,6 +437,13 @@ Deno.serve(async (req: Request) => {
           if (cardError) {
             console.error(`Failed to upsert card ${filePath}:`, cardError)
             continue
+          }
+
+          // Update stats
+          if (isNewCard) {
+            stats.added++
+          } else {
+            stats.updated++
           }
 
           // Upsert image mappings
@@ -390,30 +463,26 @@ Deno.serve(async (req: Request) => {
           }
 
           processedCardPaths.add(filePath)
-          cardsCount++
         } catch (fileError) {
           console.error(`Failed to process ${filePath}:`, fileError)
         }
       }
 
-      // Mark cards not in current sync as source_available = false
-      const { data: existingCards } = await supabase
-        .from("lumio_cards")
-        .select("id, file_path")
-        .eq("repository_id", repositoryId)
-
-      if (existingCards) {
-        for (const card of existingCards) {
-          if (!processedCardPaths.has(card.file_path)) {
-            await supabase
-              .from("lumio_cards")
-              .update({ source_available: false })
-              .eq("id", card.id)
-          }
+      // Mark cards not in current sync as source_available = false (removed from source)
+      for (const [cardPath, card] of existingCards) {
+        if (!processedCardPaths.has(cardPath)) {
+          await supabase
+            .from("lumio_cards")
+            .update({ source_available: false })
+            .eq("id", card.id)
+          stats.removed++
         }
       }
 
-      // Update repository status
+      // Calculate total cards count (added + updated + unchanged)
+      const totalCardsCount = stats.added + stats.updated + stats.unchanged
+
+      // Update repository status with delta stats
       await supabase
         .from("lumio_repositories")
         .update({
@@ -421,14 +490,19 @@ Deno.serve(async (req: Request) => {
           last_sync_at: new Date().toISOString(),
           sync_status: "synced",
           sync_error: null,
-          cards_count: cardsCount,
+          cards_count: totalCardsCount,
+          last_sync_added: stats.added,
+          last_sync_updated: stats.updated,
+          last_sync_removed: stats.removed,
+          last_sync_unchanged: stats.unchanged,
         })
         .eq("id", repositoryId)
 
       return new Response(
         JSON.stringify({
           success: true,
-          cardsCount,
+          stats,
+          cardsCount: totalCardsCount,
           commitHash: latestHash,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }

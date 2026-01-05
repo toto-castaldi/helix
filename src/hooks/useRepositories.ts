@@ -42,7 +42,6 @@ export function useRepositories() {
       .insert({
         ...repo,
         user_id: user.id,
-        branch: repo.branch || 'main',
         sync_status: 'pending',
       })
       .select()

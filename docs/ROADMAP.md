@@ -733,6 +733,52 @@ Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lum
 - Token scaduti → gestione errore 401
 - Sync concorrenti → lock con sync_status
 
+---
+
+### Milestone 9: Ottimizzazione Sync Repository Lumio ✅
+
+Obiettivo: Ottimizzare la sincronizzazione dei repository evitando di ricaricare carte non modificate, mostrando statistiche delta nell'UI, e semplificando rimuovendo il campo branch (sempre main).
+
+#### 9.1 Database
+
+- [x] Migration per aggiungere `content_hash` a `lumio_cards`
+- [x] Migration per aggiungere campi delta a `lumio_repositories` (`last_sync_added`, `last_sync_updated`, `last_sync_removed`, `last_sync_unchanged`)
+- [x] Migration per rimuovere `branch` da `lumio_repositories` (DROP COLUMN)
+
+#### 9.2 Edge Function
+
+- [x] Calcolo SHA-256 del `raw_content` per ogni carta
+- [x] Confronto hash per skip carte invariate
+- [x] Skip fetch immagini per carte invariate
+- [x] Tracking statistiche: added, updated, removed, unchanged
+- [x] Hardcode `branch='main'`
+
+#### 9.3 Types e Hook
+
+- [x] Aggiornare `LumioRepository` (rimuovi branch, aggiungi delta fields)
+- [x] Aggiornare `LumioLocalCard` (aggiungi `content_hash`)
+- [x] Aggiornare `useRepositories` (rimuovi branch da insert)
+
+#### 9.4 UI
+
+- [x] Rimuovere campo branch da `RepositoryForm`
+- [x] Rimuovere visualizzazione branch da `RepositoryCard`
+- [x] Aggiungere sezione delta sync in `RepositoryCard` (formato testo esteso)
+
+#### 9.5 Documentazione
+
+- [x] Aggiornare `CLAUDE.md` con schema DB
+- [x] Aggiornare `ROADMAP.md`
+
+#### 9.6 Test
+
+- [x] Test sync con repository esistente
+- [x] Verificare delta mostrato correttamente
+- [x] Verificare carte invariate non riprocessate
+- [x] Verificare build senza errori
+
+---
+
 ## Task vari
 
 - [x] Devops: GitHub Action per deploy Edge Functions

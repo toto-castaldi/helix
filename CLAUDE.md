@@ -20,7 +20,9 @@ Fitness Coach Assistant - A smartphone-optimized web application that serves as 
 ## Documentation
 
 - [Product specifications and feature requirements](./docs/SPECS.md)
+- [Technical specifications and architecture](./docs/TECH-SPECS.md)
 - [Implementation roadmap with step-by-step tasks](./docs/ROADMAP.md)
+- [Local development guide](./docs/LOCAL-DEVELOPMENT.md)
 
 ## Rules
 
@@ -156,10 +158,15 @@ Tables:
 - `ai_generated_plans` - AI-generated training plans (conversation_id, session_id, plan_json, accepted)
 - `coach_ai_settings` - Coach AI configuration (openai_api_key, anthropic_api_key, preferred_provider, preferred_model)
 
-- `lumio_repositories` - Repository GitHub censiti (user_id, github_owner, github_repo, branch, access_token, sync_status, last_commit_hash)
-- `lumio_cards` - Carte sincronizzate (repository_id, file_path, title, content, frontmatter, source_available)
+- `lumio_repositories` - Repository GitHub censiti (user_id, github_owner, github_repo, access_token, sync_status, last_commit_hash, last_sync_added, last_sync_updated, last_sync_removed, last_sync_unchanged)
+- `lumio_cards` - Carte sincronizzate (repository_id, file_path, title, content, content_hash, frontmatter, source_available)
 - `lumio_card_images` - Immagini delle carte (card_id, original_path, storage_path)
 - `exercises.lumio_card_id` - FK per associare esercizio a carta locale
+
+**Note Milestone 9:**
+- Campo `branch` rimosso da `lumio_repositories` (sempre "main", hardcoded in Edge Function)
+- Campo `content_hash` aggiunto a `lumio_cards` per ottimizzazione sync (SHA-256)
+- Campi delta (`last_sync_*`) in `lumio_repositories` per tracking modifiche
 
 All tables have Row Level Security (RLS) policies.
 

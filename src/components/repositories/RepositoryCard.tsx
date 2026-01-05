@@ -1,9 +1,39 @@
-import { FolderGit2, GitBranch, Lock, RefreshCw, FileText } from 'lucide-react'
+import { FolderGit2, Lock, RefreshCw, FileText } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CardActions } from '@/components/shared'
 import { SyncStatusBadge } from './SyncStatusBadge'
 import type { LumioRepository } from '@/types'
+
+/**
+ * Format delta stats for display
+ */
+function formatSyncDelta(repo: LumioRepository): string | null {
+  const { last_sync_added, last_sync_updated, last_sync_removed, last_sync_unchanged } = repo
+
+  // If all stats are 0 or undefined, no delta to show
+  if (!last_sync_added && !last_sync_updated && !last_sync_removed && !last_sync_unchanged) {
+    return null
+  }
+
+  // If everything is unchanged
+  if (!last_sync_added && !last_sync_updated && !last_sync_removed && last_sync_unchanged) {
+    return 'Nessuna modifica'
+  }
+
+  const parts: string[] = []
+  if (last_sync_added && last_sync_added > 0) {
+    parts.push(`${last_sync_added} aggiunt${last_sync_added === 1 ? 'a' : 'e'}`)
+  }
+  if (last_sync_updated && last_sync_updated > 0) {
+    parts.push(`${last_sync_updated} modificat${last_sync_updated === 1 ? 'a' : 'e'}`)
+  }
+  if (last_sync_removed && last_sync_removed > 0) {
+    parts.push(`${last_sync_removed} rimoss${last_sync_removed === 1 ? 'a' : 'e'}`)
+  }
+
+  return parts.length > 0 ? parts.join(', ') : 'Nessuna modifica'
+}
 
 interface RepositoryCardProps {
   repository: LumioRepository
@@ -57,10 +87,6 @@ export function RepositoryCard({
         </div>
 
         <div className="mt-3 flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <GitBranch className="h-3.5 w-3.5" />
-            <span>{repository.branch}</span>
-          </div>
           <button
             type="button"
             onClick={() => onViewCards(repository)}
@@ -78,8 +104,15 @@ export function RepositoryCard({
           />
         </div>
 
+        {/* Delta sync stats */}
+        {repository.last_sync_at && formatSyncDelta(repository) && (
+          <div className="mt-2 text-xs text-muted-foreground">
+            {formatSyncDelta(repository)}
+          </div>
+        )}
+
         {repository.sync_status === 'error' && repository.sync_error && (
-          <div className="mt-2 p-2 bg-destructive/10 rounded text-sm text-destructive">
+          <div className="mt-2 p-2 bg-destructive/10 rounded text-sm text-destructive break-words">
             {repository.sync_error}
           </div>
         )}
