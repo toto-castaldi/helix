@@ -1,4 +1,4 @@
-# Specifiche - Fitness Coach Assistant
+# Specifiche - Helix
 
 ## Vision
 
@@ -61,14 +61,14 @@ Quando un esercizio ha una carta associata (locale o esterna), la descrizione de
 
 ### Repository Carte Lumio
 
-I coach possono censire repository GitHub contenenti carte Lumio per sincronizzarle localmente in FCA.
+I coach possono censire repository GitHub contenenti carte Lumio per sincronizzarle localmente in Helix.
 
 #### Caratteristiche
 
 - **Repository pubblici e privati**: per i repo privati serve un token di accesso GitHub
 - **Sincronizzazione**: manuale (bottone) + automatica (job esterno periodico)
 - **Scope per utente**: ogni coach vede solo i propri repository censiti
-- **Persistenza carte eliminate**: se una carta viene rimossa dal repo sorgente, resta disponibile in FCA con un warning "sorgente non trovata"
+- **Persistenza carte eliminate**: se una carta viene rimossa dal repo sorgente, resta disponibile in Helix con un warning "sorgente non trovata"
 - **Visualizzazione carte**: cliccando sul contatore carte si apre un elenco con ricerca delle carte presenti nel repository
 
 #### Struttura Repository

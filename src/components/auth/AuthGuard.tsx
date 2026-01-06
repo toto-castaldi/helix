@@ -22,8 +22,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <div className="w-full max-w-sm space-y-6 text-center">
           <div className="space-y-2">
-            <img src="/logo.svg" alt="FCA Logo" className="mx-auto h-32 w-32" />
-            <h1 className="text-2xl font-bold">Fitness Coach Assistant</h1>
+            <img src="/logo.svg" alt="Helix Logo" className="mx-auto h-32 w-32" />
+            <h1 className="text-2xl font-bold">Helix</h1>
           </div>
           <LoginButton />
         </div>

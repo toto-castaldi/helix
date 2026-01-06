@@ -43,8 +43,8 @@ export function Layout() {
         <div className="flex items-center justify-between px-4 py-3">
           {/* Logo + App name */}
           <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="FCA" className="h-8 w-8" />
-            <span className="text-lg font-semibold">FCA</span>
+            <img src="/logo.svg" alt="Helix" className="h-8 w-8" />
+            <span className="text-lg font-semibold">Helix</span>
           </div>
 
           {/* User menu */}

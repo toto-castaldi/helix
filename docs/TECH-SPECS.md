@@ -1,4 +1,4 @@
-# Specifiche Tecniche - Fitness Coach Assistant
+# Specifiche Tecniche - Helix
 
 Documentazione tecnica dettagliata delle funzionalità implementate.
 

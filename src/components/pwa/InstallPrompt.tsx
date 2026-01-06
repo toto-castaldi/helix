@@ -60,7 +60,7 @@ export function InstallPrompt() {
         <div className="flex-1">
           <p className="font-medium">Installa l'app</p>
           <p className="text-sm opacity-90">
-            Aggiungi Fitness Coach Assistant alla schermata home per un accesso rapido
+            Aggiungi Helix alla schermata home per un accesso rapido
           </p>
         </div>
         <button

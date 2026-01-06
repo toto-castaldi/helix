@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'icon-192.png', 'icon-512.png', 'logo.svg'],
       manifest: {
-        name: 'Fitness Coach Assistant',
-        short_name: 'FCA',
+        name: 'Helix',
+        short_name: 'Helix',
         description: 'AI assistant per fitness coach - pianifica allenamenti e gestisci clienti',
         theme_color: '#059669',
         background_color: '#ffffff',

@@ -88,7 +88,7 @@ Per abilitare il login con Google:
 3. Vai su **APIs & Services** > **Credentials**
 4. **Create Credentials** > **OAuth 2.0 Client ID**
 5. Tipo: **Web application**
-6. Nome: `FCA Local`
+6. Nome: `Helix Local`
 7. JavaScript origins: `http://localhost:5173`
 8. Redirect URIs: `http://localhost:54321/auth/v1/callback`
 

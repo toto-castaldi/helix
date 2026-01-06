@@ -1,4 +1,4 @@
-# Roadmap - Fitness Coach Assistant
+# Roadmap - Helix
 
 ## Versione 1
 
@@ -197,8 +197,8 @@ Obiettivo: Trasformare l'applicazione in una PWA installabile su Android con sup
 #### 4.2 Web App Manifest
 
 - [x] Configurare manifest in VitePWA:
-  - Nome: "Fitness Coach Assistant"
-  - Short name: "FCA"
+  - Nome: "Helix"
+  - Short name: "Helix"
   - Theme color e background color
   - Display: standalone
   - Orientation: portrait
@@ -215,7 +215,7 @@ Obiettivo: Trasformare l'applicazione in una PWA installabile su Android con sup
 #### 4.4 Meta Tag e HTML
 
 - [x] Aggiornare `index.html`:
-  - Title: "Fitness Coach Assistant"
+  - Title: "Helix"
   - Meta description
   - Meta theme-color
 
@@ -426,7 +426,7 @@ Obiettivo: Configurare un ambiente di sviluppo locale completo con Supabase CLI,
 
 ### Milestone 8: Repository Carte Lumio Locali ✅
 
-Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lumio, sincronizzarle localmente in FCA, e selezionarle per gli esercizi tramite una UI dedicata invece che inserire URL manuali.
+Obiettivo: Permettere ai coach di censire repository GitHub contenenti carte Lumio, sincronizzarle localmente in Helix, e selezionarle per gli esercizi tramite una UI dedicata invece che inserire URL manuali.
 
 **Decisioni architetturali:**
 

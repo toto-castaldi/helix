@@ -1,8 +1,8 @@
 server {                                                                                    
 	listen 80;                                                                              
-	server_name fca.toto-castaldi.com;                                                         
+	server_name helix.toto-castaldi.com;                                                         
                                                                                               
-	root /var/www/fitness-coach-assistant;                                                            
+	root /var/www/helix;                                                            
 	index index.html;                                                                       
                                                                                               
 	# Gzip compression                                                                      
