@@ -12,6 +12,9 @@ export function Layout() {
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
+  // Get user avatar from Google OAuth metadata
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture
+
   // Close menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -38,23 +41,36 @@ export function Layout() {
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-bold">Fitness Coach Assitant</h1>
-          <div className="relative" ref={menuRef}>
+          {/* Logo + App name */}
+          <div className="flex items-center gap-2">
+            <img src="/logo.svg" alt="FCA" className="h-8 w-8" />
+            <span className="text-lg font-semibold">FCA</span>
+          </div>
+
+          {/* User menu */}
+          <div className="flex items-center gap-2" ref={menuRef}>
+            {/* Avatar */}
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="flex items-center gap-2 p-2 rounded-md hover:bg-accent"
+              className="flex items-center gap-2"
             >
-              <span className="text-xs text-muted-foreground hidden sm:inline max-w-32 truncate">
-                {user?.email}
-              </span>
-              <div className="rounded-full bg-primary/10 p-1.5">
-                <User className="h-4 w-4 text-primary" />
-              </div>
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile"
+                  referrerPolicy="no-referrer"
+                  className="h-9 w-9 rounded-full object-cover border-2 border-muted"
+                />
+              ) : (
+                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+              )}
             </button>
 
             {/* Dropdown Menu */}
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 w-48 bg-background border rounded-md shadow-lg z-50">
+              <div className="absolute right-4 top-14 w-48 bg-background border rounded-md shadow-lg z-50">
                 <div className="p-2 border-b">
                   <p className="text-sm font-medium truncate">{user?.email}</p>
                 </div>
