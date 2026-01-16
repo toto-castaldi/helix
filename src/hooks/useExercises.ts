@@ -6,7 +6,7 @@ import type {
   ExerciseInsert,
   ExerciseUpdate,
   ExerciseBlockInsert,
-  LumioLocalCard
+  LumioLocalCardWithRepository
 } from '@/types'
 
 export function useExercises() {
@@ -62,16 +62,16 @@ export function useExercises() {
       lumioCardIds.length > 0
         ? supabase
             .from('lumio_cards')
-            .select('*')
+            .select('*, repository:lumio_repositories(*)')
             .in('id', lumioCardIds)
-        : Promise.resolve({ data: [] as LumioLocalCard[], error: null })
+        : Promise.resolve({ data: [] as LumioLocalCardWithRepository[], error: null })
     ])
 
     const blocksMap = new Map<string, typeof blocksResult.data>()
     const tagsMap = new Map<string, typeof tagsResult.data>()
     const sessionsCountMap = new Map<string, number>()
     const plannedSessionsCountMap = new Map<string, number>()
-    const lumioCardsMap = new Map<string, LumioLocalCard>()
+    const lumioCardsMap = new Map<string, LumioLocalCardWithRepository>()
 
     blocksResult.data?.forEach(block => {
       const existing = blocksMap.get(block.exercise_id) || []
@@ -99,7 +99,7 @@ export function useExercises() {
     })
 
     lumioCardsResult.data?.forEach(card => {
-      lumioCardsMap.set(card.id, card as LumioLocalCard)
+      lumioCardsMap.set(card.id, card as LumioLocalCardWithRepository)
     })
 
     const exercisesWithDetails: ExerciseWithDetails[] = exercisesData.map(exercise => ({

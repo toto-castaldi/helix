@@ -86,7 +86,7 @@ export interface ExerciseWithDetails extends Exercise {
   tags?: ExerciseTag[]
   sessionsCount?: number
   plannedSessionsCount?: number
-  lumio_card?: LumioLocalCard | null
+  lumio_card?: LumioLocalCardWithRepository | null
 }
 
 export interface Gym {
