@@ -17,11 +17,9 @@ export function Repositories() {
     repositories,
     loading,
     error,
-    syncing,
     createRepository,
     updateRepository,
     deleteRepository,
-    syncRepository,
     refetch,
   } = useRepositories()
 
@@ -41,7 +39,7 @@ export function Repositories() {
     handleDelete,
   } = useEntityPage<LumioRepository>()
 
-  // Polling for sync status updates when any repo is syncing
+  // Polling for sync status updates when any repo is syncing (Docora sends webhooks)
   useEffect(() => {
     const hasSyncingRepo = repositories.some((repo) => repo.sync_status === 'syncing')
     if (!hasSyncingRepo) return
@@ -54,11 +52,8 @@ export function Repositories() {
   }, [repositories, refetch])
 
   const onSubmitCreate = async (data: LumioRepositoryInsert) => {
-    const result = await handleCreate(createRepository, data)
-    // Auto-sync after creation
-    if (result) {
-      syncRepository(result.id)
-    }
+    // Repository is automatically registered with Docora in createRepository
+    await handleCreate(createRepository, data)
   }
 
   const onSubmitUpdate = async (data: LumioRepositoryInsert) => {
@@ -67,10 +62,6 @@ export function Repositories() {
 
   const onConfirmDelete = async () => {
     await handleDelete(deleteRepository)
-  }
-
-  const onSync = (repository: LumioRepository) => {
-    syncRepository(repository.id)
   }
 
   if (loading) {
@@ -120,10 +111,8 @@ export function Repositories() {
       {!isFormVisible && (
         <RepositoryList
           repositories={repositories}
-          syncingId={syncing}
           onEdit={openEditForm}
           onDelete={openDeleteConfirm}
-          onSync={onSync}
           onViewCards={setViewingCardsRepo}
         />
       )}

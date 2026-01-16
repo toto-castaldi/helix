@@ -315,6 +315,7 @@ export interface LumioRepository {
   github_owner: string
   github_repo: string
   access_token: string | null
+  docora_repository_id: string | null
   last_commit_hash: string | null
   last_commit_at: string | null
   last_sync_at: string | null

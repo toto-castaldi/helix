@@ -93,6 +93,10 @@ verify_jwt = true
 enabled = true
 verify_jwt = true
 
-[functions.lumio-check-pending]
+[functions.docora-register]
 enabled = true
-verify_jwt = false  # Uses service_role key instead
+verify_jwt = true
+
+[functions.docora-webhook]
+enabled = true
+verify_jwt = false  # Uses HMAC signature verification instead
