@@ -36,21 +36,27 @@ export function resolveImagePaths(
 }
 
 /**
- * Resolves a relative path from a base file path.
+ * Resolves a relative or absolute path from a base file path.
  *
  * Examples:
  * - base: "cards/file.md", relative: "../assets/img.png" -> "assets/img.png"
  * - base: "docs/guide/file.md", relative: "../../assets/img.png" -> "assets/img.png"
  * - base: "file.md", relative: "assets/img.png" -> "assets/img.png"
  * - base: "cards/file.md", relative: "./img.png" -> "cards/img.png"
+ * - base: "cards/file.md", absolute: "/assets/img.png" -> "assets/img.png"
  */
-function resolveRelativePath(baseFilePath: string, relativePath: string): string {
+function resolveRelativePath(baseFilePath: string, imagePath: string): string {
+  // Handle absolute paths (starting with /)
+  if (imagePath.startsWith('/')) {
+    return imagePath.slice(1) // Remove leading slash
+  }
+
   // Get the directory of the base file
   const baseParts = baseFilePath.split('/')
   baseParts.pop() // Remove filename, keep directory parts
 
   // Handle the relative path
-  const relativeParts = relativePath.split('/')
+  const relativeParts = imagePath.split('/')
 
   for (const part of relativeParts) {
     if (part === '..') {
