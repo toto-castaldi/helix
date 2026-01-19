@@ -150,7 +150,7 @@ export interface SessionExerciseUpdate extends Partial<Omit<SessionExerciseInser
 }
 
 export interface SessionExerciseWithDetails extends SessionExercise {
-  exercise?: Exercise
+  exercise?: ExerciseWithDetails
 }
 
 export interface SessionWithDetails extends Session {

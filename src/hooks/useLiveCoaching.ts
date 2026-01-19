@@ -57,7 +57,10 @@ export function useLiveCoaching() {
         gym:gyms(*),
         exercises:session_exercises(
           *,
-          exercise:exercises(*)
+          exercise:exercises(
+            *,
+            lumio_card:lumio_cards(*, repository:lumio_repositories(*))
+          )
         )
       `)
       .eq('session_date', date)
