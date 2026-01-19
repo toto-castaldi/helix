@@ -35,11 +35,6 @@ pop3_port = 54326
 enabled = true
 file_size_limit = "50MiB"
 
-[storage.buckets.exercise-images]
-public = true
-file_size_limit = "10MiB"
-allowed_mime_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
-
 [storage.buckets.lumio-images]
 public = true
 file_size_limit = "10MiB"

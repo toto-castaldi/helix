@@ -104,7 +104,7 @@ Per abilitare login Google in locale, vedi istruzioni in `README.md` sezione "Go
 
 ### Seed Data
 
-Il file `supabase/seed.sql` contiene 15 esercizi default con tag e blocchi step-by-step.
+Il file `supabase/seed.sql` contiene 15 esercizi default con tag.
 Viene eseguito automaticamente con `npm run supabase:reset`.
 
 ## Project Structure
@@ -176,8 +176,7 @@ Tables:
 
 - `clients` - Coach's clients (first_name, last_name, birth_date, age_years, gender, physical_notes)
 - `goal_history` - Client goal history (goal, started_at, ended_at)
-- `exercises` - Exercise catalog (user_id null = default, otherwise custom, card_url for external Lumio markdown)
-- `exercise_blocks` - Step-by-step exercise instructions with images
+- `exercises` - Exercise catalog (user_id null = default, otherwise custom, lumio_card_id for local Lumio cards)
 - `exercise_tags` - Exercise categorization tags
 - `gyms` - Coach's gyms (name, address, description)
 - `sessions` - Training sessions (client_id, gym_id, session_date, status: planned/completed, current_exercise_index)
@@ -191,7 +190,6 @@ Tables:
 - `lumio_cards` - Carte sincronizzate (repository_id, file_path, title, content, content_hash, frontmatter, source_available)
 - `lumio_card_images` - Immagini delle carte (card_id, original_path, storage_path)
 - `docora_chunk_buffer` - Buffer temporaneo per file chunked da Docora (chunk_id, repository_id, file_path, chunk_index, chunk_total, content)
-- `exercises.lumio_card_id` - FK per associare esercizio a carta locale
 
 **Note Milestone 9:**
 - Campo `branch` rimosso da `lumio_repositories` (sempre "main", hardcoded in Edge Function)
@@ -212,7 +210,7 @@ Located in `supabase/functions/`:
 |----------|-------------|
 | `ai-chat` | AI planning chat - receives clientId, generates client card internally, calls OpenAI/Anthropic |
 | `client-export` | Generates client card markdown for export (same format used by AI context) |
-| `lumio-card` | Fetches and parses external Lumio markdown cards, resolves image paths |
+| `lumio-card` | **DEPRECATED** - External Lumio markdown cards removed, only local cards via Docora |
 
 **Milestone 10 - Docora Integration:**
 
@@ -226,7 +224,6 @@ Located in `supabase/functions/`:
 
 | Bucket | Description |
 |--------|-------------|
-| `exercise-images` | Immagini blocchi esercizi |
 | `lumio-images` | Immagini carte Lumio sincronizzate |
 
 ### Client Card Format
