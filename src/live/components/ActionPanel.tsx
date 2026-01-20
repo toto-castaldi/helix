@@ -5,8 +5,8 @@ interface ActionPanelProps {
   onComplete: () => void
   onSkip: () => void
   onCenter: () => void
+  onDelete: () => void
   onAdd?: () => void
-  onDelete?: () => void
   disabled?: boolean
 }
 
@@ -14,8 +14,8 @@ export function ActionPanel({
   onComplete,
   onSkip,
   onCenter,
-  onAdd,
   onDelete,
+  onAdd,
   disabled = false,
 }: ActionPanelProps) {
   return (
@@ -53,6 +53,17 @@ export function ActionPanel({
         <span className="text-xs">PROSSIMO</span>
       </Button>
 
+      {/* Delete Button - rose/red distintivo */}
+      <Button
+        onClick={onDelete}
+        disabled={disabled}
+        size="xl"
+        className="h-20 flex-col gap-2 bg-rose-600 hover:bg-rose-700 text-white"
+      >
+        <Trash2 className="w-8 h-8" />
+        <span className="text-xs">ELIMINA</span>
+      </Button>
+
       {/* Add Button */}
       {onAdd && (
         <Button
@@ -64,20 +75,6 @@ export function ActionPanel({
         >
           <Plus className="w-8 h-8" />
           <span className="text-xs">AGGIUNGI</span>
-        </Button>
-      )}
-
-      {/* Delete Button */}
-      {onDelete && (
-        <Button
-          onClick={onDelete}
-          disabled={disabled}
-          size="xl"
-          variant="destructive"
-          className="h-20 flex-col gap-2"
-        >
-          <Trash2 className="w-8 h-8" />
-          <span className="text-xs">ELIMINA</span>
         </Button>
       )}
     </div>

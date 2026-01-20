@@ -625,6 +625,91 @@ export function useLiveCoaching() {
     [sessions]
   )
 
+  // Delete exercise from session
+  const deleteExerciseFromSession = useCallback(
+    async (sessionId: string, exerciseId: string): Promise<boolean> => {
+      const session = sessions.find((s) => s.id === sessionId)
+      if (!session || !session.exercises) return false
+
+      const exerciseIndex = session.exercises.findIndex((e) => e.id === exerciseId)
+      if (exerciseIndex === -1) return false
+
+      // Don't allow deleting if it's the only exercise
+      if (session.exercises.length <= 1) {
+        setError('Non puoi eliminare l\'ultimo esercizio della sessione')
+        return false
+      }
+
+      const result = await withSaveTracking(async () => {
+        // Delete the exercise from database
+        const { error: deleteError } = await supabase
+          .from('session_exercises')
+          .delete()
+          .eq('id', exerciseId)
+
+        if (deleteError) {
+          throw new Error(deleteError.message)
+        }
+
+        return true
+      })
+
+      if (result === null) {
+        return false
+      }
+
+      // Calculate new index:
+      // - If deleting the last exercise, select the previous one
+      // - Otherwise, keep the same index (next exercise slides into place)
+      const isLastExercise = exerciseIndex === session.exercises.length - 1
+      const currentIndex = session.current_exercise_index
+      let newIndex: number
+
+      if (isLastExercise && currentIndex === exerciseIndex) {
+        // Deleting the last exercise which is also current: go to previous
+        newIndex = Math.max(0, currentIndex - 1)
+      } else if (exerciseIndex < currentIndex) {
+        // Deleting an exercise before current: adjust index down
+        newIndex = currentIndex - 1
+      } else {
+        // Deleting current or after: keep same index (next slides in)
+        newIndex = Math.min(currentIndex, session.exercises.length - 2)
+      }
+
+      // Optimistic update - remove exercise and set new index
+      setSessions((prev) =>
+        prev.map((s) => {
+          if (s.id !== sessionId) return s
+
+          const newExercises = s.exercises?.filter((e) => e.id !== exerciseId) || []
+
+          // Reindex exercises
+          const reindexedExercises = newExercises.map((ex, idx) => ({
+            ...ex,
+            order_index: idx,
+          }))
+
+          return {
+            ...s,
+            exercises: reindexedExercises,
+            current_exercise_index: newIndex,
+          }
+        })
+      )
+
+      // Update current_exercise_index in database
+      if (newIndex !== session.current_exercise_index) {
+        await supabase
+          .from('sessions')
+          .update({ current_exercise_index: newIndex })
+          .eq('id', sessionId)
+      }
+
+      return true
+    },
+    [sessions, withSaveTracking]
+  )
+
   // Get current exercise for a session
   const getCurrentExercise = useCallback(
     (sessionId: string): SessionExerciseWithDetails | null => {
@@ -673,6 +758,7 @@ export function useLiveCoaching() {
     startAllSessions,
     replanSession,
     addExerciseToSession,
+    deleteExerciseFromSession,
     getCurrentExercise,
     getNextExercise,
     isSessionComplete,

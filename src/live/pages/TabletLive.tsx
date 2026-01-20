@@ -5,6 +5,7 @@ import { ClientStripBar } from '@/live/components/ClientStripBar'
 import { ActionPanel } from '@/live/components/ActionPanel'
 import { ExerciseCarousel } from '@/live/components/ExerciseCarousel'
 import { SaveIndicator } from '@/live/components/SaveIndicator'
+import { ConfirmDialog } from '@/live/components/ConfirmDialog'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 
@@ -20,9 +21,11 @@ export function TabletLive() {
     completeExercise,
     skipExercise,
     selectExercise,
+    deleteExerciseFromSession,
   } = useLiveCoaching()
 
   const [selectedClientIndex, setSelectedClientIndex] = useState(0)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const date = (location.state as { date?: string })?.date
 
   useEffect(() => {
@@ -99,6 +102,29 @@ export function TabletLive() {
     }
   }
 
+  const handleDeleteClick = () => {
+    if (selectedSession && selectedSession.exercises && selectedSession.exercises.length > 1) {
+      setShowDeleteConfirm(true)
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (selectedSession) {
+      const currentExercise = selectedSession.exercises?.[selectedSession.current_exercise_index]
+      if (currentExercise) {
+        await deleteExerciseFromSession(selectedSession.id, currentExercise.id)
+      }
+    }
+    setShowDeleteConfirm(false)
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false)
+  }
+
+  // Get current exercise name for delete confirmation
+  const currentExerciseName = selectedSession?.exercises?.[selectedSession.current_exercise_index]?.exercise?.name || 'questo esercizio'
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -134,6 +160,7 @@ export function TabletLive() {
           onComplete={handleComplete}
           onSkip={handleSkip}
           onCenter={handleCenter}
+          onDelete={handleDeleteClick}
           disabled={!selectedSession}
         />
 
@@ -148,6 +175,17 @@ export function TabletLive() {
           )}
         </div>
       </main>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Elimina esercizio"
+        message={`Sei sicuro di voler eliminare "${currentExerciseName}" dalla sessione?`}
+        confirmLabel="Elimina"
+        cancelLabel="Annulla"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   )
 }
