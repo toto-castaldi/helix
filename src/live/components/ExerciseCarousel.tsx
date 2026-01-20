@@ -63,17 +63,17 @@ export function ExerciseCarousel({
   const nextExercise = currentIndex < exercises.length - 1 ? exercises[currentIndex + 1] : null
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col min-h-0 overflow-hidden">
       {/* Progress indicator */}
-      <div className="flex items-center justify-center gap-2 mb-4">
+      <div className="flex items-center justify-center gap-1.5 mb-2 shrink-0">
         {exercises.map((_, index) => (
           <button
             key={index}
             onClick={() => onSelectExercise(index)}
             className={cn(
-              'w-3 h-3 rounded-full transition-all',
+              'w-2.5 h-2.5 rounded-full transition-all',
               index === currentIndex
-                ? 'bg-primary w-8'
+                ? 'bg-primary w-6'
                 : index < currentIndex
                 ? 'bg-gray-500'
                 : 'bg-gray-700'
@@ -85,13 +85,13 @@ export function ExerciseCarousel({
       {/* Cards container - 3 columns grid */}
       <div
         ref={containerRef}
-        className="flex-1 grid grid-cols-3 gap-4 px-4"
+        className="flex-1 grid grid-cols-3 gap-2 px-2 min-h-0 overflow-hidden"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         {/* Previous exercise (left) */}
-        <div className="flex justify-end h-full">
+        <div className="flex justify-end h-full min-h-0">
           {prevExercise ? (
             <ExerciseCard
               exercise={prevExercise}
@@ -104,7 +104,7 @@ export function ExerciseCarousel({
         </div>
 
         {/* Current exercise (center) */}
-        <div className="flex justify-center h-full">
+        <div className="flex justify-center h-full min-h-0">
           <ExerciseCard
             exercise={currentExercise}
             isCurrentExercise={true}
@@ -117,7 +117,7 @@ export function ExerciseCarousel({
         </div>
 
         {/* Next exercise (right) */}
-        <div className="flex justify-start h-full">
+        <div className="flex justify-start h-full min-h-0">
           {nextExercise ? (
             <ExerciseCard
               exercise={nextExercise}
@@ -131,11 +131,11 @@ export function ExerciseCarousel({
       </div>
 
       {/* Exercise counter */}
-      <div className="text-center mt-4">
-        <span className="text-2xl font-bold text-white">
+      <div className="text-center mt-2 shrink-0">
+        <span className="text-xl font-bold text-white">
           {currentIndex + 1}
         </span>
-        <span className="text-gray-400"> / {exercises.length}</span>
+        <span className="text-gray-400 text-sm"> / {exercises.length}</span>
       </div>
     </div>
   )

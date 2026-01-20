@@ -181,9 +181,9 @@ export function TabletLive() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+    <div className="h-screen bg-gray-900 text-white flex flex-col overflow-hidden">
       {/* Header with client strip */}
-      <header className="flex items-center px-4 py-2 border-b border-gray-800 bg-gray-950">
+      <header className="flex items-center px-4 py-2 border-b border-gray-800 bg-gray-950 shrink-0">
         <Button
           variant="ghost"
           size="icon-lg"

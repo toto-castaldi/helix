@@ -52,16 +52,16 @@ export function ExerciseCard({
   return (
     <Card
       className={cn(
-        'transition-all cursor-pointer w-[320px] h-full',
+        'transition-all cursor-pointer w-[320px] h-full overflow-hidden',
         getCardStyles(),
         !isCurrentExercise && !isCompleted && !isSkipped && 'hover:bg-gray-750'
       )}
       onClick={onClick}
     >
-      <CardContent className="p-4 h-full flex flex-col">
-        {/* 1. Nome - h-[32px] */}
-        <div className="h-[32px] flex items-start justify-between">
-          <h3 className="text-lg font-semibold text-white truncate flex-1">
+      <CardContent className="p-3 h-full flex flex-col min-h-0 overflow-hidden">
+        {/* 1. Nome */}
+        <div className="flex items-start justify-between shrink-0">
+          <h3 className="text-base font-semibold text-white truncate flex-1">
             {exerciseInfo?.name || 'Esercizio'}
           </h3>
           {isCompleted && (
@@ -76,15 +76,15 @@ export function ExerciseCard({
           )}
         </div>
 
-        {/* 2. Descrizione - h-[60px] */}
-        <div className="h-[60px] mt-2">
-          <p className="text-sm text-gray-400 line-clamp-3">
+        {/* 2. Descrizione - può ridursi */}
+        <div className="mt-1 shrink overflow-hidden">
+          <p className="text-xs text-gray-400 line-clamp-2">
             {exerciseInfo?.description || '\u00A0'}
           </p>
         </div>
 
-        {/* 3. Serie e Reps - h-[70px] */}
-        <div className="h-[70px] mt-4 grid grid-cols-2 gap-4">
+        {/* 3. Serie e Reps */}
+        <div className="mt-2 grid grid-cols-2 gap-2 shrink-0">
           <ParameterControl
             label="Serie"
             value={exercise.sets}
@@ -103,8 +103,8 @@ export function ExerciseCard({
           />
         </div>
 
-        {/* 4. Peso e Durata - h-[70px] */}
-        <div className="h-[70px] mt-4 grid grid-cols-2 gap-4">
+        {/* 4. Peso e Durata */}
+        <div className="mt-2 grid grid-cols-2 gap-2 shrink-0">
           <ParameterControl
             label="Peso"
             value={exercise.weight_kg}
@@ -127,17 +127,17 @@ export function ExerciseCard({
           />
         </div>
 
-        {/* 5. Note - flex-1 (riempie lo spazio restante) */}
-        <div className="flex-1 mt-4 min-h-[60px]">
+        {/* 5. Note - riempie lo spazio restante */}
+        <div className="flex-1 mt-2 min-h-0 overflow-hidden">
           {isCurrentExercise ? (
             <Textarea
               value={exercise.notes || ''}
               onChange={(e) => onUpdateNotes?.(e.target.value)}
               placeholder="Note esercizio..."
-              className="h-full resize-none bg-gray-700 border-gray-600 text-white text-sm"
+              className="h-full resize-none bg-gray-700 border-gray-600 text-white text-xs"
             />
           ) : (
-            <p className="text-sm text-gray-500 italic line-clamp-3">
+            <p className="text-xs text-gray-500 italic line-clamp-2">
               {exercise.notes || '\u00A0'}
             </p>
           )}

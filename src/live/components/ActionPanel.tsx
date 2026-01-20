@@ -25,49 +25,49 @@ export function ActionPanel({
   hasLumioCard = false,
 }: ActionPanelProps) {
   return (
-    <div className="flex flex-col gap-4 w-24">
+    <div className="flex flex-col gap-2 w-20 h-full">
       {/* Complete Button - emerald come esercizi completati */}
       <Button
         onClick={onComplete}
         disabled={disabled}
-        size="xl"
-        className="h-20 flex-col gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+        size="lg"
+        className="flex-1 min-h-0 flex-col gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
       >
-        <Check className="w-8 h-8" />
-        <span className="text-xs">OK</span>
+        <Check className="w-6 h-6 shrink-0" />
+        <span className="text-[10px]">OK</span>
       </Button>
 
       {/* Skip Button - amber come esercizi saltati */}
       <Button
         onClick={onSkip}
         disabled={disabled}
-        size="xl"
-        className="h-20 flex-col gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+        size="lg"
+        className="flex-1 min-h-0 flex-col gap-1 bg-amber-600 hover:bg-amber-700 text-white"
       >
-        <SkipForward className="w-8 h-8" />
-        <span className="text-xs">SALTA</span>
+        <SkipForward className="w-6 h-6 shrink-0" />
+        <span className="text-[10px]">SALTA</span>
       </Button>
 
       {/* Center Button - gray come esercizi da fare */}
       <Button
         onClick={onCenter}
         disabled={disabled}
-        size="xl"
-        className="h-20 flex-col gap-2 bg-gray-700 hover:bg-gray-600 text-white border border-gray-600"
+        size="lg"
+        className="flex-1 min-h-0 flex-col gap-1 bg-gray-700 hover:bg-gray-600 text-white border border-gray-600"
       >
-        <Target className="w-8 h-8" />
-        <span className="text-xs">PROSSIMO</span>
+        <Target className="w-6 h-6 shrink-0" />
+        <span className="text-[10px]">PROSSIMO</span>
       </Button>
 
       {/* Delete Button - rose/red distintivo */}
       <Button
         onClick={onDelete}
         disabled={disabled}
-        size="xl"
-        className="h-20 flex-col gap-2 bg-rose-600 hover:bg-rose-700 text-white"
+        size="lg"
+        className="flex-1 min-h-0 flex-col gap-1 bg-rose-600 hover:bg-rose-700 text-white"
       >
-        <Trash2 className="w-8 h-8" />
-        <span className="text-xs">ELIMINA</span>
+        <Trash2 className="w-6 h-6 shrink-0" />
+        <span className="text-[10px]">ELIMINA</span>
       </Button>
 
       {/* Change Button - viola per modifica esercizio */}
@@ -75,11 +75,11 @@ export function ActionPanel({
         <Button
           onClick={onChange}
           disabled={disabled}
-          size="xl"
-          className="h-20 flex-col gap-2 bg-violet-600 hover:bg-violet-700 text-white"
+          size="lg"
+          className="flex-1 min-h-0 flex-col gap-1 bg-violet-600 hover:bg-violet-700 text-white"
         >
-          <RefreshCw className="w-8 h-8" />
-          <span className="text-xs">MODIFICA</span>
+          <RefreshCw className="w-6 h-6 shrink-0" />
+          <span className="text-[10px]">MODIFICA</span>
         </Button>
       )}
 
@@ -88,15 +88,15 @@ export function ActionPanel({
         <Button
           onClick={onInfo}
           disabled={disabled || !hasLumioCard}
-          size="xl"
-          className={`h-20 flex-col gap-2 text-white ${
+          size="lg"
+          className={`flex-1 min-h-0 flex-col gap-1 text-white ${
             hasLumioCard && !disabled
               ? "bg-sky-600 hover:bg-sky-700"
               : "bg-sky-600/50 cursor-not-allowed opacity-50"
           }`}
         >
-          <Info className="w-8 h-8" />
-          <span className="text-xs">INFO</span>
+          <Info className="w-6 h-6 shrink-0" />
+          <span className="text-[10px]">INFO</span>
         </Button>
       )}
 
@@ -105,11 +105,11 @@ export function ActionPanel({
         <Button
           onClick={onAdd}
           disabled={disabled}
-          size="xl"
-          className="h-20 flex-col gap-2 bg-cyan-600 hover:bg-cyan-700 text-white"
+          size="lg"
+          className="flex-1 min-h-0 flex-col gap-1 bg-cyan-600 hover:bg-cyan-700 text-white"
         >
-          <Plus className="w-8 h-8" />
-          <span className="text-xs">AGGIUNGI</span>
+          <Plus className="w-6 h-6 shrink-0" />
+          <span className="text-[10px]">AGGIUNGI</span>
         </Button>
       )}
     </div>
