@@ -1,5 +1,5 @@
 import { Button } from '@/shared/components/ui/button'
-import { Check, SkipForward, Plus, Trash2, Target, RefreshCw } from 'lucide-react'
+import { Check, SkipForward, Plus, Trash2, Target, RefreshCw, Info } from 'lucide-react'
 
 interface ActionPanelProps {
   onComplete: () => void
@@ -7,8 +7,10 @@ interface ActionPanelProps {
   onCenter: () => void
   onDelete: () => void
   onChange?: () => void
+  onInfo?: () => void
   onAdd?: () => void
   disabled?: boolean
+  hasLumioCard?: boolean
 }
 
 export function ActionPanel({
@@ -17,8 +19,10 @@ export function ActionPanel({
   onCenter,
   onDelete,
   onChange,
+  onInfo,
   onAdd,
   disabled = false,
+  hasLumioCard = false,
 }: ActionPanelProps) {
   return (
     <div className="flex flex-col gap-4 w-24">
@@ -76,6 +80,23 @@ export function ActionPanel({
         >
           <RefreshCw className="w-8 h-8" />
           <span className="text-xs">MODIFICA</span>
+        </Button>
+      )}
+
+      {/* Info Button - sky/azzurro per scheda Lumio */}
+      {onInfo && (
+        <Button
+          onClick={onInfo}
+          disabled={disabled || !hasLumioCard}
+          size="xl"
+          className={`h-20 flex-col gap-2 text-white ${
+            hasLumioCard && !disabled
+              ? "bg-sky-600 hover:bg-sky-700"
+              : "bg-sky-600/50 cursor-not-allowed opacity-50"
+          }`}
+        >
+          <Info className="w-8 h-8" />
+          <span className="text-xs">INFO</span>
         </Button>
       )}
 

@@ -8,9 +8,10 @@ import { ExerciseCarousel } from '@/live/components/ExerciseCarousel'
 import { SaveIndicator } from '@/live/components/SaveIndicator'
 import { ConfirmDialog } from '@/live/components/ConfirmDialog'
 import { ExercisePickerLive } from '@/live/components/ExercisePickerLive'
+import { LumioCardModalLive } from '@/live/components/LumioCardModalLive'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
-import type { ExerciseWithDetails } from '@/shared/types'
+import type { ExerciseWithDetails, LumioLocalCardWithRepository } from '@/shared/types'
 
 export function TabletLive() {
   const navigate = useNavigate()
@@ -34,6 +35,7 @@ export function TabletLive() {
   const [selectedClientIndex, setSelectedClientIndex] = useState(0)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [pickerMode, setPickerMode] = useState<'add' | 'change' | null>(null)
+  const [showLumioCard, setShowLumioCard] = useState(false)
   const date = (location.state as { date?: string })?.date
 
   useEffect(() => {
@@ -158,8 +160,17 @@ export function TabletLive() {
     setPickerMode(null)
   }
 
-  // Get current exercise name for delete confirmation
-  const currentExerciseName = selectedSession?.exercises?.[selectedSession.current_exercise_index]?.exercise?.name || 'questo esercizio'
+  // Get current exercise data for delete confirmation and Lumio card
+  const currentExercise = selectedSession?.exercises?.[selectedSession.current_exercise_index]
+  const currentExerciseName = currentExercise?.exercise?.name || 'questo esercizio'
+  const currentLumioCard = currentExercise?.exercise?.lumio_card as LumioLocalCardWithRepository | null
+  const hasLumioCard = !!currentLumioCard
+
+  const handleInfoClick = () => {
+    if (hasLumioCard) {
+      setShowLumioCard(true)
+    }
+  }
 
   if (loading) {
     return (
@@ -198,8 +209,10 @@ export function TabletLive() {
           onCenter={handleCenter}
           onDelete={handleDeleteClick}
           onChange={handleChangeClick}
+          onInfo={handleInfoClick}
           onAdd={handleAddClick}
           disabled={!selectedSession}
+          hasLumioCard={hasLumioCard}
         />
 
         {/* Exercise Carousel */}
@@ -232,6 +245,14 @@ export function TabletLive() {
         exercises={exercises}
         onSelect={handleExerciseSelectFromPicker}
         onClose={handleExercisePickerClose}
+      />
+
+      {/* Lumio Card Modal */}
+      <LumioCardModalLive
+        open={showLumioCard}
+        exerciseName={currentExerciseName}
+        lumioCard={currentLumioCard}
+        onClose={() => setShowLumioCard(false)}
       />
     </div>
   )
