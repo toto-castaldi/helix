@@ -64,14 +64,13 @@ export function ActionPanel({
         <span className="text-xs">ELIMINA</span>
       </Button>
 
-      {/* Add Button */}
+      {/* Add Button - cyan/blue per azione positiva di aggiunta */}
       {onAdd && (
         <Button
           onClick={onAdd}
           disabled={disabled}
           size="xl"
-          variant="outline"
-          className="h-20 flex-col gap-2 border-gray-600"
+          className="h-20 flex-col gap-2 bg-cyan-600 hover:bg-cyan-700 text-white"
         >
           <Plus className="w-8 h-8" />
           <span className="text-xs">AGGIUNGI</span>

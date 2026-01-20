@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useLiveCoaching } from '@/shared/hooks/useLiveCoaching'
+import { useExercises } from '@/hooks/useExercises'
 import { ClientStripBar } from '@/live/components/ClientStripBar'
 import { ActionPanel } from '@/live/components/ActionPanel'
 import { ExerciseCarousel } from '@/live/components/ExerciseCarousel'
 import { SaveIndicator } from '@/live/components/SaveIndicator'
 import { ConfirmDialog } from '@/live/components/ConfirmDialog'
+import { ExercisePickerLive } from '@/live/components/ExercisePickerLive'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
+import type { ExerciseWithDetails } from '@/shared/types'
 
 export function TabletLive() {
   const navigate = useNavigate()
@@ -22,10 +25,14 @@ export function TabletLive() {
     skipExercise,
     selectExercise,
     deleteExerciseFromSession,
+    addExerciseToSession,
   } = useLiveCoaching()
+
+  const { exercises, refetch: refetchExercises } = useExercises()
 
   const [selectedClientIndex, setSelectedClientIndex] = useState(0)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showExercisePicker, setShowExercisePicker] = useState(false)
   const date = (location.state as { date?: string })?.date
 
   useEffect(() => {
@@ -122,6 +129,22 @@ export function TabletLive() {
     setShowDeleteConfirm(false)
   }
 
+  const handleAddClick = () => {
+    refetchExercises()
+    setShowExercisePicker(true)
+  }
+
+  const handleExerciseSelectFromPicker = async (exercise: ExerciseWithDetails) => {
+    if (selectedSession) {
+      await addExerciseToSession(selectedSession.id, exercise)
+      setShowExercisePicker(false)
+    }
+  }
+
+  const handleExercisePickerClose = () => {
+    setShowExercisePicker(false)
+  }
+
   // Get current exercise name for delete confirmation
   const currentExerciseName = selectedSession?.exercises?.[selectedSession.current_exercise_index]?.exercise?.name || 'questo esercizio'
 
@@ -161,6 +184,7 @@ export function TabletLive() {
           onSkip={handleSkip}
           onCenter={handleCenter}
           onDelete={handleDeleteClick}
+          onAdd={handleAddClick}
           disabled={!selectedSession}
         />
 
@@ -185,6 +209,14 @@ export function TabletLive() {
         cancelLabel="Annulla"
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
+      />
+
+      {/* Exercise Picker Modal */}
+      <ExercisePickerLive
+        open={showExercisePicker}
+        exercises={exercises}
+        onSelect={handleExerciseSelectFromPicker}
+        onClose={handleExercisePickerClose}
       />
     </div>
   )
