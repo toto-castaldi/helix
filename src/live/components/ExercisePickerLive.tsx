@@ -6,6 +6,7 @@ import type { ExerciseWithDetails } from '@/shared/types'
 
 interface ExercisePickerLiveProps {
   open: boolean
+  title?: string
   exercises: ExerciseWithDetails[]
   onSelect: (exercise: ExerciseWithDetails) => void
   onClose: () => void
@@ -13,6 +14,7 @@ interface ExercisePickerLiveProps {
 
 export function ExercisePickerLive({
   open,
+  title = 'Seleziona Esercizio',
   exercises,
   onSelect,
   onClose,
@@ -39,7 +41,7 @@ export function ExercisePickerLive({
     <div className="fixed inset-0 z-50 bg-gray-900 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-950">
-        <h1 className="text-xl font-semibold text-white">Seleziona Esercizio</h1>
+        <h1 className="text-xl font-semibold text-white">{title}</h1>
         <Button
           variant="ghost"
           size="icon-lg"

@@ -1,11 +1,12 @@
 import { Button } from '@/shared/components/ui/button'
-import { Check, SkipForward, Plus, Trash2, Target } from 'lucide-react'
+import { Check, SkipForward, Plus, Trash2, Target, RefreshCw } from 'lucide-react'
 
 interface ActionPanelProps {
   onComplete: () => void
   onSkip: () => void
   onCenter: () => void
   onDelete: () => void
+  onChange?: () => void
   onAdd?: () => void
   disabled?: boolean
 }
@@ -15,6 +16,7 @@ export function ActionPanel({
   onSkip,
   onCenter,
   onDelete,
+  onChange,
   onAdd,
   disabled = false,
 }: ActionPanelProps) {
@@ -63,6 +65,19 @@ export function ActionPanel({
         <Trash2 className="w-8 h-8" />
         <span className="text-xs">ELIMINA</span>
       </Button>
+
+      {/* Change Button - viola per modifica esercizio */}
+      {onChange && (
+        <Button
+          onClick={onChange}
+          disabled={disabled}
+          size="xl"
+          className="h-20 flex-col gap-2 bg-violet-600 hover:bg-violet-700 text-white"
+        >
+          <RefreshCw className="w-8 h-8" />
+          <span className="text-xs">MODIFICA</span>
+        </Button>
+      )}
 
       {/* Add Button - cyan/blue per azione positiva di aggiunta */}
       {onAdd && (

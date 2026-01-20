@@ -26,13 +26,14 @@ export function TabletLive() {
     selectExercise,
     deleteExerciseFromSession,
     addExerciseToSession,
+    changeExercise,
   } = useLiveCoaching()
 
   const { exercises, refetch: refetchExercises } = useExercises()
 
   const [selectedClientIndex, setSelectedClientIndex] = useState(0)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [showExercisePicker, setShowExercisePicker] = useState(false)
+  const [pickerMode, setPickerMode] = useState<'add' | 'change' | null>(null)
   const date = (location.state as { date?: string })?.date
 
   useEffect(() => {
@@ -131,18 +132,30 @@ export function TabletLive() {
 
   const handleAddClick = () => {
     refetchExercises()
-    setShowExercisePicker(true)
+    setPickerMode('add')
+  }
+
+  const handleChangeClick = () => {
+    refetchExercises()
+    setPickerMode('change')
   }
 
   const handleExerciseSelectFromPicker = async (exercise: ExerciseWithDetails) => {
-    if (selectedSession) {
+    if (!selectedSession) return
+
+    if (pickerMode === 'add') {
       await addExerciseToSession(selectedSession.id, exercise)
-      setShowExercisePicker(false)
+    } else if (pickerMode === 'change') {
+      const currentExercise = selectedSession.exercises?.[selectedSession.current_exercise_index]
+      if (currentExercise) {
+        await changeExercise(selectedSession.id, currentExercise.id, exercise)
+      }
     }
+    setPickerMode(null)
   }
 
   const handleExercisePickerClose = () => {
-    setShowExercisePicker(false)
+    setPickerMode(null)
   }
 
   // Get current exercise name for delete confirmation
@@ -184,6 +197,7 @@ export function TabletLive() {
           onSkip={handleSkip}
           onCenter={handleCenter}
           onDelete={handleDeleteClick}
+          onChange={handleChangeClick}
           onAdd={handleAddClick}
           disabled={!selectedSession}
         />
@@ -213,7 +227,8 @@ export function TabletLive() {
 
       {/* Exercise Picker Modal */}
       <ExercisePickerLive
-        open={showExercisePicker}
+        open={pickerMode !== null}
+        title={pickerMode === 'change' ? 'Cambia Esercizio' : 'Seleziona Esercizio'}
         exercises={exercises}
         onSelect={handleExerciseSelectFromPicker}
         onClose={handleExercisePickerClose}
