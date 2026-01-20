@@ -11,13 +11,12 @@ import { LogOut, Calendar, Play } from 'lucide-react'
 export function TabletDateSelect() {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
-  const { sessions, loading, fetchSessionsForDate, startAllSessions } = useLiveCoaching()
+  const { sessions, loading, fetchSessionsForDate } = useLiveCoaching()
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date()
     return today.toISOString().split('T')[0]
   })
-  const [starting, setStarting] = useState(false)
 
   useEffect(() => {
     if (selectedDate) {
@@ -25,12 +24,8 @@ export function TabletDateSelect() {
     }
   }, [selectedDate, fetchSessionsForDate])
 
-  const handleStartSession = async () => {
+  const handleStartSession = () => {
     if (sessions.length > 0) {
-      setStarting(true)
-      // Reset all sessions to planned state before starting
-      await startAllSessions()
-      setStarting(false)
       navigate('/live', { state: { date: selectedDate } })
     }
   }
@@ -137,15 +132,11 @@ export function TabletDateSelect() {
           {/* Start Button */}
           <Button
             onClick={handleStartSession}
-            disabled={sessions.length === 0 || loading || starting}
+            disabled={sessions.length === 0 || loading}
             size="xl"
             className="w-full h-20 text-2xl"
           >
-            {starting ? (
-              <div className="animate-spin rounded-full h-8 w-8 border-4 border-white border-t-transparent mr-4" />
-            ) : (
-              <Play className="w-8 h-8 mr-4" />
-            )}
+            <Play className="w-8 h-8 mr-4" />
             Inizia Sessione
           </Button>
         </div>
