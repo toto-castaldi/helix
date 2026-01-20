@@ -130,13 +130,6 @@ export function ExerciseCarousel({
         </div>
       </div>
 
-      {/* Exercise counter */}
-      <div className="text-center mt-2 shrink-0">
-        <span className="text-xl font-bold text-white">
-          {currentIndex + 1}
-        </span>
-        <span className="text-gray-400 text-sm"> / {exercises.length}</span>
-      </div>
     </div>
   )
 }
