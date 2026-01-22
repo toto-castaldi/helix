@@ -36,9 +36,10 @@ export function LumioLocalCardViewer({ card, className }: LumioLocalCardViewerPr
       card.content,
       card.file_path,
       card.repository.user_id,
-      card.repository.id
+      card.repository.id,
+      card.updated_at
     )
-  }, [card.content, card.file_path, card.repository])
+  }, [card.content, card.file_path, card.repository, card.updated_at])
 
   return (
     <div className={className}>
