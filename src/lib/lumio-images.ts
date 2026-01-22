@@ -13,7 +13,8 @@ export function resolveImagePaths(
   content: string,
   cardFilePath: string,
   userId: string,
-  repositoryId: string
+  repositoryId: string,
+  cardUpdatedAt?: string
 ): string {
   // Regex to find markdown images: ![alt](path)
   const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
@@ -31,7 +32,12 @@ export function resolveImagePaths(
     const storagePath = `${userId}/${repositoryId}/${resolvedPath}`
     const { data } = supabase.storage.from('lumio-images').getPublicUrl(storagePath)
 
-    return `![${alt}](${data.publicUrl})`
+    // Cache busting with card's updated_at timestamp
+    const cacheBuster = cardUpdatedAt
+      ? `?t=${new Date(cardUpdatedAt).getTime()}`
+      : ''
+
+    return `![${alt}](${data.publicUrl}${cacheBuster})`
   })
 }
 
