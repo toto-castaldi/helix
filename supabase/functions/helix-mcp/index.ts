@@ -1591,19 +1591,31 @@ Deno.serve(async (req: Request) => {
   }
 
   // Handle OAuth Authorization Server Metadata (RFC 8414)
-  // Some clients may request this directly
+  // Claude may request this on our server instead of the actual auth server
+  // We proxy the Supabase Auth metadata
   if (req.method === "GET" && url.pathname.endsWith("/.well-known/oauth-authorization-server")) {
-    console.log("[OAUTH] Authorization Server Metadata request - redirecting to Supabase")
+    console.log("[OAUTH] Authorization Server Metadata request - proxying from Supabase")
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!
-    // Return the Supabase auth server metadata location
-    return new Response(JSON.stringify({
-      message: "Authorization server is at Supabase",
-      authorization_server: `${supabaseUrl}/auth/v1`,
-      metadata_url: `${supabaseUrl}/auth/v1/.well-known/openid-configuration`
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
-    })
+
+    try {
+      // Fetch the actual OAuth metadata from Supabase Auth
+      const metadataResponse = await fetch(`${supabaseUrl}/auth/v1/.well-known/openid-configuration`)
+      const metadata = await metadataResponse.json()
+
+      console.log("[OAUTH] Proxied Supabase Auth metadata")
+      return new Response(JSON.stringify(metadata, null, 2), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    } catch (error) {
+      console.error("[OAUTH] Failed to fetch Supabase metadata:", error)
+      return new Response(JSON.stringify({
+        error: "Failed to fetch authorization server metadata"
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
   }
 
   // Handle token introspection or other OAuth endpoints that might be called
