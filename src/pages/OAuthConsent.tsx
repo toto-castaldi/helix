@@ -35,7 +35,9 @@ export function OAuthConsent() {
     // Fetch authorization details from Supabase OAuth
     const fetchAuthDetails = async () => {
       try {
+        console.log('Fetching auth details for:', authorizationId)
         const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(authorizationId)
+        console.log('Auth details response:', { data, error })
 
         if (error) {
           console.error('Error fetching auth details:', error)
@@ -46,6 +48,14 @@ export function OAuthConsent() {
             redirect_url: searchParams.get('redirect_uri') || undefined,
           })
         } else {
+          // Check if consent was already given (redirect_url present)
+          // This handles auto-consent for previously approved clients
+          if (data?.redirect_url) {
+            console.log('Auto-redirect detected, redirecting to:', data.redirect_url)
+            window.location.href = data.redirect_url
+            return
+          }
+
           setAuthDetails({
             client_name: data?.client?.name || 'Applicazione OAuth',
             scope: data?.scope || 'openid email profile',
@@ -84,6 +94,10 @@ export function OAuthConsent() {
 
       // Use direct REST API call with proper authentication
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+
+      console.log('Approving authorization:', authorizationId)
+      console.log('Access token (first 20 chars):', accessToken.substring(0, 20) + '...')
+
       const response = await fetch(
         `${supabaseUrl}/auth/v1/oauth/authorizations/${authorizationId}/consent`,
         {
@@ -91,11 +105,12 @@ export function OAuthConsent() {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
-            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
           body: JSON.stringify({ action: 'approve' }),
         }
       )
+
+      console.log('Response status:', response.status)
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
