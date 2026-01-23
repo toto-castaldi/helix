@@ -10,7 +10,7 @@ interface AuthorizationDetails {
   client_name?: string
   client_uri?: string
   scope?: string
-  redirect_uri?: string
+  redirect_url?: string
 }
 
 export function OAuthConsent() {
@@ -32,17 +32,39 @@ export function OAuthConsent() {
       return
     }
 
-    // In a real implementation, we would fetch authorization details
-    // For now, we'll use the information from the URL params
-    const clientName = searchParams.get('client_name') || 'Claude Web'
-    const scope = searchParams.get('scope') || 'openid email profile'
+    // Fetch authorization details from Supabase OAuth
+    const fetchAuthDetails = async () => {
+      try {
+        const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(authorizationId)
 
-    setAuthDetails({
-      client_name: clientName,
-      scope: scope,
-      redirect_uri: searchParams.get('redirect_uri') || undefined,
-    })
-    setLoading(false)
+        if (error) {
+          console.error('Error fetching auth details:', error)
+          // Fallback to URL params
+          setAuthDetails({
+            client_name: searchParams.get('client_name') || 'Claude Web',
+            scope: searchParams.get('scope') || 'openid email profile',
+            redirect_url: searchParams.get('redirect_uri') || undefined,
+          })
+        } else {
+          setAuthDetails({
+            client_name: data?.client?.name || 'Applicazione OAuth',
+            scope: data?.scope || 'openid email profile',
+            redirect_url: data?.redirect_url,
+          })
+        }
+      } catch (err) {
+        console.error('Error fetching auth details:', err)
+        // Fallback to URL params
+        setAuthDetails({
+          client_name: searchParams.get('client_name') || 'Claude Web',
+          scope: searchParams.get('scope') || 'openid email profile',
+          redirect_url: searchParams.get('redirect_uri') || undefined,
+        })
+      }
+      setLoading(false)
+    }
+
+    fetchAuthDetails()
   }, [authorizationId, searchParams])
 
   const handleApprove = async () => {
@@ -52,28 +74,16 @@ export function OAuthConsent() {
     setError(null)
 
     try {
-      // Supabase OAuth 2.1 approval
-      // The actual method may vary based on Supabase SDK version
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/auth/v1/oauth/authorize?authorization_id=${authorizationId}&decision=approve`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          },
-        }
-      )
+      // Use Supabase SDK OAuth 2.1 approval method
+      const { data, error: approvalError } = await supabase.auth.oauth.approveAuthorization(authorizationId)
 
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error_description || data.message || 'Errore durante l\'approvazione')
+      if (approvalError) {
+        throw new Error(approvalError.message || 'Errore durante l\'approvazione')
       }
 
       // The response should contain a redirect URL
-      const data = await response.json()
-      if (data.redirect_uri) {
-        window.location.href = data.redirect_uri
+      if (data?.redirect_url) {
+        window.location.href = data.redirect_url
       } else {
         // Fallback - close window or redirect to home
         window.close()
@@ -92,21 +102,12 @@ export function OAuthConsent() {
     setSubmitting(true)
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/auth/v1/oauth/authorize?authorization_id=${authorizationId}&decision=deny`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          },
-        }
-      )
+      // Use Supabase SDK OAuth 2.1 deny method
+      const { data } = await supabase.auth.oauth.denyAuthorization(authorizationId)
 
       // Even on deny, redirect back to client
-      const data = await response.json()
-      if (data.redirect_uri) {
-        window.location.href = data.redirect_uri
+      if (data?.redirect_url) {
+        window.location.href = data.redirect_url
       } else {
         window.close()
         navigate('/')
