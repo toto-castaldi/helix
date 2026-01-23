@@ -93,7 +93,7 @@ export function OAuthConsent() {
             'Content-Type': 'application/json',
             'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           },
-          body: JSON.stringify({ consent: 'approve' }),
+          body: JSON.stringify({ action: 'approve' }),
         }
       )
 
