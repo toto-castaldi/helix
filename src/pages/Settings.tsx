@@ -159,7 +159,7 @@ export function Settings() {
 {`{
   "mcpServers": {
     "helix": {
-      "url": "${window.location.origin.replace('localhost:5173', '<project>.supabase.co')}/functions/v1/helix-mcp",
+      "url": "${import.meta.env.VITE_SUPABASE_URL}/functions/v1/helix-mcp",
       "headers": {
         "X-Helix-API-Key": "<tua-api-key>"
       }
