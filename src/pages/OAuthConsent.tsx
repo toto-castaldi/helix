@@ -74,12 +74,37 @@ export function OAuthConsent() {
     setError(null)
 
     try {
-      // Use Supabase SDK OAuth 2.1 approval method
-      const { data, error: approvalError } = await supabase.auth.oauth.approveAuthorization(authorizationId)
+      // Get current session to obtain access token
+      const { data: sessionData } = await supabase.auth.getSession()
+      const accessToken = sessionData?.session?.access_token
 
-      if (approvalError) {
-        throw new Error(approvalError.message || 'Errore durante l\'approvazione')
+      if (!accessToken) {
+        throw new Error('Sessione non valida. Effettua nuovamente il login.')
       }
+
+      // Use direct REST API call with proper authentication
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const response = await fetch(
+        `${supabaseUrl}/auth/v1/oauth/authorizations/${authorizationId}/consent`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ consent: 'approve' }),
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('OAuth consent error:', response.status, errorData)
+        throw new Error(errorData.message || errorData.error || `Errore ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('OAuth consent response:', data)
 
       // The response should contain a redirect URL
       if (data?.redirect_url) {
