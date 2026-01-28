@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Helix è un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra e un server MCP per pianificazione AI via Claude. Questa milestone aggiunge il supporto per esercizi di gruppo — esercizi fatti contemporaneamente da più clienti.
+Helix è un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra e un server MCP per pianificazione AI via Claude. La milestone "Esercizi di Gruppo" ha aggiunto il supporto per esercizi condivisi tra più clienti durante le lezioni di gruppo.
 
 ## Core Value
 
@@ -11,8 +11,6 @@ Durante le lezioni di gruppo, il coach può gestire gli esercizi condivisi da un
 ## Requirements
 
 ### Validated
-
-Funzionalità esistenti, già implementate e funzionanti:
 
 - ✓ Gestione clienti (anagrafica, obiettivi, storico) — existing
 - ✓ Catalogo esercizi con tag e carte Lumio — existing
@@ -23,18 +21,16 @@ Funzionalità esistenti, già implementate e funzionanti:
 - ✓ Autenticazione Google OAuth — existing
 - ✓ Gestione palestre — existing
 - ✓ Repository Lumio con sync Docora — existing
+- ✓ Flag `is_group` su session_exercises (database) — v1.0
+- ✓ UI pianificazione: toggle "di gruppo" su esercizi in sessione — v1.0
+- ✓ Live tablet: tab toggle "Individuali" | "Gruppo" — v1.0
+- ✓ Live tablet: vista gruppo con esercizi del giorno — v1.0
+- ✓ Live tablet: completamento di gruppo (un tap → tutti i clienti) — v1.0
+- ✓ MCP: lettura/scrittura campo is_group negli esercizi sessione — v1.0
 
 ### Active
 
-Nuove funzionalità per questa milestone:
-
-- [ ] Flag `is_group` su session_exercises (database)
-- [ ] UI pianificazione: toggle "di gruppo" su esercizi in sessione
-- [ ] Live tablet: tab toggle "Individuali" | "Gruppo"
-- [ ] Live tablet: vista gruppo con timeline esercizi del giorno
-- [ ] Live tablet: completamento di gruppo (un tap → tutti i clienti)
-- [ ] MCP: lettura campo is_group negli esercizi sessione
-- [ ] MCP: scrittura is_group in add/update session exercise
+(Next milestone requirements will be defined via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -42,34 +38,32 @@ Nuove funzionalità per questa milestone:
 - Orario pianificato per esercizi — l'ordine basta, usa order_index
 - Statistiche aggregate per esercizi di gruppo — può essere v2
 - Notifiche ai clienti per esercizi di gruppo — non richiesto
+- Class booking/scheduling — Helix è per coaching, non gym management
+- Client-facing group view — gruppi sono strumento interno coach
 
 ## Context
 
-**Codebase esistente:**
-- React 19 + Vite + TypeScript frontend
-- Supabase PostgreSQL backend con RLS
-- Due entry point: main app + live tablet PWA
-- Shared code pattern in `src/shared/`
-- Custom hooks per data management (`useSessions`, `useExercises`, etc.)
+**Shipped v1.0 Esercizi di Gruppo** with:
+- 49 files modified, ~7,000 lines added
+- 4 phases, 6 plans completed
+- Tech stack unchanged: React 19 + Vite + TypeScript + Supabase
+
+**Current codebase:**
+- ~18,000 LOC TypeScript
+- Two entry points: main app + live tablet PWA
 - MCP server in Edge Function `helix-mcp`
+- Realtime enabled on `session_exercises` for cross-tablet sync
 
-**Tabella target:**
-- `session_exercises` — già contiene: exercise_id, order_index, sets, reps, weight_kg, duration_seconds, completed, skipped, notes
-
-**Live coaching attuale:**
-- `TabletLive.tsx` con carousel di esercizi
-- `useLiveCoaching` hook per stato e operazioni
-- Seleziona client → mostra suoi esercizi → completa/skip
-
-**MCP attuale:**
-- Resource `helix://sessions/{id}` ritorna sessione con esercizi
-- Tool `add_session_exercise`, `update_session_exercise` per modifiche
+**Key additions:**
+- `is_group` column in `session_exercises` with partial index
+- RPC functions: `complete_group_exercise`, `skip_group_exercise_for_client`
+- Components: `GroupExerciseView`, `GroupExerciseCard`
 
 ## Constraints
 
 - **Tech stack**: Supabase + React esistente — nessuna nuova dipendenza
-- **Schema**: Aggiungere colonna, non ristrutturare tabelle
-- **Backward compatible**: Sessioni esistenti devono funzionare (is_group default false)
+- **Schema**: Aggiungere colonne, non ristrutturare tabelle
+- **Backward compatible**: Sessioni esistenti devono funzionare
 - **RLS**: Mantenere isolamento per coach (user_id)
 - **Mobile-first**: UI tablet deve funzionare bene con touch
 
@@ -77,10 +71,13 @@ Nuove funzionalità per questa milestone:
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Flag booleano `is_group` invece di relazione | Semplice, ogni sessione è indipendente, non serve tracciare "gruppi" come entità | — Pending |
-| Tab toggle invece di filtro | Più chiaro per il coach, due modalità di lavoro distinte | — Pending |
-| Completamento automatico per tutti | Efficienza durante la lezione, un tap basta | — Pending |
-| Ordine da order_index | Riusa campo esistente, no schema aggiuntivo | — Pending |
+| Flag booleano `is_group` invece di relazione | Semplice, ogni sessione è indipendente | ✓ Good — works well, minimal complexity |
+| Tab toggle invece di filtro | Più chiaro per il coach, due modalità di lavoro distinte | ✓ Good — clean UX separation |
+| Completamento automatico per tutti | Efficienza durante la lezione, un tap basta | ✓ Good — with undo toast for safety |
+| Ordine da order_index | Riusa campo esistente, no schema aggiuntivo | ✓ Good — no changes needed |
+| Partial index for is_group | Most exercises not group, saves space | ✓ Good — efficient queries |
+| SECURITY INVOKER for RPC | Respects RLS policies, user context preserved | ✓ Good — secure by default |
+| Toast duration 4 seconds | Enough time to react, not too long | ✓ Good — balanced UX |
 
 ---
-*Last updated: 2026-01-28 after initialization*
+*Last updated: 2026-01-28 after v1.0 milestone*
