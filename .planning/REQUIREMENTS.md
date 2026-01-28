@@ -22,15 +22,15 @@
 
 ### UI Live Tablet
 
-| ID | Requirement | Acceptance Criteria |
-|----|-------------|---------------------|
-| REQ-LIVE-001 | Tab toggle "Individuali" / "Gruppo" | Toggle in alto nella pagina TabletLive |
-| REQ-LIVE-002 | Vista individuale (default) | Comportamento attuale: esercizi del cliente selezionato |
-| REQ-LIVE-003 | Vista gruppo | Lista esercizi is_group=true di TUTTI i clienti della giornata |
-| REQ-LIVE-004 | Indicatore visivo gruppo | Icon/badge su ExerciseCard quando is_group=true |
-| REQ-LIVE-005 | Lista partecipanti per esercizio | Mostra nomi clienti che hanno quell'esercizio di gruppo |
-| REQ-LIVE-006 | Complete-for-all | Un tap su "completa" marca l'esercizio per tutti i partecipanti |
-| REQ-LIVE-007 | Skip per singolo | Possibilità di saltare per un singolo cliente anche se di gruppo |
+| ID | Requirement | Acceptance Criteria | Status |
+|----|-------------|---------------------|--------|
+| REQ-LIVE-001 | Tab toggle "Individuali" / "Gruppo" | Toggle in alto nella pagina TabletLive | Complete ✓ |
+| REQ-LIVE-002 | Vista individuale (default) | Comportamento attuale: esercizi del cliente selezionato | Complete ✓ |
+| REQ-LIVE-003 | Vista gruppo | Lista esercizi is_group=true di TUTTI i clienti della giornata | Complete ✓ |
+| REQ-LIVE-004 | Indicatore visivo gruppo | Icon/badge su ExerciseCard quando is_group=true | Complete ✓ |
+| REQ-LIVE-005 | Lista partecipanti per esercizio | Mostra nomi clienti che hanno quell'esercizio di gruppo | Complete ✓ |
+| REQ-LIVE-006 | Complete-for-all | Un tap su "completa" marca l'esercizio per tutti i partecipanti | Complete ✓ |
+| REQ-LIVE-007 | Skip per singolo | Possibilità di saltare per un singolo cliente anche se di gruppo | Complete ✓ |
 
 ### MCP Server
 

@@ -82,20 +82,21 @@ Plans:
 ### Phase 4: UI Live Tablet
 **Goal:** Vista gruppo con complete-for-all nel live coaching
 **Requirements:** REQ-LIVE-001, REQ-LIVE-002, REQ-LIVE-003, REQ-LIVE-004, REQ-LIVE-005, REQ-LIVE-006, REQ-LIVE-007
-**Status:** Pending
+**Status:** Complete
+**Completed:** 2026-01-28
 **Depends on:** Phase 1, Phase 3
 **Plans:** 3 plans
 
 **Deliverables:**
-- [ ] Tab toggle "Individuali" / "Gruppo" in TabletLive
-- [ ] Vista individuale: comportamento esistente
-- [ ] Vista gruppo: lista esercizi is_group=true di tutti i clienti del giorno
-- [ ] Indicatore visivo su ExerciseCard per esercizi di gruppo
-- [ ] Lista partecipanti per ogni esercizio di gruppo
-- [ ] Complete-for-all: un tap marca completo per tutti
-- [ ] Skip individuale: possibilità di saltare per singolo cliente
-- [ ] RPC function per update atomico cross-session
-- [ ] Realtime subscription per sync cross-tablet
+- [x] Tab toggle "Individuali" / "Gruppo" in TabletLive
+- [x] Vista individuale: comportamento esistente
+- [x] Vista gruppo: lista esercizi is_group=true di tutti i clienti del giorno
+- [x] Indicatore visivo su ExerciseCard per esercizi di gruppo
+- [x] Lista partecipanti per ogni esercizio di gruppo
+- [x] Complete-for-all: un tap marca completo per tutti
+- [x] Skip individuale: possibilità di saltare per singolo cliente
+- [x] RPC function per update atomico cross-session
+- [x] Realtime subscription per sync cross-tablet
 
 **Success Criteria:**
 - Coach può switchare tra vista individuale e gruppo
@@ -105,9 +106,9 @@ Plans:
 - Sync real-time tra tablet (se più coach)
 
 Plans:
-- [ ] 04-01-PLAN.md — RPC functions + Realtime publication
-- [ ] 04-02-PLAN.md — Hook extension + View toggle
-- [ ] 04-03-PLAN.md — GroupExerciseView + GroupExerciseCard components
+- [x] 04-01-PLAN.md — RPC functions + Realtime publication
+- [x] 04-02-PLAN.md — Hook extension + View toggle
+- [x] 04-03-PLAN.md — GroupExerciseView + GroupExerciseCard components
 
 ---
 
