@@ -97,6 +97,7 @@ export function SessionDetail() {
         completed: false,
         completed_at: null,
         skipped: false,
+        is_group: false,
         exercise: exercise,
       }
 
