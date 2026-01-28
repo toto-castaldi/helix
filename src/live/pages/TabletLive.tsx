@@ -9,6 +9,8 @@ import { SaveIndicator } from '@/live/components/SaveIndicator'
 import { ConfirmDialog } from '@/live/components/ConfirmDialog'
 import { ExercisePickerLive } from '@/live/components/ExercisePickerLive'
 import { LumioCardModalLive } from '@/live/components/LumioCardModalLive'
+import { GroupExerciseView } from '@/live/components/GroupExerciseView'
+import { supabase } from '@/shared/lib/supabase'
 import { ArrowLeft, Users } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { cn } from '@/shared/lib/utils'
@@ -29,9 +31,9 @@ export function TabletLive() {
     deleteExerciseFromSession,
     addExerciseToSession,
     changeExercise,
-    // Group functions - will be used in plan 03
-    completeGroupExercise: _completeGroupExercise,
-    skipGroupExerciseForClient: _skipGroupExerciseForClient,
+    // Group functions
+    completeGroupExercise,
+    skipGroupExerciseForClient,
   } = useLiveCoaching()
 
   const { exercises, refetch: refetchExercises } = useExercises()
@@ -177,6 +179,21 @@ export function TabletLive() {
     }
   }
 
+  // Undo handler for group complete-all action
+  // Note: Uses individual updates (not atomic RPC) - acceptable tradeoff for undo path
+  // which is rare and doesn't require strict atomicity
+  const handleUndoGroupComplete = async (exerciseIds: string[]) => {
+    for (const id of exerciseIds) {
+      await supabase
+        .from('session_exercises')
+        .update({ completed: false, completed_at: null })
+        .eq('id', id)
+    }
+    if (date) {
+      await fetchSessionsForDate(date)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -261,10 +278,15 @@ export function TabletLive() {
             </div>
           </>
         ) : (
-          // Placeholder for group view (will be implemented in plan 03)
-          <div className="flex-1 flex items-center justify-center text-gray-400">
-            Vista gruppo - coming in next plan
-          </div>
+          <GroupExerciseView
+            sessions={sessions}
+            currentDate={date || ''}
+            onCompleteGroup={async (exerciseId, _exerciseName) => {
+              return await completeGroupExercise(date || '', exerciseId)
+            }}
+            onSkipParticipant={skipGroupExerciseForClient}
+            onUndoComplete={handleUndoGroupComplete}
+          />
         )}
       </main>
 
