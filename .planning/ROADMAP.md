@@ -59,14 +59,15 @@ Plans:
 ### Phase 3: UI Pianificazione
 **Goal:** Toggle "di gruppo" nella pagina SessionDetail
 **Requirements:** REQ-PLAN-001, REQ-PLAN-002
-**Status:** Pending
+**Status:** Complete
+**Completed:** 2026-01-28
 **Depends on:** Phase 1
 **Plans:** 1 plan
 
 **Deliverables:**
-- [ ] Switch/toggle per is_group su ogni esercizio in SessionDetail
-- [ ] Indicatore visivo (icon/badge) nella lista esercizi
-- [ ] Hook useSessions aggiornato per gestire is_group
+- [x] Switch/toggle per is_group su ogni esercizio in SessionDetail
+- [x] Indicatore visivo (icon/badge) nella lista esercizi
+- [x] Hook useSessions aggiornato per gestire is_group
 
 **Success Criteria:**
 - Coach può marcare esercizio come "di gruppo" durante pianificazione
@@ -74,7 +75,7 @@ Plans:
 - Stato persistito correttamente in database
 
 Plans:
-- [ ] 03-01-PLAN.md — Add group toggle and visual indicators to SessionDetail
+- [x] 03-01-PLAN.md — Add group toggle and visual indicators to SessionDetail
 
 ---
 

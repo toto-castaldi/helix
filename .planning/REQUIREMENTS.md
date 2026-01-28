@@ -15,10 +15,10 @@
 
 ### UI Pianificazione
 
-| ID | Requirement | Acceptance Criteria |
-|----|-------------|---------------------|
-| REQ-PLAN-001 | Toggle "di gruppo" in SessionDetail | Switch visibile per ogni esercizio nella sessione |
-| REQ-PLAN-002 | Indicatore visivo in lista esercizi | Badge/icon che mostra quali esercizi sono di gruppo |
+| ID | Requirement | Acceptance Criteria | Status |
+|----|-------------|---------------------|--------|
+| REQ-PLAN-001 | Toggle "di gruppo" in SessionDetail | Switch visibile per ogni esercizio nella sessione | Complete ✓ |
+| REQ-PLAN-002 | Indicatore visivo in lista esercizi | Badge/icon che mostra quali esercizi sono di gruppo | Complete ✓ |
 
 ### UI Live Tablet
 
