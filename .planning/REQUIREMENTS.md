@@ -34,12 +34,12 @@
 
 ### MCP Server
 
-| ID | Requirement | Acceptance Criteria |
-|----|-------------|---------------------|
-| REQ-MCP-001 | Lettura is_group in session resource | Campo is_group incluso in helix://sessions/{id} |
-| REQ-MCP-002 | Scrittura is_group in add_session_exercise | Parametro opzionale is_group nel tool |
-| REQ-MCP-003 | Scrittura is_group in update_session_exercise | Parametro opzionale is_group nel tool |
-| REQ-MCP-004 | Lettura is_group in create_training_plan | Supporto is_group negli esercizi del piano |
+| ID | Requirement | Acceptance Criteria | Status |
+|----|-------------|---------------------|--------|
+| REQ-MCP-001 | Lettura is_group in session resource | Campo is_group incluso in helix://sessions/{id} | Complete ✓ |
+| REQ-MCP-002 | Scrittura is_group in add_session_exercise | Parametro opzionale is_group nel tool | Complete ✓ |
+| REQ-MCP-003 | Scrittura is_group in update_session_exercise | Parametro opzionale is_group nel tool | Complete ✓ |
+| REQ-MCP-004 | Lettura is_group in create_training_plan | Supporto is_group negli esercizi del piano | Complete ✓ |
 
 ## V2 Requirements (Post-MVP)
 

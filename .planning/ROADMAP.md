@@ -35,19 +35,24 @@ Plans:
 ### Phase 2: MCP Server Integration
 **Goal:** Esporre is_group in lettura e scrittura via MCP
 **Requirements:** REQ-MCP-001, REQ-MCP-002, REQ-MCP-003, REQ-MCP-004
-**Status:** Pending
+**Status:** Complete ✓
+**Completed:** 2026-01-28
 **Depends on:** Phase 1
+**Plans:** 1 plan
 
 **Deliverables:**
-- [ ] Resource helix://sessions/{id} include is_group negli esercizi
-- [ ] Tool add_session_exercise accetta parametro is_group
-- [ ] Tool update_session_exercise accetta parametro is_group
-- [ ] Tool create_training_plan supporta is_group negli esercizi
+- [x] Resource helix://sessions/{id} include is_group negli esercizi
+- [x] Tool add_session_exercise accetta parametro is_group
+- [x] Tool update_session_exercise accetta parametro is_group
+- [x] Tool create_training_plan supporta is_group negli esercizi
 
 **Success Criteria:**
-- Claude può leggere is_group dalle sessioni
-- Claude può creare esercizi con is_group=true
-- Claude può modificare is_group su esercizi esistenti
+- Claude può leggere is_group dalle sessioni ✓
+- Claude può creare esercizi con is_group=true ✓
+- Claude può modificare is_group su esercizi esistenti ✓
+
+Plans:
+- [x] 02-01-PLAN.md — Add is_group to MCP resources and tools
 
 ---
 
