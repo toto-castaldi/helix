@@ -13,12 +13,12 @@
 | Phase 3: UI Pianificazione | Complete | 2026-01-28 | 2026-01-28 |
 | Phase 4: UI Live Tablet | In progress | 2026-01-28 | - |
 
-Progress: [====] 87% (Plan 04-01 complete, 04-02/04-03 pending)
+Progress: [=====] 93% (Plan 04-02 complete, 04-03 pending)
 
 ## Current Task
 
-Plan 04-01 complete - RPC functions and realtime enabled
-Next: 04-02-PLAN.md (TypeScript types and hooks)
+Plan 04-02 complete - Hook extended with group functions and realtime, view mode toggle added
+Next: 04-03-PLAN.md (GroupExerciseView component)
 
 ## Blockers
 
@@ -36,6 +36,7 @@ None
 | 03-01 | Badge with Users icon | Visual indicator matches toggle icon for clear association |
 | 03-01 | Summary count only when > 0 | Avoid visual clutter when no group exercises |
 | 04-01 | SECURITY INVOKER for RPC functions | Respects RLS policies, user context preserved |
+| 04-02 | Underscore prefix for unused destructured | TypeScript pattern to suppress unused variable errors |
 
 ## Notes
 
@@ -46,11 +47,12 @@ None
 - Phase 2 Plan 01: Added is_group to MCP resources and tools
 - Phase 3 Plan 01: Added group toggle, badge, and summary count to UI
 - Phase 4 Plan 01: Added RPC functions and realtime for group exercises
+- Phase 4 Plan 02: Extended hook with group functions, added view toggle
 
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 04-01-PLAN.md
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
 
 ---
