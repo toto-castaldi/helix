@@ -250,7 +250,7 @@ export function TabletLive() {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex p-4 gap-4">
+      <main className="flex-1 flex p-4 gap-4 min-h-0">
         {viewMode === 'individual' ? (
           <>
             {/* Action Panel */}
