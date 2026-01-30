@@ -1,12 +1,22 @@
-# Helix — Esercizi di Gruppo
+# Helix — Esercizi di Gruppo v1.1
 
 ## What This Is
 
-Helix è un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra e un server MCP per pianificazione AI via Claude. La milestone "Esercizi di Gruppo" ha aggiunto il supporto per esercizi condivisi tra più clienti durante le lezioni di gruppo.
+Helix è un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra e un server MCP per pianificazione AI via Claude. Supporta esercizi condivisi tra più clienti durante le lezioni di gruppo.
 
 ## Core Value
 
 Durante le lezioni di gruppo, il coach può gestire gli esercizi condivisi da un'unica vista, completandoli una volta per tutti i partecipanti.
+
+## Current Milestone: v1.1 Group Exercise Improvements
+
+**Goal:** Separare la vista cliente (individuali vs gruppo), introdurre template gruppi riutilizzabili, e rimuovere Live dall'app mobile.
+
+**Target features:**
+- Vista cliente separata nel tablet: esercizi individuali da una parte, di gruppo dall'altra
+- Template esercizi di gruppo: definire una volta, associare a più sessioni
+- Rimuovere sezione Live dall'app mobile (solo tablet)
+- Bugfix: export cliente non funzionante
 
 ## Requirements
 
@@ -30,7 +40,10 @@ Durante le lezioni di gruppo, il coach può gestire gli esercizi condivisi da un
 
 ### Active
 
-(Next milestone requirements will be defined via `/gsd:new-milestone`)
+- [ ] Live tablet: vista cliente con separazione individuali/gruppo
+- [ ] Template esercizi di gruppo riutilizzabili
+- [ ] Rimuovere Live dall'app mobile standard
+- [ ] Bugfix: export cliente (errore visibile)
 
 ### Out of Scope
 
@@ -80,4 +93,4 @@ Durante le lezioni di gruppo, il coach può gestire gli esercizi condivisi da un
 | Toast duration 4 seconds | Enough time to react, not too long | ✓ Good — balanced UX |
 
 ---
-*Last updated: 2026-01-28 after v1.0 milestone*
+*Last updated: 2026-01-30 after v1.1 milestone start*

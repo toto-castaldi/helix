@@ -1,30 +1,27 @@
 # Execution State: Helix
 
-**Milestone:** v1.0 Esercizi di Gruppo — SHIPPED
-**Current Phase:** Milestone complete
-**Updated:** 2026-01-28
+**Milestone:** v1.1 Group Exercise Improvements
+**Current Phase:** Not started (defining requirements)
+**Updated:** 2026-01-30
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-28)
+See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Group exercise management for live coaching
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v1.1
 
 ## Progress
 
 | Phase | Status | Started | Completed |
 |-------|--------|---------|-----------|
-| Phase 1: Database Schema | Complete | 2026-01-28 | 2026-01-28 |
-| Phase 2: MCP Server Integration | Complete | 2026-01-28 | 2026-01-28 |
-| Phase 3: UI Pianificazione | Complete | 2026-01-28 | 2026-01-28 |
-| Phase 4: UI Live Tablet | Complete | 2026-01-28 | 2026-01-28 |
+| (phases will be defined in roadmap) | — | — | — |
 
-Progress: [====] 100% (4/4 phases complete)
+Progress: [----] 0% (defining requirements)
 
 ## Current Task
 
-**Milestone v1.0 shipped.** Next: `/gsd:new-milestone` for v1.1 planning.
+**Defining v1.1 requirements.** Next: complete requirements → create roadmap.
 
 ## Blockers
 
@@ -32,20 +29,19 @@ None
 
 ## Accumulated Decisions
 
-Archived to PROJECT.md Key Decisions table.
+(Carried from v1.0 — see PROJECT.md Key Decisions table)
 
 ## Notes
 
 - v1.0 Esercizi di Gruppo shipped 2026-01-28
-- Milestone audit passed: 11/11 requirements, 4/4 E2E flows
-- Archives: milestones/v1.0-ROADMAP.md, milestones/v1.0-REQUIREMENTS.md
-- Git tag: v1.0
+- v1.1 started 2026-01-30
+- Focus: vista cliente separata, template gruppi, rimuovere Live da mobile, bugfix export
 
 ## Session Continuity
 
-Last session: 2026-01-28
-Stopped at: Milestone v1.0 complete
+Last session: 2026-01-30
+Stopped at: Defining requirements
 Resume file: None
 
 ---
-*State tracking: milestone complete*
+*State tracking: requirements definition*
