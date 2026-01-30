@@ -28,10 +28,10 @@
   2. Table `group_template_exercises` exists with exercise_id, parameters (sets, reps, weight, duration), order_index
   3. RLS policies enforce coach isolation (user_id)
   4. TypeScript types exported for template entities
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 05-01: Migration + types + RLS
+- [ ] 05-01-PLAN.md — Create migration with tables, RLS, indexes; add TypeScript types; update CLAUDE.md
 
 ---
 
