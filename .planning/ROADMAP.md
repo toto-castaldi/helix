@@ -11,7 +11,7 @@
 
 ## Phases
 
-- [ ] **Phase 5: Template Database Schema** - Tables for group templates and exercises
+- [x] **Phase 5: Template Database Schema** - Tables for group templates and exercises
 - [ ] **Phase 6: Template Management UI** - CRUD for templates in main app
 - [ ] **Phase 7: MCP Template Integration** - Resources and tools for templates
 - [ ] **Phase 8: Client View Separation** - Two tabs in tablet client view
@@ -31,7 +31,7 @@
 **Plans**: 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — Create migration with tables, RLS, indexes; add TypeScript types; update CLAUDE.md
+- [x] 05-01-PLAN.md — Create migration with tables, RLS, indexes; add TypeScript types; update CLAUDE.md
 
 ---
 
@@ -112,7 +112,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 5. Template Database Schema | 0/1 | Not started | - |
+| 5. Template Database Schema | 1/1 | ✓ Complete | 2026-01-30 |
 | 6. Template Management UI | 0/3 | Not started | - |
 | 7. MCP Template Integration | 0/2 | Not started | - |
 | 8. Client View Separation | 0/1 | Not started | - |
