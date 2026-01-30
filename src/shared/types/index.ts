@@ -362,3 +362,54 @@ export interface LumioCardImage {
   storage_path: string
   created_at: string
 }
+
+// Group Templates
+
+export interface GroupTemplate {
+  id: string
+  user_id: string
+  name: string
+  created_at: string
+  updated_at: string
+}
+
+export interface GroupTemplateInsert {
+  name: string
+}
+
+export interface GroupTemplateUpdate extends Partial<GroupTemplateInsert> {}
+
+export interface GroupTemplateExercise {
+  id: string
+  template_id: string
+  exercise_id: string
+  order_index: number
+  sets: number | null
+  reps: number | null
+  weight_kg: number | null
+  duration_seconds: number | null
+  notes: string | null
+  created_at: string
+}
+
+export interface GroupTemplateExerciseInsert {
+  template_id: string
+  exercise_id: string
+  order_index?: number
+  sets?: number | null
+  reps?: number | null
+  weight_kg?: number | null
+  duration_seconds?: number | null
+  notes?: string | null
+}
+
+export interface GroupTemplateExerciseUpdate
+  extends Partial<Omit<GroupTemplateExerciseInsert, 'template_id'>> {}
+
+export interface GroupTemplateWithExercises extends GroupTemplate {
+  exercises?: GroupTemplateExerciseWithDetails[]
+}
+
+export interface GroupTemplateExerciseWithDetails extends GroupTemplateExercise {
+  exercise?: ExerciseWithDetails
+}
