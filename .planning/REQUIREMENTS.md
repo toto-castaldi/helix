@@ -65,7 +65,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | Associazione automatica template per orario | Complessità, selezione manuale sufficiente per v1.1 |
 | Parametri variabili per cliente nel template | Complicherebbe UX, tutti fanno stesso allenamento |
 | Vista cliente-facing separata | Coach e cliente usano stessa vista |
-| Class booking/scheduling | Helix è per coaching, non gym management |
+| Class booking/scheduling | Helix è per coaching, not gym management |
 
 ## Traceability
 
@@ -73,31 +73,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TMPL-01 | TBD | Pending |
-| TMPL-02 | TBD | Pending |
-| TMPL-03 | TBD | Pending |
-| TMPL-04 | TBD | Pending |
-| TMPL-05 | TBD | Pending |
-| VIEW-01 | TBD | Pending |
-| VIEW-02 | TBD | Pending |
-| VIEW-03 | TBD | Pending |
-| MOBL-01 | TBD | Pending |
-| MOBL-02 | TBD | Pending |
-| MCP-01 | TBD | Pending |
-| MCP-02 | TBD | Pending |
-| MCP-03 | TBD | Pending |
-| MCP-04 | TBD | Pending |
-| MCP-05 | TBD | Pending |
-| MCP-06 | TBD | Pending |
-| MCP-07 | TBD | Pending |
-| MCP-08 | TBD | Pending |
-| FIX-01 | TBD | Pending |
+| TMPL-01 | Phase 6 | Pending |
+| TMPL-02 | Phase 6 | Pending |
+| TMPL-03 | Phase 6 | Pending |
+| TMPL-04 | Phase 6 | Pending |
+| TMPL-05 | Phase 6 | Pending |
+| VIEW-01 | Phase 8 | Pending |
+| VIEW-02 | Phase 8 | Pending |
+| VIEW-03 | Phase 8 | Pending |
+| MOBL-01 | Phase 9 | Pending |
+| MOBL-02 | Phase 9 | Pending |
+| MCP-01 | Phase 7 | Pending |
+| MCP-02 | Phase 7 | Pending |
+| MCP-03 | Phase 7 | Pending |
+| MCP-04 | Phase 7 | Pending |
+| MCP-05 | Phase 7 | Pending |
+| MCP-06 | Phase 7 | Pending |
+| MCP-07 | Phase 7 | Pending |
+| MCP-08 | Phase 7 | Pending |
+| FIX-01 | Phase 9 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 19 total
-- Mapped to phases: 0
-- Unmapped: 19 (will be mapped during roadmap creation)
+- Mapped to phases: 19
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 after initial definition*
+*Last updated: 2026-01-30 after roadmap creation*
