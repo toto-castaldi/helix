@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Play, Filter, X } from 'lucide-react'
+import { Play, Filter, X, LayoutTemplate } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SessionForm } from '@/components/sessions/SessionForm'
 import { SessionCard } from '@/components/sessions/SessionCard'
+import { TemplateManager } from '@/components/templates'
 import {
   LoadingSpinner,
   ErrorAlert,
@@ -27,6 +28,7 @@ export function Sessions() {
   const { gyms } = useGyms()
 
   const [showForm, setShowForm] = useState(false)
+  const [showTemplateManager, setShowTemplateManager] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<SessionWithDetails | null>(null)
 
@@ -84,6 +86,10 @@ export function Sessions() {
         <PageHeader title="Sessioni">
           {!showForm && (
             <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setShowTemplateManager(true)}>
+                <LayoutTemplate className="h-4 w-4 mr-2" />
+                Template
+              </Button>
               <Button size="sm" variant="default" onClick={() => navigate('/live')}>
                 <Play className="h-4 w-4 mr-2" />
                 Live
@@ -152,6 +158,10 @@ export function Sessions() {
             ))
           )}
         </div>
+      )}
+
+      {showTemplateManager && (
+        <TemplateManager onClose={() => setShowTemplateManager(false)} />
       )}
     </div>
   )
