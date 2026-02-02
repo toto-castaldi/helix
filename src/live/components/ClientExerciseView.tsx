@@ -9,12 +9,14 @@ interface ClientExerciseViewProps {
   session: SessionWithDetails
   onSelectExercise: (index: number) => void
   onUpdateExercise: (field: string, value: number | string | null) => void
+  resetTrigger?: number
 }
 
 export function ClientExerciseView({
   session,
   onSelectExercise,
   onUpdateExercise,
+  resetTrigger,
 }: ClientExerciseViewProps) {
   // Filter exercises by is_group and track original indices
   const { individualExercises, groupExercises, individualIndices, groupIndices } = useMemo(() => {
@@ -87,6 +89,7 @@ export function ClientExerciseView({
                 indexMap={individualIndexMap}
                 onSelectExercise={onSelectExercise}
                 onUpdateExercise={onUpdateExercise}
+                resetTrigger={resetTrigger}
               />
             </div>
           ) : (
@@ -109,6 +112,7 @@ export function ClientExerciseView({
                 indexMap={groupIndexMap}
                 onSelectExercise={onSelectExercise}
                 onUpdateExercise={onUpdateExercise}
+                resetTrigger={resetTrigger}
               />
             </div>
           ) : (

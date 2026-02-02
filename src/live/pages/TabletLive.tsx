@@ -36,6 +36,7 @@ export function TabletLive() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [pickerMode, setPickerMode] = useState<'add' | 'change' | null>(null)
   const [showLumioCard, setShowLumioCard] = useState(false)
+  const [resetTrigger, setResetTrigger] = useState(0)
   const date = (location.state as { date?: string })?.date
 
   useEffect(() => {
@@ -88,17 +89,9 @@ export function TabletLive() {
     }
   }
 
-  const handleCenter = async () => {
-    if (selectedSession) {
-      const exercises = selectedSession.exercises || []
-      // Find first non-completed and non-skipped exercise
-      const firstIncompleteIndex = exercises.findIndex(
-        (ex) => !ex.completed && !ex.skipped
-      )
-      if (firstIncompleteIndex !== -1) {
-        await selectExercise(selectedSession.id, firstIncompleteIndex)
-      }
-    }
+  const handleCenter = () => {
+    // Reset carousel to show first incomplete exercise
+    setResetTrigger(prev => prev + 1)
   }
 
   const handleUpdateExercise = async (field: string, value: number | string | null) => {
@@ -237,6 +230,7 @@ export function TabletLive() {
               session={selectedSession}
               onSelectExercise={handleExerciseSelect}
               onUpdateExercise={handleUpdateExercise}
+              resetTrigger={resetTrigger}
             />
           )}
         </div>

@@ -11,6 +11,8 @@ interface ExerciseCarouselProps {
   exercises?: SessionExerciseWithDetails[]
   currentIndex?: number
   indexMap?: (localIndex: number) => number
+  // Reset trigger - increment to reset manual navigation
+  resetTrigger?: number
 }
 
 export function ExerciseCarousel({
@@ -20,9 +22,17 @@ export function ExerciseCarousel({
   exercises: exercisesProp,
   currentIndex: currentIndexProp,
   indexMap,
+  resetTrigger,
 }: ExerciseCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [manualIndex, setManualIndex] = useState<number | null>(null)
+
+  // Reset manual index when resetTrigger changes
+  useMemo(() => {
+    if (resetTrigger !== undefined) {
+      setManualIndex(null)
+    }
+  }, [resetTrigger])
 
   // Use provided exercises or fall back to session exercises
   const exercises = exercisesProp || session.exercises || []
