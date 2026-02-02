@@ -99,11 +99,11 @@ Plans:
   1. Live page does not exist in mobile app
   2. No navigation or links to Live functionality in mobile app
   3. Client export works without errors
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: Remove Live from mobile
-- [ ] 09-02: Fix client export
+- [ ] 09-01-PLAN.md — Remove Live page, route, and button from main mobile app
+- [ ] 09-02-PLAN.md — Investigate and fix client export bug
 
 ---
 
@@ -117,8 +117,8 @@ Plans:
 | 6. Template Management UI | 3/3 | ✓ Complete | 2026-02-02 |
 | 7. MCP Template Integration | 3/3 | ✓ Complete | 2026-02-02 |
 | 8. Client View Separation | 1/1 | ✓ Complete | 2026-02-02 |
-| 9. Mobile Cleanup + Bugfix | 0/2 | Not started | - |
+| 9. Mobile Cleanup + Bugfix | 0/2 | Planned | - |
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-02-02 (Phase 8)*
+*Last updated: 2026-02-02 (Phase 9 planned)*
