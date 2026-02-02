@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import { ExerciseCard } from './ExerciseCard'
 import type { SessionWithDetails, SessionExerciseWithDetails } from '@/shared/types'
 import { cn } from '@/shared/lib/utils'
@@ -22,21 +22,43 @@ export function ExerciseCarousel({
   indexMap,
 }: ExerciseCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [localIndex, setLocalIndex] = useState(0)
+  const [manualIndex, setManualIndex] = useState<number | null>(null)
 
   // Use provided exercises or fall back to session exercises
   const exercises = exercisesProp || session.exercises || []
-  // Use provided currentIndex, or localIndex for filtered views, or session index
+
+  // For filtered views, find the first non-completed/non-skipped exercise
+  const autoCurrentIndex = useMemo(() => {
+    if (!exercisesProp) {
+      return session.current_exercise_index
+    }
+    // Find first incomplete exercise in filtered list
+    const firstIncomplete = exercises.findIndex(ex => !ex.completed && !ex.skipped)
+    if (firstIncomplete !== -1) {
+      return firstIncomplete
+    }
+    // All done - show last one
+    return Math.max(0, exercises.length - 1)
+  }, [exercisesProp, exercises, session.current_exercise_index])
+
+  // Use provided currentIndex, manual selection, auto-computed, or session index
   const currentIndex = currentIndexProp !== undefined
     ? currentIndexProp
-    : exercisesProp
-      ? localIndex
-      : session.current_exercise_index
+    : manualIndex !== null
+      ? manualIndex
+      : autoCurrentIndex
+
+  // Reset manual index when exercises change (e.g., after complete/skip)
+  // This allows auto-advance to take over
+  const exercisesKey = exercises.map(e => `${e.id}-${e.completed}-${e.skipped}`).join(',')
+  useMemo(() => {
+    setManualIndex(null)
+  }, [exercisesKey])
 
   // Map local index to global index when calling onSelectExercise
   const handleSelectExercise = (idx: number) => {
     if (exercisesProp) {
-      setLocalIndex(idx)
+      setManualIndex(idx)
     }
     const globalIndex = indexMap ? indexMap(idx) : idx
     onSelectExercise(globalIndex)
@@ -90,16 +112,18 @@ export function ExerciseCarousel({
     <div className="h-full flex flex-col min-h-0 overflow-hidden">
       {/* Progress indicator */}
       <div className="flex items-center justify-center gap-1.5 mb-2 shrink-0">
-        {exercises.map((_, index) => (
+        {exercises.map((ex, index) => (
           <button
-            key={index}
+            key={ex.id}
             onClick={() => handleSelectExercise(index)}
             className={cn(
               'w-2.5 h-2.5 rounded-full transition-all',
               index === currentIndex
                 ? 'bg-amber-400 w-6'
-                : index < currentIndex
+                : ex.completed
                 ? 'bg-emerald-400'
+                : ex.skipped
+                ? 'bg-amber-500'
                 : 'bg-white/40'
             )}
           />
