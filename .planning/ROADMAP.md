@@ -7,7 +7,7 @@
 ## Milestones
 
 - **v1.0 Esercizi di Gruppo** - Phases 1-4 (shipped 2026-01-28) - see milestones/v1.0-ROADMAP.md
-- **v1.1 Group Exercise Improvements** - Phases 5-9 (in progress)
+- **v1.1 Group Exercise Improvements** - Phases 5-9 (complete 2026-02-02)
 
 ## Phases
 
@@ -15,7 +15,7 @@
 - [x] **Phase 6: Template Management UI** - CRUD for templates in main app
 - [x] **Phase 7: MCP Template Integration** - Resources and tools for templates
 - [x] **Phase 8: Client View Separation** - Two tabs in tablet client view
-- [ ] **Phase 9: Mobile Cleanup + Bugfix** - Remove Live from mobile, fix export
+- [x] **Phase 9: Mobile Cleanup + Bugfix** - Remove Live from mobile, fix export
 
 ## Phase Details
 
@@ -102,8 +102,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Remove Live page, route, and button from main mobile app
-- [ ] 09-02-PLAN.md — Investigate and fix client export bug
+- [x] 09-01-PLAN.md — Remove Live page, route, and button from main mobile app
+- [x] 09-02-PLAN.md — Investigate and fix client export bug
 
 ---
 
@@ -117,8 +117,8 @@ Plans:
 | 6. Template Management UI | 3/3 | ✓ Complete | 2026-02-02 |
 | 7. MCP Template Integration | 3/3 | ✓ Complete | 2026-02-02 |
 | 8. Client View Separation | 1/1 | ✓ Complete | 2026-02-02 |
-| 9. Mobile Cleanup + Bugfix | 0/2 | Planned | - |
+| 9. Mobile Cleanup + Bugfix | 2/2 | ✓ Complete | 2026-02-02 |
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-02-02 (Phase 9 planned)*
+*Last updated: 2026-02-02 (Phase 9 complete — v1.1 milestone done)*

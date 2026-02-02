@@ -23,8 +23,8 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### Cleanup Mobile
 
-- [ ] **MOBL-01**: Rimuovere pagina Live dall'app mobile
-- [ ] **MOBL-02**: Rimuovere navigazione/link alla funzionalità Live dall'app mobile
+- [x] **MOBL-01**: Rimuovere pagina Live dall'app mobile
+- [x] **MOBL-02**: Rimuovere navigazione/link alla funzionalità Live dall'app mobile
 
 ### MCP Integration
 
@@ -39,7 +39,7 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### Bugfix
 
-- [ ] **FIX-01**: Export cliente funziona senza errori
+- [x] **FIX-01**: Export cliente funziona senza errori
 
 ## Future Requirements
 
@@ -78,11 +78,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TMPL-03 | Phase 6 | Complete |
 | TMPL-04 | Phase 6 | Complete |
 | TMPL-05 | Phase 6 | Complete |
-| VIEW-01 | Phase 8 | Pending |
-| VIEW-02 | Phase 8 | Pending |
-| VIEW-03 | Phase 8 | Pending |
-| MOBL-01 | Phase 9 | Pending |
-| MOBL-02 | Phase 9 | Pending |
+| VIEW-01 | Phase 8 | Complete |
+| VIEW-02 | Phase 8 | Complete |
+| VIEW-03 | Phase 8 | Complete |
+| MOBL-01 | Phase 9 | Complete |
+| MOBL-02 | Phase 9 | Complete |
 | MCP-01 | Phase 7 | Complete |
 | MCP-02 | Phase 7 | Complete |
 | MCP-03 | Phase 7 | Complete |
@@ -91,7 +91,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MCP-06 | Phase 7 | Complete |
 | MCP-07 | Phase 7 | Complete |
 | MCP-08 | Phase 7 | Complete |
-| FIX-01 | Phase 9 | Pending |
+| FIX-01 | Phase 9 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 19 total
@@ -100,4 +100,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-02-02 after Phase 7 completion*
+*Last updated: 2026-02-02 (all v1.1 requirements complete)*
