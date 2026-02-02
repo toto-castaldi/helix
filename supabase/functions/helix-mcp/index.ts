@@ -557,6 +557,11 @@ function getPromptDefinitions() {
         { name: "date", description: "Data (default: oggi)", required: false },
       ],
     },
+    {
+      name: "template-analysis",
+      description: "Analizza l'utilizzo dei template di gruppo",
+      arguments: [],
+    },
   ]
 }
 
@@ -1834,6 +1839,18 @@ async function getPrompt(
         .select("name, address")
         .eq("user_id", userId)
 
+      // Fetch available group templates
+      const { data: templates } = await supabase
+        .from("group_templates")
+        .select(`
+          id, name,
+          exercises:group_template_exercises(
+            exercise:exercises(name)
+          )
+        `)
+        .eq("user_id", userId)
+        .order("name")
+
       const date = session_date || new Date().toISOString().split("T")[0]
       const focusText = focus_areas ? `\n\nFOCUS RICHIESTO: ${focus_areas}` : ""
 
@@ -1848,6 +1865,17 @@ async function getPrompt(
       const gymList = (gyms || [])
         .map(g => `- ${g.name}${g.address ? ` (${g.address})` : ""}`)
         .join("\n") || "Nessuna palestra registrata"
+
+      const templatesList = (templates || [])
+        .map(t => {
+          const exerciseNames = (t.exercises as Array<{ exercise: { name: string } | null }>)
+            ?.slice(0, 3)
+            .map(e => e.exercise?.name)
+            .filter(Boolean)
+            .join(", ")
+          return `- ${t.name} (ID: ${t.id}): ${exerciseNames}${(t.exercises?.length || 0) > 3 ? "..." : ""}`
+        })
+        .join("\n") || "Nessun template disponibile"
 
       return {
         messages: [{
@@ -1867,6 +1895,9 @@ ${exerciseList}
 PALESTRE DISPONIBILI:
 ${gymList}
 
+TEMPLATE GRUPPI DISPONIBILI:
+${templatesList}
+
 Crea un piano di allenamento dettagliato considerando:
 1. Obiettivo attuale del cliente
 2. Storico sessioni precedenti
@@ -1874,7 +1905,8 @@ Crea un piano di allenamento dettagliato considerando:
 4. Progressione rispetto alle sessioni passate
 
 Proponi la lista degli esercizi con serie, ripetizioni, pesi e note.
-Quando il piano e' confermato, usa il tool "create_training_plan" per crearlo in Helix.`,
+Quando il piano e' confermato, usa il tool "create_training_plan" per crearlo in Helix.
+Se il cliente partecipa a sessioni di gruppo, considera di usare un template esistente con il tool "apply_template_to_session".`,
           },
         }],
       }
@@ -2059,6 +2091,61 @@ Fornisci:
 1. Priorita del giorno
 2. Suggerimenti per ottimizzare il tempo
 3. Eventuali note preparatorie per ogni cliente`,
+          },
+        }],
+      }
+    }
+
+    case "template-analysis": {
+      // Fetch templates with usage stats
+      const { data: templates } = await supabase
+        .from("group_templates")
+        .select(`
+          id, name, created_at,
+          exercises:group_template_exercises(id)
+        `)
+        .eq("user_id", userId)
+        .order("name")
+
+      // For each template, count how many sessions use it
+      const templateStats = await Promise.all(
+        (templates || []).map(async (t) => {
+          const { count } = await supabase
+            .from("session_exercises")
+            .select("session_id", { count: "exact", head: true })
+            .eq("template_id", t.id)
+
+          return {
+            id: t.id,
+            name: t.name,
+            exercise_count: (t.exercises as Array<{ id: string }>)?.length || 0,
+            times_applied: count || 0,
+            created_at: t.created_at,
+          }
+        })
+      )
+
+      const statsText = templateStats.length > 0
+        ? templateStats
+            .map(t => `- ${t.name}: ${t.exercise_count} esercizi, usato ${t.times_applied} volte`)
+            .join("\n")
+        : "Nessun template creato."
+
+      return {
+        messages: [{
+          role: "user",
+          content: {
+            type: "text",
+            text: `Analizza l'utilizzo dei template di gruppo per questo coach.
+
+TEMPLATE DISPONIBILI:
+${statsText}
+
+Fornisci:
+1. Quali template sono piu' utilizzati e perche'
+2. Template poco usati che potrebbero essere eliminati
+3. Suggerimenti per nuovi template basati sui pattern di utilizzo
+4. Raccomandazioni per ottimizzare la gestione delle sessioni di gruppo`,
           },
         }],
       }
