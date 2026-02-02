@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs'
 import { Badge } from '@/shared/components/ui/badge'
-import { ExerciseCard } from './ExerciseCard'
+import { ExerciseCarousel } from './ExerciseCarousel'
 import { Users, User } from 'lucide-react'
 import type { SessionWithDetails, SessionExerciseWithDetails } from '@/shared/types'
 
@@ -42,45 +42,15 @@ export function ClientExerciseView({
     }
   }, [session.exercises])
 
-  const currentIndex = session.current_exercise_index
-  const currentExercise = session.exercises?.[currentIndex]
+  const currentExercise = session.exercises?.[session.current_exercise_index]
 
   // Check if current exercise is in individual or group tab
   const isCurrentIndividual = currentExercise && !currentExercise.is_group
   const defaultTab = isCurrentIndividual ? 'individual' : 'group'
 
-  const renderExerciseList = (
-    exercises: SessionExerciseWithDetails[],
-    originalIndices: number[]
-  ) => {
-    if (exercises.length === 0) {
-      return null
-    }
-
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-        {exercises.map((exercise, listIndex) => {
-          const originalIndex = originalIndices[listIndex]
-          const isCurrent = originalIndex === currentIndex
-
-          return (
-            <div key={exercise.id} className="flex justify-center">
-              <ExerciseCard
-                exercise={exercise}
-                isCurrentExercise={isCurrent}
-                onClick={() => onSelectExercise(originalIndex)}
-                onUpdateSets={isCurrent ? (value) => onUpdateExercise('sets', value) : undefined}
-                onUpdateReps={isCurrent ? (value) => onUpdateExercise('reps', value) : undefined}
-                onUpdateWeight={isCurrent ? (value) => onUpdateExercise('weight_kg', value) : undefined}
-                onUpdateDuration={isCurrent ? (value) => onUpdateExercise('duration_seconds', value) : undefined}
-                onUpdateNotes={isCurrent ? (value) => onUpdateExercise('notes', value) : undefined}
-              />
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
+  // Create index map functions for each tab
+  const individualIndexMap = (localIndex: number) => individualIndices[localIndex]
+  const groupIndexMap = (localIndex: number) => groupIndices[localIndex]
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -108,11 +78,17 @@ export function ClientExerciseView({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="individual" className="flex-1 overflow-auto min-h-0 mt-0">
+        <TabsContent value="individual" className="flex-1 min-h-0 mt-0">
           {individualExercises.length > 0 ? (
-            renderExerciseList(individualExercises, individualIndices)
+            <ExerciseCarousel
+              session={session}
+              exercises={individualExercises}
+              indexMap={individualIndexMap}
+              onSelectExercise={onSelectExercise}
+              onUpdateExercise={onUpdateExercise}
+            />
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-400 h-full">
+            <div className="flex items-center justify-center h-full text-gray-400">
               <div className="text-center">
                 <User className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p className="text-lg">Nessun esercizio individuale</p>
@@ -122,11 +98,17 @@ export function ClientExerciseView({
           )}
         </TabsContent>
 
-        <TabsContent value="group" className="flex-1 overflow-auto min-h-0 mt-0">
+        <TabsContent value="group" className="flex-1 min-h-0 mt-0">
           {groupExercises.length > 0 ? (
-            renderExerciseList(groupExercises, groupIndices)
+            <ExerciseCarousel
+              session={session}
+              exercises={groupExercises}
+              indexMap={groupIndexMap}
+              onSelectExercise={onSelectExercise}
+              onUpdateExercise={onUpdateExercise}
+            />
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-400 h-full">
+            <div className="flex items-center justify-center h-full text-gray-400">
               <div className="text-center">
                 <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p className="text-lg">Nessun esercizio di gruppo</p>

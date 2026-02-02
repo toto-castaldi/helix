@@ -1,22 +1,46 @@
 import { useRef, useState } from 'react'
 import { ExerciseCard } from './ExerciseCard'
-import type { SessionWithDetails } from '@/shared/types'
+import type { SessionWithDetails, SessionExerciseWithDetails } from '@/shared/types'
 import { cn } from '@/shared/lib/utils'
 
 interface ExerciseCarouselProps {
   session: SessionWithDetails
   onSelectExercise: (index: number) => void
   onUpdateExercise: (field: string, value: number | string | null) => void
+  // Optional: for filtered exercise views
+  exercises?: SessionExerciseWithDetails[]
+  currentIndex?: number
+  indexMap?: (localIndex: number) => number
 }
 
 export function ExerciseCarousel({
   session,
   onSelectExercise,
   onUpdateExercise,
+  exercises: exercisesProp,
+  currentIndex: currentIndexProp,
+  indexMap,
 }: ExerciseCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const currentIndex = session.current_exercise_index
-  const exercises = session.exercises || []
+  const [localIndex, setLocalIndex] = useState(0)
+
+  // Use provided exercises or fall back to session exercises
+  const exercises = exercisesProp || session.exercises || []
+  // Use provided currentIndex, or localIndex for filtered views, or session index
+  const currentIndex = currentIndexProp !== undefined
+    ? currentIndexProp
+    : exercisesProp
+      ? localIndex
+      : session.current_exercise_index
+
+  // Map local index to global index when calling onSelectExercise
+  const handleSelectExercise = (idx: number) => {
+    if (exercisesProp) {
+      setLocalIndex(idx)
+    }
+    const globalIndex = indexMap ? indexMap(idx) : idx
+    onSelectExercise(globalIndex)
+  }
 
   // Swipe handling
   const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -42,10 +66,10 @@ export function ExerciseCarousel({
 
     if (isLeftSwipe && currentIndex < exercises.length - 1) {
       // Swipe left = next exercise
-      onSelectExercise(currentIndex + 1)
+      handleSelectExercise(currentIndex + 1)
     } else if (isRightSwipe && currentIndex > 0) {
       // Swipe right = previous exercise
-      onSelectExercise(currentIndex - 1)
+      handleSelectExercise(currentIndex - 1)
     }
   }
 
@@ -69,7 +93,7 @@ export function ExerciseCarousel({
         {exercises.map((_, index) => (
           <button
             key={index}
-            onClick={() => onSelectExercise(index)}
+            onClick={() => handleSelectExercise(index)}
             className={cn(
               'w-2.5 h-2.5 rounded-full transition-all',
               index === currentIndex
@@ -96,7 +120,7 @@ export function ExerciseCarousel({
             <ExerciseCard
               exercise={prevExercise}
               isCurrentExercise={false}
-              onClick={() => onSelectExercise(currentIndex - 1)}
+              onClick={() => handleSelectExercise(currentIndex - 1)}
             />
           ) : (
             <div className="w-[320px]" /> // Empty space
@@ -122,7 +146,7 @@ export function ExerciseCarousel({
             <ExerciseCard
               exercise={nextExercise}
               isCurrentExercise={false}
-              onClick={() => onSelectExercise(currentIndex + 1)}
+              onClick={() => handleSelectExercise(currentIndex + 1)}
             />
           ) : (
             <div className="w-[320px]" /> // Empty space
