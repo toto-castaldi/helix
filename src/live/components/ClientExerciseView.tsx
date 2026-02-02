@@ -53,8 +53,8 @@ export function ClientExerciseView({
   const groupIndexMap = (localIndex: number) => groupIndices[localIndex]
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      <Tabs defaultValue={defaultTab} className="flex flex-col h-full">
+    <div className="h-full flex flex-col">
+      <Tabs defaultValue={defaultTab} className="flex flex-col flex-1 min-h-0">
         <TabsList className="bg-gray-800 border border-gray-700 shrink-0 mx-4 mb-2">
           <TabsTrigger
             value="individual"
@@ -78,15 +78,17 @@ export function ClientExerciseView({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="individual" className="flex-1 min-h-0 mt-0">
+        <TabsContent value="individual" className="flex-1 min-h-0 mt-0 h-full">
           {individualExercises.length > 0 ? (
-            <ExerciseCarousel
-              session={session}
-              exercises={individualExercises}
-              indexMap={individualIndexMap}
-              onSelectExercise={onSelectExercise}
-              onUpdateExercise={onUpdateExercise}
-            />
+            <div className="h-full">
+              <ExerciseCarousel
+                session={session}
+                exercises={individualExercises}
+                indexMap={individualIndexMap}
+                onSelectExercise={onSelectExercise}
+                onUpdateExercise={onUpdateExercise}
+              />
+            </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
               <div className="text-center">
@@ -98,15 +100,17 @@ export function ClientExerciseView({
           )}
         </TabsContent>
 
-        <TabsContent value="group" className="flex-1 min-h-0 mt-0">
+        <TabsContent value="group" className="flex-1 min-h-0 mt-0 h-full">
           {groupExercises.length > 0 ? (
-            <ExerciseCarousel
-              session={session}
-              exercises={groupExercises}
-              indexMap={groupIndexMap}
-              onSelectExercise={onSelectExercise}
-              onUpdateExercise={onUpdateExercise}
-            />
+            <div className="h-full">
+              <ExerciseCarousel
+                session={session}
+                exercises={groupExercises}
+                indexMap={groupIndexMap}
+                onSelectExercise={onSelectExercise}
+                onUpdateExercise={onUpdateExercise}
+              />
+            </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
               <div className="text-center">
