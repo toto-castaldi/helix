@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 Phase: 7 of 9 (MCP Template Integration)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-02 - Completed 07-01-PLAN.md
+Last activity: 2026-02-02 - Completed 07-02-PLAN.md
 
-Progress: [######----] 71% (5/7 plans complete)
+Progress: [######----] 86% (6/7 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5 (v1.3)
+- Total plans completed: 6 (v1.4)
 - Average duration: 6m
-- Total execution time: 28m
+- Total execution time: 33m
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [######----] 71% (5/7 plans complete)
 |-------|-------|-------|----------|
 | 05 | 1 | 2m | 2m |
 | 06 | 3 | 18m | 6m |
-| 07 | 1 | 8m | 8m |
+| 07 | 2 | 13m | 6.5m |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (2m), 06-01 (5m), 06-02 (8m), 06-03 (5m), 07-01 (8m)
+- Last 5 plans: 06-01 (5m), 06-02 (8m), 06-03 (5m), 07-01 (8m), 07-02 (5m)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -59,6 +59,8 @@ Recent decisions affecting current work:
 - v1.4: MCP resource preview includes exercise_count + first 3 names
 - v1.4: MCP detail sorts exercises by order_index
 - v1.4: Filter by user_id in MCP queries (explicit RLS compliance)
+- v1.5: MCP template CRUD tools verify ownership via user_id
+- v1.5: delete_group_template checks canDeleteTemplate pattern
 
 ### Pending Todos
 
@@ -71,8 +73,8 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 07-01-PLAN.md
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
 
 ---
-*State tracking: Phase 7 in progress - 1/3 plans complete*
+*State tracking: Phase 7 in progress - 2/3 plans complete*
