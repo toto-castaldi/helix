@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Calendar, Building2, User, Edit2, X, Users } from 'lucide-react'
+import { ArrowLeft, Plus, Calendar, Building2, User, Edit2, X, Users, LayoutTemplate } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
@@ -8,10 +8,12 @@ import { Label } from '@/components/ui/label'
 import { SessionForm } from '@/components/sessions/SessionForm'
 import { SessionExerciseCard } from '@/components/sessions/SessionExerciseCard'
 import { ExercisePicker } from '@/components/sessions/ExercisePicker'
+import { ApplyTemplateDialog } from '@/components/templates'
 import { useSessions } from '@/hooks/useSessions'
 import { useClients } from '@/hooks/useClients'
 import { useGyms } from '@/hooks/useGyms'
 import { useExercises } from '@/hooks/useExercises'
+import { useGroupTemplates } from '@/hooks/useGroupTemplates'
 import { formatDate } from '@/lib/utils'
 import type { SessionWithDetails, SessionInsert, SessionExerciseUpdate, SessionExerciseWithDetails, ExerciseWithDetails } from '@/types'
 
@@ -30,12 +32,14 @@ export function SessionDetail() {
   const { clients } = useClients()
   const { gyms } = useGyms()
   const { exercises: catalogExercises, refetch: refetchExercises } = useExercises()
+  const { templates, applyTemplateToSession } = useGroupTemplates()
 
   const [session, setSession] = useState<SessionWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExercisePicker, setShowExercisePicker] = useState(false)
+  const [showApplyTemplate, setShowApplyTemplate] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -98,6 +102,7 @@ export function SessionDetail() {
         completed_at: null,
         skipped: false,
         is_group: false,
+        template_id: null,
         exercise: exercise,
       }
 
@@ -196,6 +201,16 @@ export function SessionDetail() {
 
     // Save to DB in background
     reorderExercises(id, reordered.map(e => e.id))
+  }
+
+  // Apply template to session
+  const handleApplyTemplate = async (templateId: string, mode: 'add' | 'replace') => {
+    if (!id) return
+    const success = await applyTemplateToSession(id, templateId, mode)
+    if (success) {
+      await loadSession(id)
+    }
+    setShowApplyTemplate(false)
   }
 
   if (loading) {
@@ -324,10 +339,16 @@ export function SessionDetail() {
               </span>
             )}
           </div>
-          <Button size="sm" onClick={() => setShowExercisePicker(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Aggiungi
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setShowApplyTemplate(true)}>
+              <LayoutTemplate className="h-4 w-4 mr-2" />
+              Template
+            </Button>
+            <Button size="sm" onClick={() => setShowExercisePicker(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Aggiungi
+            </Button>
+          </div>
         </div>
 
         {session.exercises && session.exercises.length > 0 ? (
@@ -364,6 +385,16 @@ export function SessionDetail() {
           onSelect={handleAddExercise}
           onClose={() => setShowExercisePicker(false)}
           onRefresh={refetchExercises}
+        />
+      )}
+
+      {/* Apply Template Dialog */}
+      {showApplyTemplate && (
+        <ApplyTemplateDialog
+          templates={templates}
+          hasGroupExercises={(session.exercises?.filter(e => e.is_group).length || 0) > 0}
+          onApply={handleApplyTemplate}
+          onClose={() => setShowApplyTemplate(false)}
         />
       )}
     </div>
