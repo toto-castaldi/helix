@@ -4,7 +4,7 @@ import { useLiveCoaching } from '@/shared/hooks/useLiveCoaching'
 import { useExercises } from '@/hooks/useExercises'
 import { ClientStripBar } from '@/live/components/ClientStripBar'
 import { ActionPanel } from '@/live/components/ActionPanel'
-import { ExerciseCarousel } from '@/live/components/ExerciseCarousel'
+import { ClientExerciseView } from '@/live/components/ClientExerciseView'
 import { SaveIndicator } from '@/live/components/SaveIndicator'
 import { ConfirmDialog } from '@/live/components/ConfirmDialog'
 import { ExercisePickerLive } from '@/live/components/ExercisePickerLive'
@@ -266,10 +266,10 @@ export function TabletLive() {
               hasLumioCard={hasLumioCard}
             />
 
-            {/* Exercise Carousel */}
-            <div className="flex-1">
+            {/* Client Exercise View with tabs */}
+            <div className="flex-1 min-h-0">
               {selectedSession && (
-                <ExerciseCarousel
+                <ClientExerciseView
                   session={selectedSession}
                   onSelectExercise={handleExerciseSelect}
                   onUpdateExercise={handleUpdateExercise}
