@@ -8,7 +8,6 @@ import { Exercises } from '@/pages/Exercises'
 import { ExerciseDetail } from '@/pages/ExerciseDetail'
 import { Sessions } from '@/pages/Sessions'
 import { SessionDetail } from '@/pages/SessionDetail'
-import { LiveCoaching } from '@/pages/LiveCoaching'
 import { Settings } from '@/pages/Settings'
 import { Repositories } from '@/pages/Repositories'
 import { OAuthConsent } from '@/pages/OAuthConsent'
@@ -35,7 +34,6 @@ function App() {
             <Route path="/exercise/:id" element={<ExerciseDetail />} />
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/sessions/:id" element={<SessionDetail />} />
-            <Route path="/live" element={<LiveCoaching />} />
             <Route path="/repositories" element={<Repositories />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
