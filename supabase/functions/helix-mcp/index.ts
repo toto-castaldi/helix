@@ -198,6 +198,8 @@ function getResourceTemplates() {
     { uri: "helix://sessions/planned", name: "sessions-planned", description: "Sessioni pianificate", mimeType: "application/json" },
     { uriTemplate: "helix://sessions/date/{date}", name: "sessions-by-date", description: "Sessioni per data", mimeType: "application/json" },
     { uriTemplate: "helix://sessions/{sessionId}", name: "session-detail", description: "Dettaglio sessione", mimeType: "application/json" },
+    { uri: "helix://group-templates", name: "group-templates-list", description: "Lista template gruppi", mimeType: "application/json" },
+    { uriTemplate: "helix://group-templates/{templateId}", name: "group-template-detail", description: "Dettaglio template gruppo con esercizi", mimeType: "application/json" },
     { uri: "helix://coach/summary", name: "coach-summary", description: "Riepilogo coach", mimeType: "application/json" },
     { uri: "helix://today", name: "today-sessions", description: "Sessioni di oggi", mimeType: "application/json" },
   ]
@@ -732,6 +734,65 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .single()
 
     if (error) throw new Error(`Sessione non trovata: ${sessionId}`)
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
+  }
+
+  // helix://group-templates
+  if (uri === "helix://group-templates") {
+    const { data, error } = await supabase
+      .from("group_templates")
+      .select(`
+        id, name, created_at, updated_at,
+        exercises:group_template_exercises(
+          id,
+          exercise:exercises(id, name)
+        )
+      `)
+      .eq("user_id", userId)
+      .order("name")
+
+    if (error) throw new Error(error.message)
+
+    // Transform for preview: count + first 3 exercise names
+    const templatesWithPreview = (data || []).map(t => ({
+      id: t.id,
+      name: t.name,
+      exercise_count: t.exercises?.length || 0,
+      exercise_preview: t.exercises?.slice(0, 3).map(e => e.exercise?.name).filter(Boolean) || [],
+      created_at: t.created_at,
+      updated_at: t.updated_at,
+    }))
+
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(templatesWithPreview, null, 2) }]
+  }
+
+  // helix://group-templates/{id}
+  const templateDetailMatch = uri.match(/^helix:\/\/group-templates\/([^\/]+)$/)
+  if (templateDetailMatch) {
+    const templateId = templateDetailMatch[1]
+    const { data, error } = await supabase
+      .from("group_templates")
+      .select(`
+        *,
+        exercises:group_template_exercises(
+          *,
+          exercise:exercises(
+            id, name, description, lumio_card_id,
+            exercise_tags(tag)
+          )
+        )
+      `)
+      .eq("id", templateId)
+      .eq("user_id", userId)
+      .single()
+
+    if (error) throw new Error(`Template non trovato: ${templateId}`)
+
+    // Sort exercises by order_index
+    if (data.exercises) {
+      data.exercises.sort((a, b) => a.order_index - b.order_index)
+    }
+
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
   }
 
