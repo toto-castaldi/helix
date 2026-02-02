@@ -1576,6 +1576,218 @@ async function executeTool(
       return { content: [{ type: "text", text: `Template eliminato con successo.` }] }
     }
 
+    case "add_template_exercise": {
+      const { template_id, exercise_id, sets, reps, weight_kg, duration_seconds, notes } = args as {
+        template_id: string
+        exercise_id: string
+        sets?: number
+        reps?: number
+        weight_kg?: number
+        duration_seconds?: number
+        notes?: string
+      }
+
+      // Verify template ownership
+      const { data: template, error: templateErr } = await supabase
+        .from("group_templates")
+        .select("id")
+        .eq("id", template_id)
+        .eq("user_id", userId)
+        .single()
+
+      if (templateErr || !template) {
+        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+      }
+
+      // Verify exercise exists and is accessible
+      const { data: exercise, error: exerciseErr } = await supabase
+        .from("exercises")
+        .select("id, name")
+        .eq("id", exercise_id)
+        .or(`user_id.eq.${userId},user_id.is.null`)
+        .single()
+
+      if (exerciseErr || !exercise) {
+        return { content: [{ type: "text", text: "Errore: Esercizio non trovato" }] }
+      }
+
+      // Get next order_index
+      const { data: existing } = await supabase
+        .from("group_template_exercises")
+        .select("order_index")
+        .eq("template_id", template_id)
+        .order("order_index", { ascending: false })
+        .limit(1)
+
+      const nextOrder = existing && existing.length > 0 ? existing[0].order_index + 1 : 0
+
+      // Insert exercise
+      const { data, error } = await supabase
+        .from("group_template_exercises")
+        .insert({
+          template_id,
+          exercise_id,
+          order_index: nextOrder,
+          sets: sets || null,
+          reps: reps || null,
+          weight_kg: weight_kg || null,
+          duration_seconds: duration_seconds || null,
+          notes: notes || null,
+        })
+        .select("id")
+        .single()
+
+      if (error) {
+        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+      }
+
+      return { content: [{ type: "text", text: `Esercizio "${exercise.name}" aggiunto al template. ID: ${data.id}` }] }
+    }
+
+    case "remove_template_exercise": {
+      const { template_exercise_id } = args as { template_exercise_id: string }
+
+      // Verify ownership through template join
+      const { data: existing, error: checkErr } = await supabase
+        .from("group_template_exercises")
+        .select("id, template:group_templates!inner(user_id)")
+        .eq("id", template_exercise_id)
+        .single()
+
+      if (checkErr || !existing) {
+        return { content: [{ type: "text", text: "Errore: Esercizio nel template non trovato" }] }
+      }
+
+      const templateData = existing.template as { user_id: string }
+      if (templateData.user_id !== userId) {
+        return { content: [{ type: "text", text: "Errore: Non autorizzato" }] }
+      }
+
+      const { error } = await supabase
+        .from("group_template_exercises")
+        .delete()
+        .eq("id", template_exercise_id)
+
+      if (error) {
+        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+      }
+
+      return { content: [{ type: "text", text: "Esercizio rimosso dal template." }] }
+    }
+
+    case "apply_template_to_session": {
+      const { template_id, session_id, mode } = args as {
+        template_id: string
+        session_id: string
+        mode: "append" | "replace"
+      }
+
+      // 1. Fetch template with exercises
+      const { data: template, error: templateErr } = await supabase
+        .from("group_templates")
+        .select(`
+          id, name,
+          exercises:group_template_exercises(
+            *, exercise:exercises(id, name)
+          )
+        `)
+        .eq("id", template_id)
+        .eq("user_id", userId)
+        .single()
+
+      if (templateErr || !template) {
+        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+      }
+
+      const templateExercises = template.exercises as Array<{
+        exercise_id: string
+        order_index: number
+        sets: number | null
+        reps: number | null
+        weight_kg: number | null
+        duration_seconds: number | null
+        notes: string | null
+        exercise: { id: string; name: string } | null
+      }>
+
+      if (!templateExercises?.length) {
+        return { content: [{ type: "text", text: "Errore: Il template non contiene esercizi" }] }
+      }
+
+      // 2. Verify session exists and belongs to user
+      const { data: session, error: sessionErr } = await supabase
+        .from("sessions")
+        .select("id, client:clients!inner(user_id)")
+        .eq("id", session_id)
+        .single()
+
+      if (sessionErr || !session) {
+        return { content: [{ type: "text", text: "Errore: Sessione non trovata" }] }
+      }
+
+      const clientData = session.client as { user_id: string }
+      if (clientData.user_id !== userId) {
+        return { content: [{ type: "text", text: "Errore: Non autorizzato per questa sessione" }] }
+      }
+
+      // 3. If replace mode, delete existing group exercises ONLY
+      if (mode === "replace") {
+        const { error: deleteErr } = await supabase
+          .from("session_exercises")
+          .delete()
+          .eq("session_id", session_id)
+          .eq("is_group", true) // CRITICAL: Only group exercises!
+
+        if (deleteErr) {
+          return { content: [{ type: "text", text: `Errore durante la rimozione: ${deleteErr.message}` }] }
+        }
+      }
+
+      // 4. Get starting order_index
+      const { data: existing } = await supabase
+        .from("session_exercises")
+        .select("order_index")
+        .eq("session_id", session_id)
+        .order("order_index", { ascending: false })
+        .limit(1)
+
+      const startIndex = mode === "append" ? ((existing?.[0]?.order_index ?? -1) + 1) : 0
+
+      // 5. Insert exercises with template_id link
+      const exercisesToInsert = templateExercises
+        .sort((a, b) => a.order_index - b.order_index)
+        .map((ex, idx) => ({
+          session_id: session_id,
+          exercise_id: ex.exercise_id,
+          template_id: template_id, // CRITICAL: Link to template!
+          order_index: startIndex + idx,
+          sets: ex.sets,
+          reps: ex.reps,
+          weight_kg: ex.weight_kg,
+          duration_seconds: ex.duration_seconds,
+          notes: ex.notes,
+          is_group: true,
+          completed: false,
+          skipped: false,
+        }))
+
+      const { error: insertErr } = await supabase
+        .from("session_exercises")
+        .insert(exercisesToInsert)
+
+      if (insertErr) {
+        return { content: [{ type: "text", text: `Errore durante l'inserimento: ${insertErr.message}` }] }
+      }
+
+      const modeText = mode === "append" ? "aggiunto" : "sostituito"
+      return {
+        content: [{
+          type: "text",
+          text: `Template "${template.name}" ${modeText} alla sessione con ${exercisesToInsert.length} esercizi di gruppo.`,
+        }],
+      }
+    }
+
     default:
       return { content: [{ type: "text", text: `Tool sconosciuto: ${name}` }] }
   }
