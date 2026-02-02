@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Group exercise management for live coaching - templates, client view separation
-**Current focus:** Phase 7 verified complete, ready for Phase 8 or 9
+**Current focus:** Phase 8 in progress, client view separation
 
 ## Current Position
 
-Phase: 7 of 9 (MCP Template Integration)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-02 - Completed 07-03-PLAN.md
+Phase: 8 of 9 (Client View Separation)
+Plan: 1 of ? in current phase
+Status: In progress
+Last activity: 2026-02-02 - Completed 08-01-PLAN.md
 
-Progress: [#######---] 100% (7/7 plans complete in scope)
+Progress: [########--] 100% (8/8 plans complete in scope)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7 (v1.4)
+- Total plans completed: 8 (v1.5)
 - Average duration: 5m
-- Total execution time: 36m
+- Total execution time: 41m
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [#######---] 100% (7/7 plans complete in scope)
 | 05 | 1 | 2m | 2m |
 | 06 | 3 | 18m | 6m |
 | 07 | 3 | 16m | 5m |
+| 08 | 1 | 5m | 5m |
 
 **Recent Trend:**
-- Last 5 plans: 06-02 (8m), 06-03 (5m), 07-01 (8m), 07-02 (5m), 07-03 (3m)
-- Trend: Improving
+- Last 5 plans: 06-03 (5m), 07-01 (8m), 07-02 (5m), 07-03 (3m), 08-01 (5m)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -62,6 +63,7 @@ Recent decisions affecting current work:
 - v1.5: MCP template CRUD tools verify ownership via user_id
 - v1.5: delete_group_template checks canDeleteTemplate pattern
 - v1.6: mode parameter required for apply_template_to_session (no default)
+- v1.7: Tab filtering with index mapping for proper exercise selection
 
 ### Pending Todos
 
@@ -74,8 +76,8 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 07-03-PLAN.md (Phase 7 complete)
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None
 
 ---
-*State tracking: Phase 7 verified complete, ready for Phase 8 (Client View) or Phase 9 (Mobile Cleanup)*
+*State tracking: Phase 8 plan 01 complete, client view tabs implemented*
