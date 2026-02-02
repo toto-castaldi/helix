@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Group exercise management for live coaching - templates, client view separation
-**Current focus:** Phase 8 complete, ready for Phase 9
+**Current focus:** Phase 9 in progress (Mobile Cleanup + Bugfix)
 
 ## Current Position
 
-Phase: 8 of 9 (Client View Separation)
-Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-02-02 - Phase 8 verified complete
+Phase: 9 of 9 (Mobile Cleanup + Bugfix)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-02 - Completed 09-01-PLAN.md
 
-Progress: [########--] 100% (8/8 plans complete in scope)
+Progress: [#########-] 90% (9/10 plans complete in scope)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8 (v1.5)
+- Total plans completed: 9 (v1.5)
 - Average duration: 5m
-- Total execution time: 41m
+- Total execution time: 45m
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [########--] 100% (8/8 plans complete in scope)
 | 06 | 3 | 18m | 6m |
 | 07 | 3 | 16m | 5m |
 | 08 | 1 | 5m | 5m |
+| 09 | 1 | 4m | 4m |
 
 **Recent Trend:**
-- Last 5 plans: 06-03 (5m), 07-01 (8m), 07-02 (5m), 07-03 (3m), 08-01 (5m)
+- Last 5 plans: 07-01 (8m), 07-02 (5m), 07-03 (3m), 08-01 (5m), 09-01 (4m)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -64,6 +65,7 @@ Recent decisions affecting current work:
 - v1.5: delete_group_template checks canDeleteTemplate pattern
 - v1.6: mode parameter required for apply_template_to_session (no default)
 - v1.7: Tab filtering with index mapping for proper exercise selection
+- v1.8: Keep ExerciseDetailModal in src/components/live/ (used by Exercises.tsx)
 
 ### Pending Todos
 
@@ -76,8 +78,8 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Phase 8 verified complete
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
 
 ---
-*State tracking: Phase 8 verified complete, ready for Phase 9 (Mobile Cleanup + Bugfix)*
+*State tracking: Phase 9 plan 1 complete, plan 2 (bugfix) remaining*
