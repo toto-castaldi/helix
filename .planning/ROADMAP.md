@@ -14,7 +14,7 @@
 - [x] **Phase 5: Template Database Schema** - Tables for group templates and exercises
 - [x] **Phase 6: Template Management UI** - CRUD for templates in main app
 - [x] **Phase 7: MCP Template Integration** - Resources and tools for templates
-- [ ] **Phase 8: Client View Separation** - Two tabs in tablet client view
+- [x] **Phase 8: Client View Separation** - Two tabs in tablet client view
 - [ ] **Phase 9: Mobile Cleanup + Bugfix** - Remove Live from mobile, fix export
 
 ## Phase Details
@@ -84,10 +84,10 @@ Plans:
   1. Client view in tablet has two tabs: "I miei" and "Gruppo"
   2. "I miei" tab shows only individual exercises (is_group=false)
   3. "Gruppo" tab shows only group exercises (is_group=true)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 08-01: Client view tabs implementation
+- [x] 08-01-PLAN.md — Add tabs component, fix realtime sync, create ClientExerciseView with tabs
 
 ---
 
@@ -116,9 +116,9 @@ Plans:
 | 5. Template Database Schema | 1/1 | ✓ Complete | 2026-01-30 |
 | 6. Template Management UI | 3/3 | ✓ Complete | 2026-02-02 |
 | 7. MCP Template Integration | 3/3 | ✓ Complete | 2026-02-02 |
-| 8. Client View Separation | 0/1 | Not started | - |
+| 8. Client View Separation | 1/1 | ✓ Complete | 2026-02-02 |
 | 9. Mobile Cleanup + Bugfix | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-02-02*
+*Last updated: 2026-02-02 (Phase 8)*

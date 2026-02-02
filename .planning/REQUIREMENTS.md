@@ -17,9 +17,9 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### Vista Cliente
 
-- [ ] **VIEW-01**: Vista cliente nel tablet ha due tab: "I miei" e "Gruppo"
-- [ ] **VIEW-02**: Tab "I miei" mostra solo esercizi individuali del cliente
-- [ ] **VIEW-03**: Tab "Gruppo" mostra solo esercizi di gruppo del cliente
+- [x] **VIEW-01**: Vista cliente nel tablet ha due tab: "I miei" e "Gruppo"
+- [x] **VIEW-02**: Tab "I miei" mostra solo esercizi individuali del cliente
+- [x] **VIEW-03**: Tab "Gruppo" mostra solo esercizi di gruppo del cliente
 
 ### Cleanup Mobile
 
