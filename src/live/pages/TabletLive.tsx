@@ -172,6 +172,19 @@ export function TabletLive() {
     }
   }
 
+  const handleReset = async () => {
+    if (selectedSession && currentExercise) {
+      await updateExerciseOnTheFly(selectedSession.id, currentExercise.id, {
+        completed: false,
+        skipped: false,
+        completed_at: null,
+      })
+    }
+  }
+
+  // Check if current exercise can be reset (is completed or skipped)
+  const canReset = currentExercise?.completed || currentExercise?.skipped
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -211,8 +224,10 @@ export function TabletLive() {
           onChange={handleChangeClick}
           onInfo={handleInfoClick}
           onAdd={handleAddClick}
+          onReset={handleReset}
           disabled={!selectedSession}
           hasLumioCard={hasLumioCard}
+          canReset={canReset}
         />
 
         {/* Client Exercise View with tabs */}

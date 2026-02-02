@@ -1,5 +1,5 @@
 import { Button } from '@/shared/components/ui/button'
-import { Check, SkipForward, Plus, Trash2, Target, RefreshCw, Info } from 'lucide-react'
+import { Check, SkipForward, Plus, Trash2, Target, RefreshCw, Info, RotateCcw } from 'lucide-react'
 
 interface ActionPanelProps {
   onComplete: () => void
@@ -9,8 +9,10 @@ interface ActionPanelProps {
   onChange?: () => void
   onInfo?: () => void
   onAdd?: () => void
+  onReset?: () => void
   disabled?: boolean
   hasLumioCard?: boolean
+  canReset?: boolean
 }
 
 export function ActionPanel({
@@ -21,8 +23,10 @@ export function ActionPanel({
   onChange,
   onInfo,
   onAdd,
+  onReset,
   disabled = false,
   hasLumioCard = false,
+  canReset = false,
 }: ActionPanelProps) {
   return (
     <div className="flex flex-col gap-2 w-20 h-full">
@@ -47,6 +51,23 @@ export function ActionPanel({
         <SkipForward className="w-6 h-6 shrink-0" />
         <span className="text-[10px]">SALTA</span>
       </Button>
+
+      {/* Reset Button - gray/slate per reset stato */}
+      {onReset && (
+        <Button
+          onClick={onReset}
+          disabled={disabled || !canReset}
+          size="lg"
+          className={`flex-1 min-h-0 flex-col gap-1 text-white ${
+            canReset && !disabled
+              ? "bg-slate-600 hover:bg-slate-700"
+              : "bg-slate-600/50 cursor-not-allowed opacity-50"
+          }`}
+        >
+          <RotateCcw className="w-6 h-6 shrink-0" />
+          <span className="text-[10px]">RESET</span>
+        </Button>
+      )}
 
       {/* Center Button - gray come esercizi da fare */}
       <Button
