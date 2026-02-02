@@ -439,6 +439,41 @@ function getToolDefinitions() {
         required: ["client_id", "session_date", "exercises"],
       },
     },
+    // ===== GROUP TEMPLATE TOOLS =====
+    {
+      name: "create_group_template",
+      description: "Crea un nuovo template di gruppo",
+      inputSchema: {
+        type: "object",
+        properties: {
+          name: { type: "string", description: "Nome del template" },
+        },
+        required: ["name"],
+      },
+    },
+    {
+      name: "update_group_template",
+      description: "Modifica il nome di un template esistente",
+      inputSchema: {
+        type: "object",
+        properties: {
+          template_id: { type: "string", description: "ID del template" },
+          name: { type: "string", description: "Nuovo nome del template" },
+        },
+        required: ["template_id", "name"],
+      },
+    },
+    {
+      name: "delete_group_template",
+      description: "Elimina un template (fallisce se in uso in sessioni)",
+      inputSchema: {
+        type: "object",
+        properties: {
+          template_id: { type: "string", description: "ID del template da eliminare" },
+        },
+        required: ["template_id"],
+      },
+    },
   ]
 }
 
@@ -1409,6 +1444,91 @@ async function executeTool(
           text: `Piano creato con successo!\n\nSessione ID: ${session.id}\nData: ${session_date}\n\nEsercizi:\n${exerciseResults.join("\n")}`,
         }],
       }
+    }
+
+    // ===== GROUP TEMPLATE TOOLS =====
+    case "create_group_template": {
+      const { name } = args as { name: string }
+
+      const { data, error } = await supabase
+        .from("group_templates")
+        .insert({ name, user_id: userId })
+        .select("id")
+        .single()
+
+      if (error) {
+        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+      }
+
+      return { content: [{ type: "text", text: `Template "${name}" creato con successo. ID: ${data.id}` }] }
+    }
+
+    case "update_group_template": {
+      const { template_id, name } = args as { template_id: string; name: string }
+
+      // Verify ownership
+      const { data: existing, error: checkErr } = await supabase
+        .from("group_templates")
+        .select("id")
+        .eq("id", template_id)
+        .eq("user_id", userId)
+        .single()
+
+      if (checkErr || !existing) {
+        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+      }
+
+      const { error } = await supabase
+        .from("group_templates")
+        .update({ name })
+        .eq("id", template_id)
+
+      if (error) {
+        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+      }
+
+      return { content: [{ type: "text", text: `Template "${name}" aggiornato con successo.` }] }
+    }
+
+    case "delete_group_template": {
+      const { template_id } = args as { template_id: string }
+
+      // Verify ownership
+      const { data: existing, error: checkErr } = await supabase
+        .from("group_templates")
+        .select("id")
+        .eq("id", template_id)
+        .eq("user_id", userId)
+        .single()
+
+      if (checkErr || !existing) {
+        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+      }
+
+      // Check if template is in use (canDeleteTemplate pattern)
+      const { count, error: countErr } = await supabase
+        .from("session_exercises")
+        .select("id", { count: "exact", head: true })
+        .eq("template_id", template_id)
+
+      if (countErr) {
+        return { content: [{ type: "text", text: `Errore: ${countErr.message}` }] }
+      }
+
+      if ((count ?? 0) > 0) {
+        return { content: [{ type: "text", text: "Errore: Impossibile eliminare il template perche' e' utilizzato in una o piu' sessioni" }] }
+      }
+
+      const { error } = await supabase
+        .from("group_templates")
+        .delete()
+        .eq("id", template_id)
+
+      if (error) {
+        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+      }
+
+      return { content: [{ type: "text", text: `Template eliminato con successo.` }] }
     }
 
     default:
