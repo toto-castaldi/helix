@@ -9,11 +9,11 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### Template Gruppo
 
-- [ ] **TMPL-01**: Coach può creare un template di allenamento di gruppo con nome
-- [ ] **TMPL-02**: Coach può aggiungere esercizi al template con parametri (serie, reps, peso, durata)
-- [ ] **TMPL-03**: Coach può modificare un template esistente
-- [ ] **TMPL-04**: Coach può eliminare un template
-- [ ] **TMPL-05**: Coach può associare un template a una sessione esistente (gli esercizi vengono copiati come gruppo)
+- [x] **TMPL-01**: Coach può creare un template di allenamento di gruppo con nome
+- [x] **TMPL-02**: Coach può aggiungere esercizi al template con parametri (serie, reps, peso, durata)
+- [x] **TMPL-03**: Coach può modificare un template esistente
+- [x] **TMPL-04**: Coach può eliminare un template
+- [x] **TMPL-05**: Coach può associare un template a una sessione esistente (gli esercizi vengono copiati come gruppo)
 
 ### Vista Cliente
 
@@ -28,14 +28,14 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### MCP Integration
 
-- [ ] **MCP-01**: Resource `helix://group-templates` — lista template di gruppo
-- [ ] **MCP-02**: Resource `helix://group-templates/{id}` — dettaglio template con esercizi
-- [ ] **MCP-03**: Tool `create_group_template` — crea nuovo template
-- [ ] **MCP-04**: Tool `update_group_template` — modifica template esistente
-- [ ] **MCP-05**: Tool `delete_group_template` — elimina template
-- [ ] **MCP-06**: Tool `add_template_exercise` — aggiunge esercizio a template
-- [ ] **MCP-07**: Tool `remove_template_exercise` — rimuove esercizio da template
-- [ ] **MCP-08**: Tool `apply_template_to_session` — associa template a sessione (copia esercizi come gruppo)
+- [x] **MCP-01**: Resource `helix://group-templates` — lista template di gruppo
+- [x] **MCP-02**: Resource `helix://group-templates/{id}` — dettaglio template con esercizi
+- [x] **MCP-03**: Tool `create_group_template` — crea nuovo template
+- [x] **MCP-04**: Tool `update_group_template` — modifica template esistente
+- [x] **MCP-05**: Tool `delete_group_template` — elimina template
+- [x] **MCP-06**: Tool `add_template_exercise` — aggiunge esercizio a template
+- [x] **MCP-07**: Tool `remove_template_exercise` — rimuove esercizio da template
+- [x] **MCP-08**: Tool `apply_template_to_session` — associa template a sessione (copia esercizi come gruppo)
 
 ### Bugfix
 
@@ -73,24 +73,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TMPL-01 | Phase 6 | Pending |
-| TMPL-02 | Phase 6 | Pending |
-| TMPL-03 | Phase 6 | Pending |
-| TMPL-04 | Phase 6 | Pending |
-| TMPL-05 | Phase 6 | Pending |
+| TMPL-01 | Phase 6 | Complete |
+| TMPL-02 | Phase 6 | Complete |
+| TMPL-03 | Phase 6 | Complete |
+| TMPL-04 | Phase 6 | Complete |
+| TMPL-05 | Phase 6 | Complete |
 | VIEW-01 | Phase 8 | Pending |
 | VIEW-02 | Phase 8 | Pending |
 | VIEW-03 | Phase 8 | Pending |
 | MOBL-01 | Phase 9 | Pending |
 | MOBL-02 | Phase 9 | Pending |
-| MCP-01 | Phase 7 | Pending |
-| MCP-02 | Phase 7 | Pending |
-| MCP-03 | Phase 7 | Pending |
-| MCP-04 | Phase 7 | Pending |
-| MCP-05 | Phase 7 | Pending |
-| MCP-06 | Phase 7 | Pending |
-| MCP-07 | Phase 7 | Pending |
-| MCP-08 | Phase 7 | Pending |
+| MCP-01 | Phase 7 | Complete |
+| MCP-02 | Phase 7 | Complete |
+| MCP-03 | Phase 7 | Complete |
+| MCP-04 | Phase 7 | Complete |
+| MCP-05 | Phase 7 | Complete |
+| MCP-06 | Phase 7 | Complete |
+| MCP-07 | Phase 7 | Complete |
+| MCP-08 | Phase 7 | Complete |
 | FIX-01 | Phase 9 | Pending |
 
 **Coverage:**
@@ -100,4 +100,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 after roadmap creation*
+*Last updated: 2026-02-02 after Phase 7 completion*

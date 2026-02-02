@@ -13,7 +13,7 @@
 
 - [x] **Phase 5: Template Database Schema** - Tables for group templates and exercises
 - [x] **Phase 6: Template Management UI** - CRUD for templates in main app
-- [ ] **Phase 7: MCP Template Integration** - Resources and tools for templates
+- [x] **Phase 7: MCP Template Integration** - Resources and tools for templates
 - [ ] **Phase 8: Client View Separation** - Two tabs in tablet client view
 - [ ] **Phase 9: Mobile Cleanup + Bugfix** - Remove Live from mobile, fix export
 
@@ -67,11 +67,12 @@ Plans:
   6. Tool `add_template_exercise` adds exercise to template
   7. Tool `remove_template_exercise` removes exercise from template
   8. Tool `apply_template_to_session` copies template exercises to session as group
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Add MCP resources for group templates (list + detail)
-- [ ] 07-02-PLAN.md — Add MCP tools and prompts for templates (CRUD + apply)
+- [x] 07-01-PLAN.md — Add MCP resources for group templates (list + detail)
+- [x] 07-02-PLAN.md — Add MCP template CRUD tools (create, update, delete)
+- [x] 07-03-PLAN.md — Add MCP exercise tools, apply tool, and prompts
 
 ---
 
@@ -114,7 +115,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 5. Template Database Schema | 1/1 | ✓ Complete | 2026-01-30 |
 | 6. Template Management UI | 3/3 | ✓ Complete | 2026-02-02 |
-| 7. MCP Template Integration | 0/2 | Not started | - |
+| 7. MCP Template Integration | 3/3 | ✓ Complete | 2026-02-02 |
 | 8. Client View Separation | 0/1 | Not started | - |
 | 9. Mobile Cleanup + Bugfix | 0/2 | Not started | - |
 
