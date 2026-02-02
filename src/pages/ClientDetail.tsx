@@ -176,8 +176,9 @@ export function ClientDetail() {
 
     setExportLoading(true)
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      // Refresh session to ensure we have a valid token
+      const { data: { session }, error: authError } = await supabase.auth.refreshSession()
+      if (authError || !session) {
         throw new Error('Non autenticato')
       }
 
