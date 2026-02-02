@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronUp, ChevronDown, Trash2, Minus, Plus, RefreshCw, Users } from 'lucide-react'
+import { ChevronUp, ChevronDown, Trash2, Minus, Plus, RefreshCw, Users, LayoutTemplate } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,6 +38,10 @@ export function SessionExerciseCard({
   onMoveDown,
 }: SessionExerciseCardProps) {
   const [showPicker, setShowPicker] = useState(false)
+
+  // Check if exercise is from template - editing is blocked
+  const isFromTemplate = Boolean(exercise.template_id)
+
   const handleNumberChange = (
     field: 'sets' | 'reps' | 'weight_kg' | 'duration_seconds',
     delta: number
@@ -75,7 +79,7 @@ export function SessionExerciseCard({
               variant="ghost"
               size="icon"
               className="h-6 w-6"
-              disabled={isFirst}
+              disabled={isFirst || isFromTemplate}
               onClick={() => onMoveUp(exercise.id)}
             >
               <ChevronUp className="h-4 w-4" />
@@ -85,7 +89,7 @@ export function SessionExerciseCard({
               variant="ghost"
               size="icon"
               className="h-6 w-6"
-              disabled={isLast}
+              disabled={isLast || isFromTemplate}
               onClick={() => onMoveDown(exercise.id)}
             >
               <ChevronDown className="h-4 w-4" />
@@ -99,16 +103,26 @@ export function SessionExerciseCard({
 
           {/* Content */}
           <div className="flex-1 space-y-3">
-            {/* Exercise name - clickable to change */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setShowPicker(true)}
-                className="flex items-center gap-2 text-left hover:text-primary transition-colors group"
-              >
+            {/* Exercise name - clickable to change (disabled for template exercises) */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {isFromTemplate ? (
                 <h4 className="font-semibold">{exercise.exercise?.name}</h4>
-                <RefreshCw className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowPicker(true)}
+                  className="flex items-center gap-2 text-left hover:text-primary transition-colors group"
+                >
+                  <h4 className="font-semibold">{exercise.exercise?.name}</h4>
+                  <RefreshCw className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              )}
+              {isFromTemplate && (
+                <Badge variant="outline" className="text-xs gap-1 border-dashed">
+                  <LayoutTemplate className="h-3 w-3" />
+                  Template
+                </Badge>
+              )}
               {exercise.is_group && (
                 <Badge variant="secondary" className="text-xs gap-1">
                   <Users className="h-3 w-3" />
@@ -118,7 +132,7 @@ export function SessionExerciseCard({
             </div>
 
             {/* Controls grid */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className={`grid grid-cols-2 gap-3 ${isFromTemplate ? 'opacity-60' : ''}`}>
               {/* Sets */}
               <div className="space-y-1">
                 <Label className="text-xs">Serie</Label>
@@ -128,6 +142,7 @@ export function SessionExerciseCard({
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('sets', -1)}
                   >
                     <Minus className="h-3 w-3" />
@@ -138,12 +153,14 @@ export function SessionExerciseCard({
                     onChange={(e) => handleInputChange('sets', e.target.value)}
                     className="h-8 w-14 text-center px-1"
                     min="0"
+                    readOnly={isFromTemplate}
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('sets', 1)}
                   >
                     <Plus className="h-3 w-3" />
@@ -160,6 +177,7 @@ export function SessionExerciseCard({
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('reps', -1)}
                   >
                     <Minus className="h-3 w-3" />
@@ -170,12 +188,14 @@ export function SessionExerciseCard({
                     onChange={(e) => handleInputChange('reps', e.target.value)}
                     className="h-8 w-14 text-center px-1"
                     min="0"
+                    readOnly={isFromTemplate}
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('reps', 1)}
                   >
                     <Plus className="h-3 w-3" />
@@ -192,6 +212,7 @@ export function SessionExerciseCard({
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('weight_kg', -0.5)}
                   >
                     <Minus className="h-3 w-3" />
@@ -203,12 +224,14 @@ export function SessionExerciseCard({
                     onChange={(e) => handleInputChange('weight_kg', e.target.value)}
                     className="h-8 w-14 text-center px-1"
                     min="0"
+                    readOnly={isFromTemplate}
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('weight_kg', 0.5)}
                   >
                     <Plus className="h-3 w-3" />
@@ -225,6 +248,7 @@ export function SessionExerciseCard({
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('duration_seconds', -10)}
                   >
                     <Minus className="h-3 w-3" />
@@ -236,12 +260,14 @@ export function SessionExerciseCard({
                     onChange={(e) => handleInputChange('duration_seconds', e.target.value)}
                     className="h-8 w-14 text-center px-1"
                     min="0"
+                    readOnly={isFromTemplate}
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
+                    disabled={isFromTemplate}
                     onClick={() => handleNumberChange('duration_seconds', 10)}
                   >
                     <Plus className="h-3 w-3" />
@@ -258,13 +284,14 @@ export function SessionExerciseCard({
             )}
 
             {/* Notes */}
-            <div className="space-y-1">
+            <div className={`space-y-1 ${isFromTemplate ? 'opacity-60' : ''}`}>
               <Label className="text-xs">Note</Label>
               <Textarea
                 placeholder="es: focus sulla fase eccentrica..."
                 value={exercise.notes || ''}
                 onChange={(e) => onUpdate(exercise.id, { notes: e.target.value || null })}
                 className="min-h-[60px] text-sm"
+                readOnly={isFromTemplate}
               />
             </div>
 
@@ -280,8 +307,8 @@ export function SessionExerciseCard({
               />
             </div>
 
-            {/* Group toggle */}
-            <div className="flex items-center justify-between pt-2 border-t">
+            {/* Group toggle - disabled for template exercises */}
+            <div className={`flex items-center justify-between pt-2 border-t ${isFromTemplate ? 'opacity-60' : ''}`}>
               <div className="flex items-center gap-2">
                 <Users className="h-3.5 w-3.5 text-muted-foreground" />
                 <Label htmlFor={`group-${exercise.id}`} className="text-xs text-muted-foreground">
@@ -292,15 +319,18 @@ export function SessionExerciseCard({
                 id={`group-${exercise.id}`}
                 checked={exercise.is_group || false}
                 onCheckedChange={(checked) => onUpdate(exercise.id, { is_group: checked })}
+                disabled={isFromTemplate}
               />
             </div>
           </div>
 
-          {/* Remove button */}
+          {/* Remove button - disabled for template exercises */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onRemove(exercise.id)}
+            disabled={isFromTemplate}
+            className={isFromTemplate ? 'opacity-50' : ''}
           >
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
