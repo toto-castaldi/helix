@@ -789,7 +789,7 @@ export function useLiveCoaching() {
               ...session,
               exercises: session.exercises?.map((ex) =>
                 ex.id === updated.id
-                  ? { ...ex, completed: updated.completed, skipped: updated.skipped, completed_at: updated.completed_at }
+                  ? { ...ex, completed: updated.completed, skipped: updated.skipped, completed_at: updated.completed_at, is_group: updated.is_group }
                   : ex
               ),
             }))
