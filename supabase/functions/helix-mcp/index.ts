@@ -474,6 +474,51 @@ function getToolDefinitions() {
         required: ["template_id"],
       },
     },
+    {
+      name: "add_template_exercise",
+      description: "Aggiunge un esercizio a un template",
+      inputSchema: {
+        type: "object",
+        properties: {
+          template_id: { type: "string", description: "ID del template" },
+          exercise_id: { type: "string", description: "ID dell'esercizio" },
+          sets: { type: "number", description: "Numero di serie" },
+          reps: { type: "number", description: "Numero di ripetizioni" },
+          weight_kg: { type: "number", description: "Peso in kg" },
+          duration_seconds: { type: "number", description: "Durata in secondi" },
+          notes: { type: "string", description: "Note sull'esercizio" },
+        },
+        required: ["template_id", "exercise_id"],
+      },
+    },
+    {
+      name: "remove_template_exercise",
+      description: "Rimuove un esercizio da un template",
+      inputSchema: {
+        type: "object",
+        properties: {
+          template_exercise_id: { type: "string", description: "ID dell'esercizio nel template" },
+        },
+        required: ["template_exercise_id"],
+      },
+    },
+    {
+      name: "apply_template_to_session",
+      description: "Applica un template a una sessione, copiando gli esercizi come gruppo",
+      inputSchema: {
+        type: "object",
+        properties: {
+          template_id: { type: "string", description: "ID del template da applicare" },
+          session_id: { type: "string", description: "ID della sessione" },
+          mode: {
+            type: "string",
+            enum: ["append", "replace"],
+            description: "append: aggiunge agli esercizi esistenti, replace: sostituisce solo gli esercizi di gruppo",
+          },
+        },
+        required: ["template_id", "session_id", "mode"],
+      },
+    },
   ]
 }
 
