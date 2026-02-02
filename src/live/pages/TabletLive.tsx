@@ -37,6 +37,7 @@ export function TabletLive() {
   const [pickerMode, setPickerMode] = useState<'add' | 'change' | null>(null)
   const [showLumioCard, setShowLumioCard] = useState(false)
   const [resetTrigger, setResetTrigger] = useState(0)
+  const [displayedExerciseId, setDisplayedExerciseId] = useState<string | null>(null)
   const date = (location.state as { date?: string })?.date
 
   useEffect(() => {
@@ -72,20 +73,14 @@ export function TabletLive() {
   }
 
   const handleComplete = async () => {
-    if (selectedSession) {
-      const currentExercise = selectedSession.exercises?.[selectedSession.current_exercise_index]
-      if (currentExercise) {
-        await completeExercise(selectedSession.id, currentExercise.id)
-      }
+    if (selectedSession && displayedExerciseId) {
+      await completeExercise(selectedSession.id, displayedExerciseId)
     }
   }
 
   const handleSkip = async () => {
-    if (selectedSession) {
-      const currentExercise = selectedSession.exercises?.[selectedSession.current_exercise_index]
-      if (currentExercise) {
-        await skipExercise(selectedSession.id, currentExercise.id)
-      }
+    if (selectedSession && displayedExerciseId) {
+      await skipExercise(selectedSession.id, displayedExerciseId)
     }
   }
 
@@ -95,13 +90,10 @@ export function TabletLive() {
   }
 
   const handleUpdateExercise = async (field: string, value: number | string | null) => {
-    if (selectedSession) {
-      const currentExercise = selectedSession.exercises?.[selectedSession.current_exercise_index]
-      if (currentExercise) {
-        await updateExerciseOnTheFly(selectedSession.id, currentExercise.id, {
-          [field]: value,
-        })
-      }
+    if (selectedSession && displayedExerciseId) {
+      await updateExerciseOnTheFly(selectedSession.id, displayedExerciseId, {
+        [field]: value,
+      })
     }
   }
 
@@ -112,11 +104,8 @@ export function TabletLive() {
   }
 
   const handleDeleteConfirm = async () => {
-    if (selectedSession) {
-      const currentExercise = selectedSession.exercises?.[selectedSession.current_exercise_index]
-      if (currentExercise) {
-        await deleteExerciseFromSession(selectedSession.id, currentExercise.id)
-      }
+    if (selectedSession && displayedExerciseId) {
+      await deleteExerciseFromSession(selectedSession.id, displayedExerciseId)
     }
     setShowDeleteConfirm(false)
   }
@@ -140,11 +129,8 @@ export function TabletLive() {
 
     if (pickerMode === 'add') {
       await addExerciseToSession(selectedSession.id, exercise)
-    } else if (pickerMode === 'change') {
-      const currentExercise = selectedSession.exercises?.[selectedSession.current_exercise_index]
-      if (currentExercise) {
-        await changeExercise(selectedSession.id, currentExercise.id, exercise)
-      }
+    } else if (pickerMode === 'change' && displayedExerciseId) {
+      await changeExercise(selectedSession.id, displayedExerciseId, exercise)
     }
     setPickerMode(null)
   }
@@ -154,7 +140,7 @@ export function TabletLive() {
   }
 
   // Get current exercise data for delete confirmation and Lumio card
-  const currentExercise = selectedSession?.exercises?.[selectedSession.current_exercise_index]
+  const currentExercise = selectedSession?.exercises?.find(ex => ex.id === displayedExerciseId)
   const currentExerciseName = currentExercise?.exercise?.name || 'questo esercizio'
   const currentLumioCard = currentExercise?.exercise?.lumio_card as LumioLocalCardWithRepository | null
   const hasLumioCard = !!currentLumioCard
@@ -166,8 +152,8 @@ export function TabletLive() {
   }
 
   const handleReset = async () => {
-    if (selectedSession && currentExercise) {
-      await updateExerciseOnTheFly(selectedSession.id, currentExercise.id, {
+    if (selectedSession && displayedExerciseId) {
+      await updateExerciseOnTheFly(selectedSession.id, displayedExerciseId, {
         completed: false,
         skipped: false,
         completed_at: null,
@@ -231,6 +217,7 @@ export function TabletLive() {
               onSelectExercise={handleExerciseSelect}
               onUpdateExercise={handleUpdateExercise}
               resetTrigger={resetTrigger}
+              onCurrentExerciseChange={setDisplayedExerciseId}
             />
           )}
         </div>

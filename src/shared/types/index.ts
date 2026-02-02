@@ -131,6 +131,7 @@ export interface SessionExercise {
   completed_at: string | null
   skipped: boolean
   is_group: boolean
+  template_id: string | null
 }
 
 export interface SessionExerciseInsert {
@@ -143,6 +144,7 @@ export interface SessionExerciseInsert {
   duration_seconds?: number | null
   notes?: string | null
   is_group?: boolean
+  template_id?: string | null
 }
 
 export interface SessionExerciseUpdate extends Partial<Omit<SessionExerciseInsert, 'session_id'>> {

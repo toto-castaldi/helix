@@ -212,7 +212,7 @@ Tables:
 - `exercise_tags` - Exercise categorization tags
 - `gyms` - Coach's gyms (name, address, description)
 - `sessions` - Training sessions (client_id, gym_id, session_date, status: planned/completed, current_exercise_index)
-- `session_exercises` - Exercises in a session (exercise_id, order_index, sets, reps, weight_kg, duration_seconds, completed, completed_at, is_group)
+- `session_exercises` - Exercises in a session (exercise_id, order_index, sets, reps, weight_kg, duration_seconds, completed, completed_at, is_group, template_id)
 - `group_templates` - Group exercise templates (user_id, name, timestamps)
 - `group_template_exercises` - Exercises in templates (template_id, exercise_id, order_index, sets, reps, weight_kg, duration_seconds, notes)
 - `ai_conversations` - AI chat sessions (user_id, client_id, title)

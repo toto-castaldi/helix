@@ -10,6 +10,7 @@ interface ClientExerciseViewProps {
   onSelectExercise: (index: number) => void
   onUpdateExercise: (field: string, value: number | string | null) => void
   resetTrigger?: number
+  onCurrentExerciseChange?: (exerciseId: string | null) => void
 }
 
 export function ClientExerciseView({
@@ -17,6 +18,7 @@ export function ClientExerciseView({
   onSelectExercise,
   onUpdateExercise,
   resetTrigger,
+  onCurrentExerciseChange,
 }: ClientExerciseViewProps) {
   // Filter exercises by is_group and track original indices
   const { individualExercises, groupExercises, individualIndices, groupIndices } = useMemo(() => {
@@ -90,6 +92,7 @@ export function ClientExerciseView({
                 onSelectExercise={onSelectExercise}
                 onUpdateExercise={onUpdateExercise}
                 resetTrigger={resetTrigger}
+                onCurrentExerciseChange={onCurrentExerciseChange}
               />
             </div>
           ) : (
@@ -113,6 +116,7 @@ export function ClientExerciseView({
                 onSelectExercise={onSelectExercise}
                 onUpdateExercise={onUpdateExercise}
                 resetTrigger={resetTrigger}
+                onCurrentExerciseChange={onCurrentExerciseChange}
               />
             </div>
           ) : (

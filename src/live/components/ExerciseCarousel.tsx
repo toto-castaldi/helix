@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react'
+import { useRef, useState, useMemo, useEffect } from 'react'
 import { ExerciseCard } from './ExerciseCard'
 import type { SessionWithDetails, SessionExerciseWithDetails } from '@/shared/types'
 import { cn } from '@/shared/lib/utils'
@@ -13,6 +13,8 @@ interface ExerciseCarouselProps {
   indexMap?: (localIndex: number) => number
   // Reset trigger - increment to reset manual navigation
   resetTrigger?: number
+  // Report the currently displayed exercise
+  onCurrentExerciseChange?: (exerciseId: string | null) => void
 }
 
 export function ExerciseCarousel({
@@ -23,6 +25,7 @@ export function ExerciseCarousel({
   currentIndex: currentIndexProp,
   indexMap,
   resetTrigger,
+  onCurrentExerciseChange,
 }: ExerciseCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [manualIndex, setManualIndex] = useState<number | null>(null)
@@ -64,6 +67,12 @@ export function ExerciseCarousel({
   useMemo(() => {
     setManualIndex(null)
   }, [exercisesKey])
+
+  // Report current exercise to parent
+  const currentExerciseId = exercises[currentIndex]?.id || null
+  useEffect(() => {
+    onCurrentExerciseChange?.(currentExerciseId)
+  }, [currentExerciseId, onCurrentExerciseChange])
 
   // Map local index to global index when calling onSelectExercise
   const handleSelectExercise = (idx: number) => {
