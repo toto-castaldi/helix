@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Play, Filter, X, LayoutTemplate } from 'lucide-react'
+import { Filter, X, LayoutTemplate } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SessionForm } from '@/components/sessions/SessionForm'
 import { SessionCard } from '@/components/sessions/SessionCard'
@@ -89,10 +89,6 @@ export function Sessions() {
               <Button size="sm" variant="outline" onClick={() => setShowTemplateManager(true)}>
                 <LayoutTemplate className="h-4 w-4 mr-2" />
                 Template
-              </Button>
-              <Button size="sm" variant="default" onClick={() => navigate('/live')}>
-                <Play className="h-4 w-4 mr-2" />
-                Live
               </Button>
               <Button size="sm" onClick={() => setShowForm(true)}>
                 Nuova
