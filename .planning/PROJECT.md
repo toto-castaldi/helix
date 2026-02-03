@@ -1,22 +1,12 @@
-# Helix — Esercizi di Gruppo v1.1
+# Helix — Fitness Coach Assistant
 
 ## What This Is
 
-Helix è un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra e un server MCP per pianificazione AI via Claude. Supporta esercizi condivisi tra più clienti durante le lezioni di gruppo.
+Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, e un server MCP per pianificazione AI via Claude.
 
 ## Core Value
 
-Durante le lezioni di gruppo, il coach può gestire gli esercizi condivisi da un'unica vista, completandoli una volta per tutti i partecipanti.
-
-## Current Milestone: v1.1 Group Exercise Improvements
-
-**Goal:** Separare la vista cliente (individuali vs gruppo), introdurre template gruppi riutilizzabili, e rimuovere Live dall'app mobile.
-
-**Target features:**
-- Vista cliente separata nel tablet: esercizi individuali da una parte, di gruppo dall'altra
-- Template esercizi di gruppo: definire una volta, associare a più sessioni
-- Rimuovere sezione Live dall'app mobile (solo tablet)
-- Bugfix: export cliente non funzionante
+Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'unica vista, completandoli una volta per tutti i partecipanti. I template permettono di riutilizzare combinazioni di esercizi predefinite.
 
 ## Requirements
 
@@ -35,42 +25,47 @@ Durante le lezioni di gruppo, il coach può gestire gli esercizi condivisi da un
 - ✓ UI pianificazione: toggle "di gruppo" su esercizi in sessione — v1.0
 - ✓ Live tablet: tab toggle "Individuali" | "Gruppo" — v1.0
 - ✓ Live tablet: vista gruppo con esercizi del giorno — v1.0
-- ✓ Live tablet: completamento di gruppo (un tap → tutti i clienti) — v1.0
+- ✓ Live tablet: completamento di gruppo (un tap -> tutti i clienti) — v1.0
 - ✓ MCP: lettura/scrittura campo is_group negli esercizi sessione — v1.0
+- ✓ Template esercizi di gruppo riutilizzabili (CRUD completo) — v1.1
+- ✓ MCP template integration (8 tools, 2 resources) — v1.1
+- ✓ Live tablet: vista cliente con separazione individuali/gruppo — v1.1
+- ✓ Mobile app senza Live (tablet-only) — v1.1
+- ✓ Export cliente funzionante (JWT refresh fix) — v1.1
 
 ### Active
 
-- [ ] Live tablet: vista cliente con separazione individuali/gruppo
-- [ ] Template esercizi di gruppo riutilizzabili
-- [ ] Rimuovere Live dall'app mobile standard
-- [ ] Bugfix: export cliente (errore visibile)
+(None — planning next milestone)
 
 ### Out of Scope
 
 - Tracciamento esplicito dei partecipanti per esercizio — non necessario, ogni cliente ha la sua sessione
 - Orario pianificato per esercizi — l'ordine basta, usa order_index
-- Statistiche aggregate per esercizi di gruppo — può essere v2
+- Statistiche aggregate per esercizi di gruppo — puo essere v2
 - Notifiche ai clienti per esercizi di gruppo — non richiesto
-- Class booking/scheduling — Helix è per coaching, non gym management
+- Class booking/scheduling — Helix e per coaching, not gym management
 - Client-facing group view — gruppi sono strumento interno coach
+- Associazione automatica template per orario — complessita, selezione manuale sufficiente
+- Parametri variabili per cliente nel template — complicherebbe UX
 
 ## Context
 
-**Shipped v1.0 Esercizi di Gruppo** with:
-- 49 files modified, ~7,000 lines added
-- 4 phases, 6 plans completed
+**Shipped v1.1 Group Exercise Improvements** with:
+- 71 files modified, +9,604 / -1,434 lines
+- 5 phases, 10 plans completed
 - Tech stack unchanged: React 19 + Vite + TypeScript + Supabase
 
 **Current codebase:**
-- ~18,000 LOC TypeScript
+- ~13,000 LOC TypeScript
 - Two entry points: main app + live tablet PWA
-- MCP server in Edge Function `helix-mcp`
+- MCP server with 23 tools, 19 resources, 5 prompts
 - Realtime enabled on `session_exercises` for cross-tablet sync
 
-**Key additions:**
-- `is_group` column in `session_exercises` with partial index
-- RPC functions: `complete_group_exercise`, `skip_group_exercise_for_client`
-- Components: `GroupExerciseView`, `GroupExerciseCard`
+**Key additions in v1.1:**
+- Tables: `group_templates`, `group_template_exercises`
+- Column: `template_id` in `session_exercises` for linked exercises
+- Components: TemplateManager, ApplyTemplateDialog, ClientExerciseView
+- MCP: Template CRUD tools, apply_template_to_session, template-analysis prompt
 
 ## Constraints
 
@@ -84,13 +79,16 @@ Durante le lezioni di gruppo, il coach può gestire gli esercizi condivisi da un
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Flag booleano `is_group` invece di relazione | Semplice, ogni sessione è indipendente | ✓ Good — works well, minimal complexity |
-| Tab toggle invece di filtro | Più chiaro per il coach, due modalità di lavoro distinte | ✓ Good — clean UX separation |
+| Flag booleano `is_group` invece di relazione | Semplice, ogni sessione e indipendente | ✓ Good — works well, minimal complexity |
+| Tab toggle invece di filtro | Piu chiaro per il coach, due modalita di lavoro distinte | ✓ Good — clean UX separation |
 | Completamento automatico per tutti | Efficienza durante la lezione, un tap basta | ✓ Good — with undo toast for safety |
 | Ordine da order_index | Riusa campo esistente, no schema aggiuntivo | ✓ Good — no changes needed |
 | Partial index for is_group | Most exercises not group, saves space | ✓ Good — efficient queries |
 | SECURITY INVOKER for RPC | Respects RLS policies, user context preserved | ✓ Good — secure by default |
 | Toast duration 4 seconds | Enough time to react, not too long | ✓ Good — balanced UX |
+| ON DELETE RESTRICT for template_id FK | Coach must explicitly remove template from sessions | ✓ Good — prevents accidental data loss |
+| Template exercises linked via template_id | Enables edit blocking, consistent updates | ✓ Good — clear ownership semantics |
+| refreshSession() for Edge Function calls | Ensures valid JWT token for authenticated requests | ✓ Good — fixes stale token issues |
 
 ---
-*Last updated: 2026-01-30 after v1.1 milestone start*
+*Last updated: 2026-02-02 after v1.1 milestone*
