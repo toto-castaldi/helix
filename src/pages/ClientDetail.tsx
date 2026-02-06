@@ -177,32 +177,23 @@ export function ClientDetail() {
     setExportLoading(true)
     try {
       // Refresh session to ensure we have a valid token
-      const { data: { session }, error: authError } = await supabase.auth.refreshSession()
-      if (authError || !session) {
+      const { error: authError } = await supabase.auth.refreshSession()
+      if (authError) {
         throw new Error('Non autenticato')
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/client-export`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            clientId: id,
-            gymId: selectedGymId || undefined,
-          }),
-        }
-      )
+      const { data, error } = await supabase.functions.invoke('client-export', {
+        body: {
+          clientId: id,
+          gymId: selectedGymId || undefined,
+        },
+      })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Errore durante l\'export')
+      if (error) {
+        throw new Error(error.message || 'Errore durante l\'export')
       }
 
-      const { markdown, filename } = await response.json()
+      const { markdown, filename } = data
 
       const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
       const url = URL.createObjectURL(blob)
