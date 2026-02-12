@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 10 of 10 (Lumio Image in ExerciseCard)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-12 — Roadmap created for v1.2
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-02-12 — Completed 10-01 (Data Layer & ImageGallery)
 
-Progress: [..........] 0% (v1.2)
+Progress: [#####.....] 50% (v1.2)
 
 ## Performance Metrics
 
@@ -27,6 +27,12 @@ Progress: [..........] 0% (v1.2)
 - Phases: 5 (phases 5-9)
 - Duration: 44 days
 
+**v1.2 Milestone:**
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 10    | 01   | 3min     | 2     | 3     |
+
 *Updated after each plan completion*
 
 ## Accumulated Context
@@ -34,7 +40,9 @@ Progress: [..........] 0% (v1.2)
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Clear for v1.2 — see PROJECT.md for historical decisions.
+
+- **10-01:** Simplified ImageGallery props (removed userId/repositoryId, storage_path already has full path)
+- **10-01:** Touch gesture isolation via stopPropagation for multi-image galleries only
 
 ### Pending Todos
 
@@ -47,8 +55,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Roadmap created, ready to plan Phase 10
+Stopped at: Completed 10-01-PLAN.md (Data Layer & ImageGallery)
 Resume file: None
 
 ---
-*State tracking: v1.2 milestone — ready to plan*
+*State tracking: v1.2 milestone — executing phase 10*
