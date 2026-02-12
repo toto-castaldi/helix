@@ -32,10 +32,11 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 - ✓ Live tablet: vista cliente con separazione individuali/gruppo — v1.1
 - ✓ Mobile app senza Live (tablet-only) — v1.1
 - ✓ Export cliente funzionante (JWT refresh fix) — v1.1
+- ✓ Live tablet: immagine esercizio da scheda Lumio nella card del carousel — v1.2
 
 ### Active
 
-- [ ] Live tablet: immagine esercizio da scheda Lumio nella card del carousel (prima immagine, se presente) — v1.2
+(None — planning next milestone)
 
 ### Out of Scope
 
@@ -50,22 +51,17 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ## Context
 
-**Shipped v1.1 Group Exercise Improvements** with:
-- 71 files modified, +9,604 / -1,434 lines
-- 5 phases, 10 plans completed
-- Tech stack unchanged: React 19 + Vite + TypeScript + Supabase
+**Shipped v1.2 Lumio Exercise Images** (2026-02-12):
+- Lumio card images in exercise carousel cards on live tablet
+- ImageGallery component with swipe, letterbox display, portrait/landscape support
+- 7 files modified, +109 / -44 lines
 
 **Current codebase:**
 - ~13,000 LOC TypeScript
 - Two entry points: main app + live tablet PWA
 - MCP server with 23 tools, 19 resources, 5 prompts
 - Realtime enabled on `session_exercises` for cross-tablet sync
-
-**Key additions in v1.1:**
-- Tables: `group_templates`, `group_template_exercises`
-- Column: `template_id` in `session_exercises` for linked exercises
-- Components: TemplateManager, ApplyTemplateDialog, ClientExerciseView
-- MCP: Template CRUD tools, apply_template_to_session, template-analysis prompt
+- Components: ImageGallery (swipeable images), ExerciseCard (unified layout with image section)
 
 ## Constraints
 
@@ -89,13 +85,9 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | ON DELETE RESTRICT for template_id FK | Coach must explicitly remove template from sessions | ✓ Good — prevents accidental data loss |
 | Template exercises linked via template_id | Enables edit blocking, consistent updates | ✓ Good — clear ownership semantics |
 | refreshSession() for Edge Function calls | Ensures valid JWT token for authenticated requests | ✓ Good — fixes stale token issues |
-
-## Current Milestone: v1.2 Lumio Exercise Images
-
-**Goal:** Mostrare la prima immagine della scheda Lumio direttamente nella card dell'esercizio nel carousel della live tablet app.
-
-**Target features:**
-- Prima immagine Lumio visibile nella ExerciseCard del carousel (se l'esercizio ha una scheda Lumio con immagini)
+| Extract images from markdown instead of lumio_card_images table | Table was empty, images embedded in card content | ✓ Good — simpler, no extra table needed |
+| Unified card layout with percentage sections | Consistent look for all exercises, with/without images | ✓ Good — clean visual hierarchy |
+| object-contain + black letterbox for images | Shows full image regardless of aspect ratio | ✓ Good — works for portrait and landscape |
 
 ---
-*Last updated: 2026-02-12 after v1.2 milestone start*
+*Last updated: 2026-02-12 after v1.2 milestone complete*

@@ -51,3 +51,29 @@
 **What's next:** v1.1 Group Exercise Improvements (shipped)
 
 ---
+
+## v1.2 Lumio Exercise Images (Shipped: 2026-02-12)
+
+**Delivered:** Lumio card images shown directly in the exercise carousel cards on the live tablet, giving coaches a visual reference during sessions.
+
+**Phases completed:** Phase 10 (2 plans)
+
+**Key accomplishments:**
+- ImageGallery component with swipeable multi-image support and touch gesture isolation
+- ExerciseCard unified layout with percentage-based sections (Title 15%, Description 10%, Image 35%, Notes 15%, Parameters 25%)
+- Image extraction from Lumio card markdown content with relative path resolution
+- Letterbox display (object-contain + black background) for both portrait and landscape images
+- ImageOff placeholder for exercises without Lumio images
+
+**Stats:**
+- 7 files modified
+- +109 / -44 lines (TypeScript)
+- 1 phase, 2 plans
+- 1 day
+
+**Git range:** `feat(10-01)` -> `fix: use h-full chain`
+
+**What's next:** TBD — next milestone goals
+
+---
+

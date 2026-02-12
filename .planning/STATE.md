@@ -5,36 +5,19 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Group exercise management for live coaching with reusable templates
-**Current focus:** Phase 10 - Lumio Image in ExerciseCard
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 10 of 10 (Lumio Image in ExerciseCard)
-Plan: 2 of 2 in current phase
-Status: Phase Complete
-Last activity: 2026-02-12 — Completed 10-02 (ExerciseCard Image Integration)
-
-Progress: [##########] 100% (v1.2)
+Status: Between milestones
+Last milestone: v1.2 Lumio Exercise Images (shipped 2026-02-12)
+Cumulative: 10 phases, 18 plans across 3 milestones (v1.0 + v1.1 + v1.2)
 
 ## Performance Metrics
 
-**Cumulative (v1.0 + v1.1):**
-- Total plans completed: 16 (6 + 10)
-- Total phases: 9 (4 + 5)
-
-**v1.1 Milestone:**
-- Plans completed: 10
-- Phases: 5 (phases 5-9)
-- Duration: 44 days
-
-**v1.2 Milestone:**
-
-| Phase | Plan | Duration | Tasks | Files |
-|-------|------|----------|-------|-------|
-| 10    | 01   | 3min     | 2     | 3     |
-| 10    | 02   | 30min    | 3     | 3     |
-
-*Updated after each plan completion*
+**Cumulative (v1.0 + v1.1 + v1.2):**
+- Total plans completed: 18 (6 + 10 + 2)
+- Total phases: 10 (4 + 5 + 1)
 
 ## Accumulated Context
 
@@ -42,15 +25,9 @@ Progress: [##########] 100% (v1.2)
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
-- **10-01:** Simplified ImageGallery props (removed userId/repositoryId, storage_path already has full path)
-- **10-01:** Touch gesture isolation via stopPropagation for multi-image galleries only
-- **10-02:** Unified card layout for all exercises (Title 15%, Image/Placeholder 40%, Notes 20%, Parameters 25%) instead of dual layout
-- **10-02:** ImageOff placeholder icon for exercises without Lumio images
-- **10-02:** PROSSIMO button moved before RESET in ActionPanel per coach feedback
-
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
@@ -59,8 +36,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 10-02-PLAN.md (ExerciseCard Image Integration) -- Phase 10 complete, v1.2 milestone done
+Stopped at: v1.2 milestone completed and archived
 Resume file: None
 
 ---
-*State tracking: v1.2 milestone — executing phase 10*
+*State tracking: between milestones — ready for /gsd:new-milestone*
