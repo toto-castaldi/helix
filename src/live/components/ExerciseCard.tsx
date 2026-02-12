@@ -59,6 +59,17 @@ export function ExerciseCard({
 
   const hasImages = cardImages.length > 0
 
+  // Extract plain-text description from Lumio card content (strip markdown images/formatting)
+  const description = useMemo(() => {
+    if (!lumioCard?.content) return null
+    const text = lumioCard.content
+      .replace(/!\[[^\]]*\]\([^)]+\)/g, '') // remove images
+      .replace(/^#{1,6}\s+.*$/gm, '')       // remove headings
+      .replace(/\n{2,}/g, '\n')             // collapse blank lines
+      .trim()
+    return text || null
+  }, [lumioCard?.content])
+
   // Determina lo stato dell'esercizio
   const getCardStyles = () => {
     if (isCompleted) {
@@ -160,15 +171,22 @@ export function ExerciseCard({
       onClick={onClick}
     >
       <CardContent className="p-3 h-full flex flex-col">
-        {/* Unified layout: Title 15% -> Image/Placeholder 40% -> Notes 20% -> Parameters 25% */}
+        {/* Layout: Title 15% -> Description 10% -> Image 35% -> Notes 15% -> Parameters 25% */}
 
         {/* 1. Title - 15% */}
         <div className="h-[15%] overflow-hidden">
           {titleSection}
         </div>
 
-        {/* 2. Image gallery or placeholder - 40% */}
-        <div className="h-[40%] overflow-hidden">
+        {/* 2. Description - 10% */}
+        <div className="h-[10%] overflow-hidden">
+          <p className="text-xs text-gray-400 line-clamp-2">
+            {description || '\u00A0'}
+          </p>
+        </div>
+
+        {/* 3. Image gallery or placeholder - 35% */}
+        <div className="h-[35%] overflow-hidden">
           {hasImages ? (
             <ImageGallery
               images={cardImages}
@@ -181,8 +199,8 @@ export function ExerciseCard({
           )}
         </div>
 
-        {/* 3. Notes - 20% */}
-        <div className="h-[20%] overflow-hidden mt-2">
+        {/* 4. Notes - 15% */}
+        <div className="h-[15%] overflow-hidden mt-2">
           {isCurrentExercise ? (
             <Textarea
               value={exercise.notes || ''}
@@ -197,7 +215,7 @@ export function ExerciseCard({
           )}
         </div>
 
-        {/* 4. Parameters - 25% */}
+        {/* 5. Parameters - 25% */}
         <div className="h-[25%] flex flex-col justify-center">
           {parametersSection}
         </div>
