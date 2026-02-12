@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 10 of 10 (Lumio Image in ExerciseCard)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-02-12 — Completed 10-01 (Data Layer & ImageGallery)
+Plan: 2 of 2 in current phase
+Status: Phase Complete
+Last activity: 2026-02-12 — Completed 10-02 (ExerciseCard Image Integration)
 
-Progress: [#####.....] 50% (v1.2)
+Progress: [##########] 100% (v1.2)
 
 ## Performance Metrics
 
@@ -32,6 +32,7 @@ Progress: [#####.....] 50% (v1.2)
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 10    | 01   | 3min     | 2     | 3     |
+| 10    | 02   | 30min    | 3     | 3     |
 
 *Updated after each plan completion*
 
@@ -43,6 +44,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 - **10-01:** Simplified ImageGallery props (removed userId/repositoryId, storage_path already has full path)
 - **10-01:** Touch gesture isolation via stopPropagation for multi-image galleries only
+- **10-02:** Unified card layout for all exercises (Title 15%, Image/Placeholder 40%, Notes 20%, Parameters 25%) instead of dual layout
+- **10-02:** ImageOff placeholder icon for exercises without Lumio images
+- **10-02:** PROSSIMO button moved before RESET in ActionPanel per coach feedback
 
 ### Pending Todos
 
@@ -55,7 +59,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed 10-01-PLAN.md (Data Layer & ImageGallery)
+Stopped at: Completed 10-02-PLAN.md (ExerciseCard Image Integration) -- Phase 10 complete, v1.2 milestone done
 Resume file: None
 
 ---
