@@ -35,10 +35,11 @@ See `.planning/milestones/v1.1-ROADMAP.md` for details.
   1. On the live tablet, an exercise with a Lumio card that has images shows the first image in its carousel card
   2. The image fits within the card without breaking the existing layout (exercise name, parameters, notes all remain visible and properly positioned)
   3. An exercise without a Lumio card, or with a Lumio card that has no images, displays exactly as it does today (no empty space, no placeholder, no layout shift)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md — Data layer (card images in query, types) + ImageGallery component
+- [ ] 10-02-PLAN.md — ExerciseCard layout redesign with image gallery + preloading + visual verification
 
 ## Progress
 
@@ -48,7 +49,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-4 | v1.0 | 6/6 | Complete | 2026-01-28 |
 | 5-9 | v1.1 | 10/10 | Complete | 2026-02-02 |
-| 10. Lumio Image in ExerciseCard | v1.2 | 0/TBD | Not started | - |
+| 10. Lumio Image in ExerciseCard | v1.2 | 0/2 | In progress | - |
 
 ---
 *Roadmap created: 2026-02-12*
