@@ -111,7 +111,7 @@ export function ImageGallery({ images, maxHeight, className }: ImageGalleryProps
                   src={getImageUrl(image.storage_path)}
                   alt={image.original_path}
                   className={cn(
-                    'object-contain w-full rounded-lg select-none pointer-events-none',
+                    'object-cover w-full h-full rounded-lg select-none pointer-events-none',
                     !loadedImages[index] && 'hidden'
                   )}
                   style={{ maxHeight }}
