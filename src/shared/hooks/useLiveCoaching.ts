@@ -62,7 +62,7 @@ export function useLiveCoaching() {
           *,
           exercise:exercises(
             *,
-            lumio_card:lumio_cards(*, repository:lumio_repositories(*), images:lumio_card_images(*))
+            lumio_card:lumio_cards(*, repository:lumio_repositories(*))
           )
         )
       `)
@@ -72,17 +72,59 @@ export function useLiveCoaching() {
     if (fetchError) {
       setError(fetchError.message)
       setSessions([])
-    } else {
-      // Sort exercises by order_index
-      const sessionsWithSortedExercises = (data || []).map((session) => ({
-        ...session,
-        exercises: session.exercises?.sort(
+      setLoading(false)
+      return
+    }
+
+    // Collect all lumio_card IDs that need images
+    const cardIds = new Set<string>()
+    for (const session of data || []) {
+      for (const ex of session.exercises || []) {
+        const cardId = ex.exercise?.lumio_card?.id
+        if (cardId) cardIds.add(cardId)
+      }
+    }
+
+    // Fetch images for all cards in one query
+    let imagesByCardId: Record<string, Array<{ id: string; card_id: string; original_path: string; storage_path: string; created_at: string }>> = {}
+    if (cardIds.size > 0) {
+      const { data: imagesData } = await supabase
+        .from('lumio_card_images')
+        .select('*')
+        .in('card_id', Array.from(cardIds))
+        .order('created_at', { ascending: true })
+
+      if (imagesData) {
+        for (const img of imagesData) {
+          if (!imagesByCardId[img.card_id]) imagesByCardId[img.card_id] = []
+          imagesByCardId[img.card_id].push(img)
+        }
+      }
+    }
+
+    // Merge images into session data and sort exercises
+    const sessionsWithImages = (data || []).map((session) => ({
+      ...session,
+      exercises: session.exercises
+        ?.map((ex: SessionExerciseWithDetails) => {
+          const card = ex.exercise?.lumio_card
+          if (card && imagesByCardId[card.id]) {
+            return {
+              ...ex,
+              exercise: {
+                ...ex.exercise,
+                lumio_card: { ...card, images: imagesByCardId[card.id] },
+              },
+            }
+          }
+          return ex
+        })
+        .sort(
           (a: SessionExerciseWithDetails, b: SessionExerciseWithDetails) =>
             a.order_index - b.order_index
         ),
-      }))
-      setSessions(sessionsWithSortedExercises)
-    }
+    }))
+    setSessions(sessionsWithImages)
 
     setLoading(false)
   }, [])
