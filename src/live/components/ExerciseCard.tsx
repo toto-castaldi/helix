@@ -42,12 +42,14 @@ export function ExerciseCard({
   const [fetchedImages, setFetchedImages] = useState<LumioCardImage[]>([])
   useEffect(() => {
     if (!cardId) return
+    console.log(`[ExerciseCard v2] fetching images for card ${cardId}`)
     supabase
       .from('lumio_card_images')
       .select('*')
       .eq('card_id', cardId)
       .order('created_at', { ascending: true })
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        console.log(`[ExerciseCard v2] card ${cardId}: got ${data?.length || 0} images, error=${error?.message || 'none'}`)
         if (data && data.length > 0) setFetchedImages(data)
       })
   }, [cardId])
