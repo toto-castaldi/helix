@@ -36,7 +36,11 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ### Active
 
-(None — planning next milestone)
+**Current Milestone: v1.3 Image Auto-Play**
+
+- [ ] Auto-play slideshow per immagini Lumio multi-image (tap per start/stop, 3 sec intervallo, loop)
+- [ ] Icona play/pause overlay sull'immagine durante auto-play
+- [ ] Swipe manuale ferma auto-play se attivo
 
 ### Out of Scope
 
@@ -90,4 +94,4 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | object-contain + black letterbox for images | Shows full image regardless of aspect ratio | ✓ Good — works for portrait and landscape |
 
 ---
-*Last updated: 2026-02-12 after v1.2 milestone complete*
+*Last updated: 2026-02-12 after v1.3 milestone started*
