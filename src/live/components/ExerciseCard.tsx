@@ -1,10 +1,12 @@
+import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Badge } from '@/shared/components/ui/badge'
 import { Textarea } from '@/shared/components/ui/textarea'
 import { ParameterControl } from './ParameterControl'
 import { ImageGallery } from './ImageGallery'
 import { cn } from '@/shared/lib/utils'
-import type { SessionExerciseWithDetails, LumioLocalCardWithImages } from '@/shared/types'
+import { supabase } from '@/shared/lib/supabase'
+import type { SessionExerciseWithDetails, LumioLocalCardWithImages, LumioCardImage } from '@/shared/types'
 import { Check, SkipForward, Users, ImageOff } from 'lucide-react'
 
 interface ExerciseCardProps {
@@ -34,11 +36,25 @@ export function ExerciseCard({
 
   // Check for Lumio card images
   const lumioCard = exerciseInfo?.lumio_card as LumioLocalCardWithImages | null | undefined
-  const lumioImages = lumioCard?.images || []
-  const hasImages = lumioImages.length > 0
+  const cardId = lumioCard?.id
 
-  // DEBUG
-  console.log(`[ExerciseCard] ${exerciseInfo?.name}: lumio_card=${!!lumioCard}, images=${lumioImages.length}, hasImages=${hasImages}`, { lumioCard, lumioImages })
+  // Fetch images directly from DB (nested join doesn't work at 4+ depth in PostgREST)
+  const [fetchedImages, setFetchedImages] = useState<LumioCardImage[]>([])
+  useEffect(() => {
+    if (!cardId) return
+    supabase
+      .from('lumio_card_images')
+      .select('*')
+      .eq('card_id', cardId)
+      .order('created_at', { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length > 0) setFetchedImages(data)
+      })
+  }, [cardId])
+
+  // Use fetched images, or images from data layer if already available
+  const lumioImages = fetchedImages.length > 0 ? fetchedImages : (lumioCard?.images || [])
+  const hasImages = lumioImages.length > 0
 
   // Determina lo stato dell'esercizio
   const getCardStyles = () => {
