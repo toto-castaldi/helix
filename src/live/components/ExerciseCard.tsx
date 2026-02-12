@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Badge } from '@/shared/components/ui/badge'
 import { Textarea } from '@/shared/components/ui/textarea'
 import { ParameterControl } from './ParameterControl'
 import { ImageGallery } from './ImageGallery'
 import { cn } from '@/shared/lib/utils'
-import { supabase } from '@/shared/lib/supabase'
-import type { SessionExerciseWithDetails, LumioLocalCardWithImages, LumioCardImage } from '@/shared/types'
+import type { SessionExerciseWithDetails, LumioLocalCardWithRepository } from '@/shared/types'
 import { Check, SkipForward, Users, ImageOff } from 'lucide-react'
 
 interface ExerciseCardProps {
@@ -34,29 +33,31 @@ export function ExerciseCard({
   const isCompleted = exercise.completed
   const isSkipped = exercise.skipped
 
-  // Check for Lumio card images
-  const lumioCard = exerciseInfo?.lumio_card as LumioLocalCardWithImages | null | undefined
-  const cardId = lumioCard?.id
+  // Extract images from Lumio card markdown content
+  const lumioCard = exerciseInfo?.lumio_card as LumioLocalCardWithRepository | null | undefined
+  const repository = lumioCard?.repository
 
-  // Fetch images directly from DB (nested join doesn't work at 4+ depth in PostgREST)
-  const [fetchedImages, setFetchedImages] = useState<LumioCardImage[]>([])
-  useEffect(() => {
-    if (!cardId) return
-    console.log(`[ExerciseCard v2] fetching images for card ${cardId}`)
-    supabase
-      .from('lumio_card_images')
-      .select('*')
-      .eq('card_id', cardId)
-      .order('created_at', { ascending: true })
-      .then(({ data, error }) => {
-        console.log(`[ExerciseCard v2] card ${cardId}: got ${data?.length || 0} images, error=${error?.message || 'none'}`)
-        if (data && data.length > 0) setFetchedImages(data)
+  const cardImages = useMemo(() => {
+    if (!lumioCard?.content || !repository) return []
+    const images: { id: string; storage_path: string; original_path: string }[] = []
+    const mdImageRegex = /!\[[^\]]*\]\(([^)]+)\)/g
+    let match
+    while ((match = mdImageRegex.exec(lumioCard.content)) !== null) {
+      const imagePath = match[1]
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) continue
+      // Resolve relative path from card's file_path
+      const resolvedPath = resolveRelativePath(lumioCard.file_path, imagePath)
+      const storagePath = `${repository.user_id}/${repository.id}/${resolvedPath}`
+      images.push({
+        id: `${lumioCard.id}-${imagePath}`,
+        storage_path: storagePath,
+        original_path: imagePath,
       })
-  }, [cardId])
+    }
+    return images
+  }, [lumioCard?.content, lumioCard?.file_path, lumioCard?.id, repository])
 
-  // Use fetched images, or images from data layer if already available
-  const lumioImages = fetchedImages.length > 0 ? fetchedImages : (lumioCard?.images || [])
-  const hasImages = lumioImages.length > 0
+  const hasImages = cardImages.length > 0
 
   // Determina lo stato dell'esercizio
   const getCardStyles = () => {
@@ -170,7 +171,7 @@ export function ExerciseCard({
         <div className="h-[40%] overflow-hidden">
           {hasImages ? (
             <ImageGallery
-              images={lumioImages}
+              images={cardImages}
               maxHeight="100%"
             />
           ) : (
@@ -203,4 +204,16 @@ export function ExerciseCard({
       </CardContent>
     </Card>
   )
+}
+
+/** Resolve a relative image path from a base file path */
+function resolveRelativePath(baseFilePath: string, imagePath: string): string {
+  if (imagePath.startsWith('/')) return imagePath.slice(1)
+  const baseParts = baseFilePath.split('/')
+  baseParts.pop() // remove filename
+  for (const part of imagePath.split('/')) {
+    if (part === '..') baseParts.pop()
+    else if (part !== '.') baseParts.push(part)
+  }
+  return baseParts.join('/')
 }

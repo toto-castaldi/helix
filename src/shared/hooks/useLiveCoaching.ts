@@ -76,56 +76,16 @@ export function useLiveCoaching() {
       return
     }
 
-    // Collect all lumio_card IDs that need images
-    const cardIds = new Set<string>()
-    for (const session of data || []) {
-      for (const ex of session.exercises || []) {
-        const cardId = ex.exercise?.lumio_card?.id
-        if (cardId) cardIds.add(cardId)
-      }
-    }
-
-    // Fetch images for all cards in one query
-    let imagesByCardId: Record<string, Array<{ id: string; card_id: string; original_path: string; storage_path: string; created_at: string }>> = {}
-    if (cardIds.size > 0) {
-      const { data: imagesData } = await supabase
-        .from('lumio_card_images')
-        .select('*')
-        .in('card_id', Array.from(cardIds))
-        .order('created_at', { ascending: true })
-
-      if (imagesData) {
-        for (const img of imagesData) {
-          if (!imagesByCardId[img.card_id]) imagesByCardId[img.card_id] = []
-          imagesByCardId[img.card_id].push(img)
-        }
-      }
-    }
-
-    // Merge images into session data and sort exercises
-    const sessionsWithImages = (data || []).map((session) => ({
+    // Sort exercises by order_index
+    const sessionsWithSortedExercises = (data || []).map((session) => ({
       ...session,
       exercises: session.exercises
-        ?.map((ex: SessionExerciseWithDetails) => {
-          const card = ex.exercise?.lumio_card
-          const cardImages = card ? imagesByCardId[card.id] : undefined
-          if (card && cardImages) {
-            return {
-              ...ex,
-              exercise: {
-                ...ex.exercise,
-                lumio_card: { ...card, images: cardImages },
-              },
-            }
-          }
-          return ex
-        })
-        .sort(
+        ?.sort(
           (a: SessionExerciseWithDetails, b: SessionExerciseWithDetails) =>
             a.order_index - b.order_index
         ),
     }))
-    setSessions(sessionsWithImages)
+    setSessions(sessionsWithSortedExercises)
 
     setLoading(false)
   }, [])

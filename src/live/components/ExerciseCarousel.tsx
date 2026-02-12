@@ -1,15 +1,26 @@
 import { useRef, useState, useMemo, useEffect } from 'react'
 import { ExerciseCard } from './ExerciseCard'
-import type { SessionWithDetails, SessionExerciseWithDetails, LumioLocalCardWithImages } from '@/shared/types'
+import type { SessionWithDetails, SessionExerciseWithDetails, LumioLocalCardWithRepository } from '@/shared/types'
 import { cn } from '@/shared/lib/utils'
 import { supabase } from '@/shared/lib/supabase'
 
 // Helper to get first image URL for an exercise (for preloading)
 function getFirstImageUrl(exercise: SessionExerciseWithDetails): string | null {
-  const lumioCard = exercise.exercise?.lumio_card as LumioLocalCardWithImages | null | undefined
-  const images = lumioCard?.images
-  if (!images || images.length === 0) return null
-  const { data } = supabase.storage.from('lumio-images').getPublicUrl(images[0].storage_path)
+  const lumioCard = exercise.exercise?.lumio_card as LumioLocalCardWithRepository | null | undefined
+  if (!lumioCard?.content || !lumioCard.repository) return null
+  const match = /!\[[^\]]*\]\(([^)]+)\)/.exec(lumioCard.content)
+  if (!match) return null
+  const imagePath = match[1]
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) return null
+  // Resolve relative path
+  const baseParts = lumioCard.file_path.split('/')
+  baseParts.pop()
+  for (const part of imagePath.split('/')) {
+    if (part === '..') baseParts.pop()
+    else if (part !== '.') baseParts.push(part)
+  }
+  const storagePath = `${lumioCard.repository.user_id}/${lumioCard.repository.id}/${baseParts.join('/')}`
+  const { data } = supabase.storage.from('lumio-images').getPublicUrl(storagePath)
   return data.publicUrl
 }
 

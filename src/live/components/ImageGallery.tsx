@@ -1,10 +1,15 @@
 import { useState, useRef, useCallback } from 'react'
 import { supabase } from '@/shared/lib/supabase'
 import { cn } from '@/shared/lib/utils'
-import type { LumioCardImage } from '@/shared/types'
+
+interface GalleryImage {
+  id: string
+  storage_path: string
+  original_path: string
+}
 
 interface ImageGalleryProps {
-  images: LumioCardImage[]
+  images: GalleryImage[]
   maxHeight: string
   className?: string
 }
