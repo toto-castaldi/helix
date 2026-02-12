@@ -85,14 +85,18 @@ export function useLiveCoaching() {
       }
     }
 
+    console.log('[useLiveCoaching] cardIds to fetch images for:', Array.from(cardIds))
+
     // Fetch images for all cards in one query
     let imagesByCardId: Record<string, Array<{ id: string; card_id: string; original_path: string; storage_path: string; created_at: string }>> = {}
     if (cardIds.size > 0) {
-      const { data: imagesData } = await supabase
+      const { data: imagesData, error: imagesError } = await supabase
         .from('lumio_card_images')
         .select('*')
         .in('card_id', Array.from(cardIds))
         .order('created_at', { ascending: true })
+
+      console.log('[useLiveCoaching] images query result:', { count: imagesData?.length, error: imagesError?.message, imagesData })
 
       if (imagesData) {
         for (const img of imagesData) {
@@ -102,18 +106,22 @@ export function useLiveCoaching() {
       }
     }
 
+    console.log('[useLiveCoaching] imagesByCardId:', imagesByCardId)
+
     // Merge images into session data and sort exercises
     const sessionsWithImages = (data || []).map((session) => ({
       ...session,
       exercises: session.exercises
         ?.map((ex: SessionExerciseWithDetails) => {
           const card = ex.exercise?.lumio_card
-          if (card && imagesByCardId[card.id]) {
+          const cardImages = card ? imagesByCardId[card.id] : undefined
+          console.log(`[useLiveCoaching] merge: ${ex.exercise?.name} card=${card?.id?.slice(0,8)} images=${cardImages?.length || 0}`)
+          if (card && cardImages) {
             return {
               ...ex,
               exercise: {
                 ...ex.exercise,
-                lumio_card: { ...card, images: imagesByCardId[card.id] },
+                lumio_card: { ...card, images: cardImages },
               },
             }
           }

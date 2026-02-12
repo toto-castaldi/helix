@@ -37,6 +37,9 @@ export function ExerciseCard({
   const lumioImages = lumioCard?.images || []
   const hasImages = lumioImages.length > 0
 
+  // DEBUG
+  console.log(`[ExerciseCard] ${exerciseInfo?.name}: lumio_card=${!!lumioCard}, images=${lumioImages.length}, hasImages=${hasImages}`, { lumioCard, lumioImages })
+
   // Determina lo stato dell'esercizio
   const getCardStyles = () => {
     if (isCompleted) {
