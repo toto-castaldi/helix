@@ -5,7 +5,7 @@ import { ParameterControl } from './ParameterControl'
 import { ImageGallery } from './ImageGallery'
 import { cn } from '@/shared/lib/utils'
 import type { SessionExerciseWithDetails, LumioLocalCardWithImages } from '@/shared/types'
-import { Check, SkipForward, Users } from 'lucide-react'
+import { Check, SkipForward, Users, ImageOff } from 'lucide-react'
 
 interface ExerciseCardProps {
   exercise: SessionExerciseWithDetails
@@ -138,80 +138,47 @@ export function ExerciseCard({
       onClick={onClick}
     >
       <CardContent className="p-3 h-full flex flex-col">
-        {hasImages ? (
-          /* Layout with images: Title -> Image -> Notes -> Parameters */
-          <>
-            {/* 1. Title - flex-shrink-0, compact */}
-            <div className="flex-shrink-0 overflow-hidden">
-              {titleSection}
-            </div>
+        {/* Unified layout: Title 15% -> Image/Placeholder 40% -> Notes 20% -> Parameters 25% */}
 
-            {/* 2. Image gallery - constrained height */}
-            <div className="flex-shrink-0 mt-1">
-              <ImageGallery
-                images={lumioImages}
-                maxHeight="200px"
-              />
-            </div>
+        {/* 1. Title - 15% */}
+        <div className="h-[15%] overflow-hidden">
+          {titleSection}
+        </div>
 
-            {/* 3. Notes - flexible, takes remaining space */}
-            <div className="flex-1 min-h-0 overflow-hidden mt-1">
-              {isCurrentExercise ? (
-                <Textarea
-                  value={exercise.notes || ''}
-                  onChange={(e) => onUpdateNotes?.(e.target.value)}
-                  placeholder="Note..."
-                  className="h-full w-full resize-none bg-gray-700 border-gray-600 text-white text-xs"
-                />
-              ) : (
-                <p className="text-xs text-gray-500 italic line-clamp-2">
-                  {exercise.notes || '\u00A0'}
-                </p>
-              )}
+        {/* 2. Image gallery or placeholder - 40% */}
+        <div className="h-[40%] overflow-hidden">
+          {hasImages ? (
+            <ImageGallery
+              images={lumioImages}
+              maxHeight="100%"
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center bg-gray-700/50 rounded-lg">
+              <ImageOff className="w-10 h-10 text-gray-600" />
             </div>
+          )}
+        </div>
 
-            {/* 4. Parameters - always at bottom */}
-            <div className="flex-shrink-0 mt-auto pt-1">
-              {parametersSection}
-            </div>
-          </>
-        ) : (
-          /* Original layout without images: Title -> Description -> Controls -> Notes */
-          <>
-            {/* 1. Titolo - 30% */}
-            <div className="h-[30%] overflow-hidden">
-              {titleSection}
-            </div>
+        {/* 3. Notes - 20% */}
+        <div className="h-[20%] overflow-hidden mt-2">
+          {isCurrentExercise ? (
+            <Textarea
+              value={exercise.notes || ''}
+              onChange={(e) => onUpdateNotes?.(e.target.value)}
+              placeholder="Note..."
+              className="h-full w-full resize-none bg-gray-700 border-gray-600 text-white text-xs"
+            />
+          ) : (
+            <p className="text-xs text-gray-500 italic line-clamp-2">
+              {exercise.notes || '\u00A0'}
+            </p>
+          )}
+        </div>
 
-            {/* 2. Descrizione - 20% */}
-            <div className="h-[20%] overflow-hidden">
-              <p className="text-sm text-gray-400 line-clamp-4">
-                {exerciseInfo?.description || '\u00A0'}
-              </p>
-            </div>
-
-            {/* 3. Controlli - 30% */}
-            <div className="h-[30%] flex flex-col justify-center">
-              {parametersSection}
-            </div>
-
-            {/* 4. Note - 20% */}
-            <div className="h-[20%]">
-              {isCurrentExercise ? (
-                <Textarea
-                  value={exercise.notes || ''}
-                  onChange={(e) => onUpdateNotes?.(e.target.value)}
-                  placeholder="Note..."
-                  className="h-full w-full resize-none bg-gray-700 border-gray-600 text-white text-xs"
-                />
-              ) : (
-                <p className="text-xs text-gray-500 italic line-clamp-2">
-                  {exercise.notes || '\u00A0'}
-                </p>
-              )}
-            </div>
-          </>
-        )}
+        {/* 4. Parameters - 25% */}
+        <div className="h-[25%] flex flex-col justify-center">
+          {parametersSection}
+        </div>
       </CardContent>
     </Card>
   )

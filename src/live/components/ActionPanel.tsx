@@ -52,6 +52,17 @@ export function ActionPanel({
         <span className="text-[10px]">SALTA</span>
       </Button>
 
+      {/* Center Button - gray come esercizi da fare */}
+      <Button
+        onClick={onCenter}
+        disabled={disabled}
+        size="lg"
+        className="flex-1 min-h-0 flex-col gap-1 bg-gray-700 hover:bg-gray-600 text-white border border-gray-600"
+      >
+        <Target className="w-6 h-6 shrink-0" />
+        <span className="text-[10px]">PROSSIMO</span>
+      </Button>
+
       {/* Reset Button - gray/slate per reset stato */}
       {onReset && (
         <Button
@@ -68,17 +79,6 @@ export function ActionPanel({
           <span className="text-[10px]">RESET</span>
         </Button>
       )}
-
-      {/* Center Button - gray come esercizi da fare */}
-      <Button
-        onClick={onCenter}
-        disabled={disabled}
-        size="lg"
-        className="flex-1 min-h-0 flex-col gap-1 bg-gray-700 hover:bg-gray-600 text-white border border-gray-600"
-      >
-        <Target className="w-6 h-6 shrink-0" />
-        <span className="text-[10px]">PROSSIMO</span>
-      </Button>
 
       {/* Delete Button - rose/red distintivo */}
       <Button
