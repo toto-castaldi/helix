@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-02)
+See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Group exercise management for live coaching with reusable templates
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Lumio Exercise Images
 
 ## Current Position
 
-Phase: Ready for v1.2+ planning
-Plan: Not started
-Status: v1.1 milestone archived
-Last activity: 2026-02-02 — v1.1 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-12 — Milestone v1.2 started
 
-Progress: Fresh start for next milestone
+Progress: Fresh start for v1.2
 
 ## Performance Metrics
 
@@ -44,9 +44,9 @@ None — clean slate for next milestone.
 
 ## Session Continuity
 
-Last session: 2026-02-02
-Stopped at: v1.1 milestone archived
+Last session: 2026-02-12
+Stopped at: Defining v1.2 requirements
 Resume file: None
 
 ---
-*State tracking: v1.1 milestone archived — ready for /gsd:new-milestone*
+*State tracking: v1.2 milestone started — defining requirements*

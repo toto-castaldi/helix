@@ -35,7 +35,7 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ### Active
 
-(None — planning next milestone)
+- [ ] Live tablet: immagine esercizio da scheda Lumio nella card del carousel (prima immagine, se presente) — v1.2
 
 ### Out of Scope
 
@@ -90,5 +90,12 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | Template exercises linked via template_id | Enables edit blocking, consistent updates | ✓ Good — clear ownership semantics |
 | refreshSession() for Edge Function calls | Ensures valid JWT token for authenticated requests | ✓ Good — fixes stale token issues |
 
+## Current Milestone: v1.2 Lumio Exercise Images
+
+**Goal:** Mostrare la prima immagine della scheda Lumio direttamente nella card dell'esercizio nel carousel della live tablet app.
+
+**Target features:**
+- Prima immagine Lumio visibile nella ExerciseCard del carousel (se l'esercizio ha una scheda Lumio con immagini)
+
 ---
-*Last updated: 2026-02-02 after v1.1 milestone*
+*Last updated: 2026-02-12 after v1.2 milestone start*
