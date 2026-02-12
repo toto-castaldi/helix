@@ -2413,10 +2413,44 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  // Handle token introspection or other OAuth endpoints that might be called
+  // Handle non-wellknown GET requests (SSE stream or health check)
+  // Claude Web sends GET with accept: text/event-stream for Streamable HTTP transport (MCP 2025-11-25)
   if (req.method === "GET" && !url.pathname.includes("/.well-known/")) {
-    console.log("[GET] Non-wellknown GET request - might be health check")
-    // Could be a health check from Claude
+    const acceptHeader = req.headers.get("accept") || ""
+    const mcpVersion = req.headers.get("mcp-protocol-version") || "none"
+    const hasAuth = !!req.headers.get("authorization") || !!req.headers.get("x-helix-api-key")
+    console.log("[GET] Non-wellknown GET request")
+    console.log("[GET] Accept:", acceptHeader)
+    console.log("[GET] MCP-Protocol-Version:", mcpVersion)
+    console.log("[GET] Has auth headers:", hasAuth)
+
+    // Authenticate first - GET requests also need auth (fixes Claude Web OAuth flow)
+    const auth = await authenticateRequest(req)
+    if (!auth) {
+      console.log("[GET] Authentication failed - returning 401 with OAuth hint")
+      console.log("[GET] This should trigger OAuth discovery on the client")
+      return unauthorizedWithOAuthHint()
+    }
+    console.log("[GET] Authenticated as user:", auth.userId)
+
+    // If client wants SSE (Streamable HTTP transport), we don't support server-to-client streaming
+    if (acceptHeader.includes("text/event-stream")) {
+      console.log("[GET] SSE stream requested by authenticated user - returning 405 (not supported)")
+      return new Response(JSON.stringify({
+        jsonrpc: "2.0",
+        id: null,
+        error: {
+          code: -32000,
+          message: "SSE streaming not supported. Use POST for JSON-RPC requests.",
+        },
+      }), {
+        status: 405,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    // Health check (authenticated)
+    console.log("[GET] Authenticated health check - returning 200")
     return new Response(JSON.stringify({
       status: "ok",
       server: "helix-mcp",
