@@ -33,17 +33,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IMGAP-01 | — | Pending |
-| IMGAP-02 | — | Pending |
-| IMGAP-03 | — | Pending |
-| IMGAP-04 | — | Pending |
-| IMGAP-05 | — | Pending |
+| IMGAP-01 | Phase 11 | Pending |
+| IMGAP-02 | Phase 11 | Pending |
+| IMGAP-03 | Phase 11 | Pending |
+| IMGAP-04 | Phase 11 | Pending |
+| IMGAP-05 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 5 total
-- Mapped to phases: 0
-- Unmapped: 5
+- Mapped to phases: 5
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-12*
-*Last updated: 2026-02-12 after initial definition*
+*Last updated: 2026-02-12 after roadmap creation*
