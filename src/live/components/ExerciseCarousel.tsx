@@ -1,7 +1,17 @@
 import { useRef, useState, useMemo, useEffect } from 'react'
 import { ExerciseCard } from './ExerciseCard'
-import type { SessionWithDetails, SessionExerciseWithDetails } from '@/shared/types'
+import type { SessionWithDetails, SessionExerciseWithDetails, LumioLocalCardWithImages } from '@/shared/types'
 import { cn } from '@/shared/lib/utils'
+import { supabase } from '@/shared/lib/supabase'
+
+// Helper to get first image URL for an exercise (for preloading)
+function getFirstImageUrl(exercise: SessionExerciseWithDetails): string | null {
+  const lumioCard = exercise.exercise?.lumio_card as LumioLocalCardWithImages | null | undefined
+  const images = lumioCard?.images
+  if (!images || images.length === 0) return null
+  const { data } = supabase.storage.from('lumio-images').getPublicUrl(images[0].storage_path)
+  return data.publicUrl
+}
 
 interface ExerciseCarouselProps {
   session: SessionWithDetails
@@ -195,6 +205,17 @@ export function ExerciseCarousel({
             <div className="w-[320px]" /> // Empty space
           )}
         </div>
+      </div>
+
+      {/* Preload images for adjacent exercises */}
+      <div className="hidden" aria-hidden="true">
+        {[-2, -1, 1, 2].map(offset => {
+          const idx = currentIndex + offset
+          if (idx < 0 || idx >= exercises.length) return null
+          const url = getFirstImageUrl(exercises[idx])
+          if (!url) return null
+          return <img key={`preload-${idx}`} src={url} alt="" />
+        })}
       </div>
 
     </div>
