@@ -10,11 +10,10 @@ interface GalleryImage {
 
 interface ImageGalleryProps {
   images: GalleryImage[]
-  maxHeight: string
   className?: string
 }
 
-export function ImageGallery({ images, maxHeight, className }: ImageGalleryProps) {
+export function ImageGallery({ images, className }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({})
   const [errorImages, setErrorImages] = useState<Record<number, boolean>>({})
@@ -81,40 +80,36 @@ export function ImageGallery({ images, maxHeight, className }: ImageGalleryProps
 
   return (
     <div
-      className={cn('relative overflow-hidden rounded-lg', className)}
-      style={{ maxHeight }}
+      className={cn('relative overflow-hidden rounded-lg h-full', className)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       {/* Sliding image track */}
       <div
-        className="flex transition-transform duration-300 ease-out"
+        className="flex h-full transition-transform duration-300 ease-out"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {images.map((image, index) => (
           <div
             key={image.id}
-            className="w-full flex-shrink-0 flex items-center justify-center bg-black"
-            style={{ maxHeight }}
+            className="w-full h-full flex-shrink-0 flex items-center justify-center bg-black rounded-lg"
           >
             {errorImages[index] ? null : (
               <>
                 {/* Skeleton placeholder */}
                 {!loadedImages[index] && (
                   <div
-                    className="w-full bg-gray-700 animate-pulse rounded-lg"
-                    style={{ height: maxHeight }}
+                    className="w-full h-full bg-gray-700 animate-pulse rounded-lg"
                   />
                 )}
                 <img
                   src={getImageUrl(image.storage_path)}
                   alt={image.original_path}
                   className={cn(
-                    'object-contain w-full h-full rounded-lg select-none pointer-events-none',
+                    'object-contain max-w-full max-h-full rounded-lg select-none pointer-events-none',
                     !loadedImages[index] && 'hidden'
                   )}
-                  style={{ maxHeight }}
                   onLoad={() => handleImageLoad(index)}
                   onError={() => handleImageError(index)}
                   draggable={false}

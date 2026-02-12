@@ -190,7 +190,6 @@ export function ExerciseCard({
           {hasImages ? (
             <ImageGallery
               images={cardImages}
-              maxHeight="100%"
             />
           ) : (
             <div className="h-full flex items-center justify-center bg-gray-700/50 rounded-lg">
