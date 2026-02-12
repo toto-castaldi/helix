@@ -68,7 +68,7 @@ export interface ExerciseWithDetails extends Exercise {
   tags?: ExerciseTag[]
   sessionsCount?: number
   plannedSessionsCount?: number
-  lumio_card?: LumioLocalCardWithRepository | null
+  lumio_card?: LumioLocalCardWithImages | null
 }
 
 export interface Gym {
@@ -355,6 +355,10 @@ export interface LumioLocalCard {
 
 export interface LumioLocalCardWithRepository extends LumioLocalCard {
   repository?: LumioRepository
+}
+
+export interface LumioLocalCardWithImages extends LumioLocalCardWithRepository {
+  images?: LumioCardImage[]
 }
 
 export interface LumioCardImage {

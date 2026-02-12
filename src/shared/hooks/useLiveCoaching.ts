@@ -62,7 +62,7 @@ export function useLiveCoaching() {
           *,
           exercise:exercises(
             *,
-            lumio_card:lumio_cards(*, repository:lumio_repositories(*))
+            lumio_card:lumio_cards(*, repository:lumio_repositories(*), images:lumio_card_images(*))
           )
         )
       `)
