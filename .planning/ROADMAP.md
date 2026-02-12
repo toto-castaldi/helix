@@ -4,7 +4,7 @@
 
 - v1.0 Esercizi di Gruppo - Phases 1-4 (shipped 2026-01-28)
 - v1.1 Group Exercise Improvements - Phases 5-9 (shipped 2026-02-02)
-- v1.2 Lumio Exercise Images - Phase 10 (in progress)
+- v1.2 Lumio Exercise Images - Phase 10 (shipped 2026-02-12)
 
 ## Phases
 
@@ -22,11 +22,11 @@ See `.planning/milestones/v1.1-ROADMAP.md` for details.
 
 </details>
 
-### v1.2 Lumio Exercise Images (In Progress)
+### v1.2 Lumio Exercise Images (Complete)
 
 **Milestone Goal:** Show the first Lumio card image directly in the exercise card of the live tablet carousel, giving coaches a visual reference during sessions.
 
-#### Phase 10: Lumio Image in ExerciseCard
+#### Phase 10: Lumio Image in ExerciseCard — Complete 2026-02-12
 
 **Goal**: Coach sees the first Lumio card image in the exercise carousel card on the live tablet
 **Depends on**: Phase 9 (v1.1 complete)
@@ -38,8 +38,8 @@ See `.planning/milestones/v1.1-ROADMAP.md` for details.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Data layer (card images in query, types) + ImageGallery component
-- [ ] 10-02-PLAN.md — ExerciseCard layout redesign with image gallery + preloading + visual verification
+- [x] 10-01-PLAN.md — Data layer (card images in query, types) + ImageGallery component
+- [x] 10-02-PLAN.md — ExerciseCard layout redesign with image gallery + preloading + visual verification
 
 ## Progress
 
@@ -49,7 +49,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-4 | v1.0 | 6/6 | Complete | 2026-01-28 |
 | 5-9 | v1.1 | 10/10 | Complete | 2026-02-02 |
-| 10. Lumio Image in ExerciseCard | v1.2 | 0/2 | In progress | - |
+| 10. Lumio Image in ExerciseCard | v1.2 | 2/2 | Complete | 2026-02-12 |
 
 ---
 *Roadmap created: 2026-02-12*
