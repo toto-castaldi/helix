@@ -95,7 +95,7 @@ export function ImageGallery({ images, maxHeight, className }: ImageGalleryProps
         {images.map((image, index) => (
           <div
             key={image.id}
-            className="w-full flex-shrink-0 flex items-center justify-center"
+            className="w-full flex-shrink-0 flex items-center justify-center bg-black"
             style={{ maxHeight }}
           >
             {errorImages[index] ? null : (
@@ -111,7 +111,7 @@ export function ImageGallery({ images, maxHeight, className }: ImageGalleryProps
                   src={getImageUrl(image.storage_path)}
                   alt={image.original_path}
                   className={cn(
-                    'object-cover w-full h-full rounded-lg select-none pointer-events-none',
+                    'object-contain w-full h-full rounded-lg select-none pointer-events-none',
                     !loadedImages[index] && 'hidden'
                   )}
                   style={{ maxHeight }}
