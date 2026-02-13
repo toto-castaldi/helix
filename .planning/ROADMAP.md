@@ -5,7 +5,7 @@
 - v1.0 Esercizi di Gruppo - Phases 1-4 (shipped 2026-01-28)
 - v1.1 Group Exercise Improvements - Phases 5-9 (shipped 2026-02-02)
 - v1.2 Lumio Exercise Images - Phase 10 (shipped 2026-02-12)
-- v1.3 Image Auto-Play - Phase 11 (in progress)
+- v1.3 Image Auto-Play - Phase 11 (shipped 2026-02-13)
 
 ## Phases
 
@@ -30,11 +30,11 @@ See `.planning/milestones/v1.2-ROADMAP.md` for details.
 
 </details>
 
-### v1.3 Image Auto-Play (In Progress)
+### v1.3 Image Auto-Play (Complete)
 
 **Milestone Goal:** Add automatic slideshow to the existing ImageGallery component so coaches can watch exercise images cycle hands-free during live sessions.
 
-- [ ] **Phase 11: Image Auto-Play Slideshow** - Tap-to-play automatic image cycling with visual feedback and gesture integration
+- [x] **Phase 11: Image Auto-Play Slideshow** - Tap-to-play automatic image cycling with visual feedback and gesture integration
 
 #### Phase 11: Image Auto-Play Slideshow
 
@@ -50,7 +50,7 @@ See `.planning/milestones/v1.2-ROADMAP.md` for details.
 **Plans**: 1 plan
 
 Plans:
-- [ ] 11-01-PLAN.md -- Auto-play slideshow with play/pause overlay, amber glow, and gesture integration
+- [x] 11-01-PLAN.md -- Auto-play slideshow with play/pause overlay, amber glow, and gesture integration
 
 ## Progress
 
@@ -61,8 +61,8 @@ Plans:
 | 1-4 | v1.0 | 6/6 | Complete | 2026-01-28 |
 | 5-9 | v1.1 | 10/10 | Complete | 2026-02-02 |
 | 10 | v1.2 | 2/2 | Complete | 2026-02-12 |
-| 11. Image Auto-Play Slideshow | v1.3 | 0/1 | Not started | - |
+| 11. Image Auto-Play Slideshow | v1.3 | 1/1 | Complete | 2026-02-13 |
 
 ---
 *Roadmap created: 2026-02-12*
-*Last updated: 2026-02-12*
+*Last updated: 2026-02-13*
