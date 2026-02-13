@@ -77,3 +77,28 @@
 
 ---
 
+
+## v1.3 Image Auto-Play (Shipped: 2026-02-13)
+
+**Delivered:** Auto-play slideshow for multi-image Lumio exercises on the live tablet, allowing coaches to watch exercise images cycle hands-free during coaching sessions.
+
+**Phases completed:** Phase 11 (1 plan)
+
+**Key accomplishments:**
+- Auto-play slideshow cycling images every 3 seconds with seamless looping
+- Persistent play/pause icon overlay with amber glow visual feedback
+- Gesture-aware stop: swipe stops playback and navigates, dot tap stops and jumps
+- Single-image and no-image exercises completely unaffected (gated by isMultiImage)
+
+**Stats:**
+- 1 file modified (source) + 7 planning docs
+- +765 / -15 lines (TypeScript)
+- 1 phase, 1 plan
+- 1 day
+
+**Git range:** `3b91b69` -> `85b7dce`
+
+**What's next:** TBD — next milestone goals
+
+---
+

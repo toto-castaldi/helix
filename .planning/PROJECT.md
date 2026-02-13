@@ -33,14 +33,13 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 - ✓ Mobile app senza Live (tablet-only) — v1.1
 - ✓ Export cliente funzionante (JWT refresh fix) — v1.1
 - ✓ Live tablet: immagine esercizio da scheda Lumio nella card del carousel — v1.2
+- ✓ Auto-play slideshow per immagini Lumio multi-image (tap per start/stop, 3 sec, loop) — v1.3
+- ✓ Play/pause overlay con amber glow durante auto-play — v1.3
+- ✓ Swipe manuale ferma auto-play e naviga (gesture-aware) — v1.3
 
 ### Active
 
-**Current Milestone: v1.3 Image Auto-Play**
-
-- [ ] Auto-play slideshow per immagini Lumio multi-image (tap per start/stop, 3 sec intervallo, loop)
-- [ ] Icona play/pause overlay sull'immagine durante auto-play
-- [ ] Swipe manuale ferma auto-play se attivo
+(No active milestone — use `/gsd:new-milestone` to start next)
 
 ### Out of Scope
 
@@ -55,17 +54,17 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ## Context
 
-**Shipped v1.2 Lumio Exercise Images** (2026-02-12):
-- Lumio card images in exercise carousel cards on live tablet
-- ImageGallery component with swipe, letterbox display, portrait/landscape support
-- 7 files modified, +109 / -44 lines
+**Shipped v1.3 Image Auto-Play** (2026-02-13):
+- Auto-play slideshow for multi-image exercises on live tablet
+- Play/pause overlay, amber glow, gesture-aware stop behavior
+- 1 source file modified, +765 / -15 lines
 
 **Current codebase:**
 - ~13,000 LOC TypeScript
 - Two entry points: main app + live tablet PWA
 - MCP server with 23 tools, 19 resources, 5 prompts
 - Realtime enabled on `session_exercises` for cross-tablet sync
-- Components: ImageGallery (swipeable images), ExerciseCard (unified layout with image section)
+- Components: ImageGallery (swipeable images + auto-play), ExerciseCard (unified layout with image section)
 
 ## Constraints
 
@@ -92,6 +91,9 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | Extract images from markdown instead of lumio_card_images table | Table was empty, images embedded in card content | ✓ Good — simpler, no extra table needed |
 | Unified card layout with percentage sections | Consistent look for all exercises, with/without images | ✓ Good — clean visual hierarchy |
 | object-contain + black letterbox for images | Shows full image regardless of aspect ratio | ✓ Good — works for portrait and landscape |
+| Full image area as tap target for auto-play | Best for tablet ergonomics during coaching | ✓ Good — easy to tap during session |
+| Swipe during auto-play stops + navigates | Coach gets both behaviors in one gesture | ✓ Good — intuitive dual behavior |
+| 3-second interval with looping | Comfortable pace for hands-free exercise demonstration | ✓ Good — works well in practice |
 
 ---
-*Last updated: 2026-02-12 after v1.3 milestone started*
+*Last updated: 2026-02-13 after v1.3 milestone completed*
