@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { Play, Pause } from 'lucide-react'
 import { supabase } from '@/shared/lib/supabase'
 import { cn } from '@/shared/lib/utils'
 
@@ -17,12 +18,36 @@ export function ImageGallery({ images, className }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({})
   const [errorImages, setErrorImages] = useState<Record<number, boolean>>({})
+  const [isPlaying, setIsPlaying] = useState(false)
 
   // Touch tracking refs for gesture isolation
   const touchStartX = useRef<number | null>(null)
   const touchCurrentX = useRef<number | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const isMultiImage = images.length > 1
+
+  // Auto-play interval logic
+  useEffect(() => {
+    if (isPlaying && isMultiImage) {
+      intervalRef.current = setInterval(() => {
+        setCurrentIndex(prev => (prev >= images.length - 1) ? 0 : prev + 1)
+      }, 3000)
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+  }, [isPlaying, isMultiImage, images.length])
+
+  // Tap-to-toggle auto-play (only for multi-image)
+  const handleTap = useCallback(() => {
+    if (!isMultiImage) return
+    setIsPlaying(prev => !prev)
+  }, [isMultiImage])
 
   const getImageUrl = useCallback((storagePath: string): string => {
     const { data } = supabase.storage.from('lumio-images').getPublicUrl(storagePath)
@@ -59,6 +84,12 @@ export function ImageGallery({ images, className }: ImageGalleryProps) {
 
     const distance = touchStartX.current - touchCurrentX.current
     const threshold = 30
+    const isValidSwipe = Math.abs(distance) > threshold
+
+    // Stop auto-play on valid swipe
+    if (isValidSwipe && isPlaying) {
+      setIsPlaying(false)
+    }
 
     if (distance > threshold && currentIndex < images.length - 1) {
       // Swipe left -> next image
@@ -70,7 +101,7 @@ export function ImageGallery({ images, className }: ImageGalleryProps) {
 
     touchStartX.current = null
     touchCurrentX.current = null
-  }, [isMultiImage, currentIndex, images.length])
+  }, [isMultiImage, currentIndex, images.length, isPlaying])
 
   if (images.length === 0) return null
 
@@ -80,7 +111,12 @@ export function ImageGallery({ images, className }: ImageGalleryProps) {
 
   return (
     <div
-      className={cn('relative overflow-hidden rounded-lg h-full', className)}
+      className={cn(
+        'relative overflow-hidden rounded-lg h-full',
+        isPlaying && isMultiImage && 'ring-2 ring-amber-400/60',
+        className
+      )}
+      onClick={handleTap}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -120,6 +156,17 @@ export function ImageGallery({ images, className }: ImageGalleryProps) {
         ))}
       </div>
 
+      {/* Play/pause icon overlay (multi-image only) */}
+      {isMultiImage && (
+        <div className="absolute top-2 right-2 z-10 bg-black/50 rounded-full p-1 pointer-events-none">
+          {isPlaying ? (
+            <Pause className="w-5 h-5 text-white" />
+          ) : (
+            <Play className="w-5 h-5 text-white" />
+          )}
+        </div>
+      )}
+
       {/* Dot indicators (multi-image only) */}
       {isMultiImage && (
         <div className="flex items-center justify-center gap-1 mt-1">
@@ -130,7 +177,11 @@ export function ImageGallery({ images, className }: ImageGalleryProps) {
                 'w-1.5 h-1.5 rounded-full transition-colors',
                 index === currentIndex ? 'bg-amber-400' : 'bg-white/40'
               )}
-              onClick={() => setCurrentIndex(index)}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (isPlaying) setIsPlaying(false)
+                setCurrentIndex(index)
+              }}
               aria-label={`Image ${index + 1} of ${images.length}`}
             />
           ))}
