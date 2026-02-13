@@ -47,10 +47,10 @@ See `.planning/milestones/v1.2-ROADMAP.md` for details.
   3. A play/pause icon overlay is visible on the image indicating whether the slideshow is active or paused
   4. Coach swipes manually during active auto-play and the slideshow stops automatically
   5. Exercises with a single Lumio image or no images show no auto-play affordance and behave exactly as before
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 11-01: TBD
+- [ ] 11-01-PLAN.md -- Auto-play slideshow with play/pause overlay, amber glow, and gesture integration
 
 ## Progress
 
@@ -61,7 +61,7 @@ Plans:
 | 1-4 | v1.0 | 6/6 | Complete | 2026-01-28 |
 | 5-9 | v1.1 | 10/10 | Complete | 2026-02-02 |
 | 10 | v1.2 | 2/2 | Complete | 2026-02-12 |
-| 11. Image Auto-Play Slideshow | v1.3 | 0/TBD | Not started | - |
+| 11. Image Auto-Play Slideshow | v1.3 | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-12*
