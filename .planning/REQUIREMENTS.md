@@ -1,0 +1,64 @@
+# Requirements: Helix v1.4
+
+**Defined:** 2026-02-17
+**Core Value:** Helix si presenta con una landing page professionale multilingua e riorganizza i domini per separare presentazione e applicazioni
+
+## v1.4 Requirements
+
+### Landing Page
+
+- [ ] **LAND-01**: Landing page con hero section, tagline e visual identity Helix
+- [ ] **LAND-02**: Sezione features/benefici che spiega il servizio
+- [ ] **LAND-03**: CTA buttons che linkano a Coach app e Live app
+- [ ] **LAND-04**: Toggle manuale IT/EN per multilingua
+- [ ] **LAND-05**: Terzo entry point Vite (landing.html + vite.config.landing.ts)
+
+### Domini & Routing
+
+- [ ] **DOM-01**: Coach app servita su coach.helix.toto-castaldi.com
+- [ ] **DOM-02**: Landing page servita su helix.toto-castaldi.com
+- [ ] **DOM-03**: Live app resta su live.helix.toto-castaldi.com
+
+### Infrastruttura
+
+- [ ] **INFRA-01**: GitHub Actions aggiornate per build e deploy landing + coach su domini separati
+- [ ] **INFRA-02**: Configurazione Nginx per i tre domini (landing, coach, live)
+- [ ] **INFRA-03**: Certificati HTTPS per coach.helix.toto-castaldi.com
+
+## Future Requirements
+
+None.
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Blog o sezione news nella landing | Complessita, non necessario per v1.4 |
+| Form di contatto nella landing | Il coach accede direttamente alle app |
+| SEO avanzato (sitemap, meta tags dinamici) | Puo essere aggiunto dopo |
+| Analytics nella landing | Puo essere aggiunto dopo |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| LAND-01 | — | Pending |
+| LAND-02 | — | Pending |
+| LAND-03 | — | Pending |
+| LAND-04 | — | Pending |
+| LAND-05 | — | Pending |
+| DOM-01 | — | Pending |
+| DOM-02 | — | Pending |
+| DOM-03 | — | Pending |
+| INFRA-01 | — | Pending |
+| INFRA-02 | — | Pending |
+| INFRA-03 | — | Pending |
+
+**Coverage:**
+- v1.4 requirements: 11 total
+- Mapped to phases: 0
+- Unmapped: 11
+
+---
+*Requirements defined: 2026-02-17*
+*Last updated: 2026-02-17 after initial definition*
