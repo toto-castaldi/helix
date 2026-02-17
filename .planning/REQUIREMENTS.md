@@ -42,23 +42,23 @@ None.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LAND-01 | — | Pending |
-| LAND-02 | — | Pending |
-| LAND-03 | — | Pending |
-| LAND-04 | — | Pending |
-| LAND-05 | — | Pending |
-| DOM-01 | — | Pending |
-| DOM-02 | — | Pending |
-| DOM-03 | — | Pending |
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
+| LAND-01 | Phase 13 | Pending |
+| LAND-02 | Phase 13 | Pending |
+| LAND-03 | Phase 13 | Pending |
+| LAND-04 | Phase 13 | Pending |
+| LAND-05 | Phase 12 | Pending |
+| DOM-01 | Phase 14 | Pending |
+| DOM-02 | Phase 14 | Pending |
+| DOM-03 | Phase 14 | Pending |
+| INFRA-01 | Phase 15 | Pending |
+| INFRA-02 | Phase 15 | Pending |
+| INFRA-03 | Phase 15 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-17*
-*Last updated: 2026-02-17 after initial definition*
+*Last updated: 2026-02-17 after roadmap creation (traceability added)*
