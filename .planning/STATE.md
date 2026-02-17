@@ -2,18 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-13)
+See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** Group exercise management for live coaching with reusable templates
-**Current focus:** Planning next milestone
+**Current focus:** v1.4 Landing Page + Domini
 
 ## Current Position
 
-Phase: 11 of 11 (all milestones complete through v1.3)
-Status: Between milestones
-Last activity: 2026-02-13 — v1.3 Image Auto-Play shipped
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-17 — Milestone v1.4 started
 
-Progress: All v1.0-v1.3 milestones shipped
+Progress: Defining requirements
 
 ## Performance Metrics
 
@@ -37,9 +38,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-13
-Stopped at: Completed v1.3 milestone archival
+Last session: 2026-02-17
+Stopped at: Defining v1.4 requirements
 Resume file: None
 
 ---
-*State tracking: between milestones — use /gsd:new-milestone to start next*
+*State tracking: v1.4 milestone — defining requirements*

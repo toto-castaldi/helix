@@ -39,7 +39,11 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ### Active
 
-(No active milestone — use `/gsd:new-milestone` to start next)
+**Milestone v1.4: Landing Page + Domini**
+
+- [ ] Landing page multilingua (IT/EN) su helix.toto-castaldi.com
+- [ ] Coach app spostata su coach.helix.toto-castaldi.com
+- [ ] Infrastruttura aggiornata (GitHub Actions, Nginx, DNS)
 
 ### Out of Scope
 
@@ -54,17 +58,18 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ## Context
 
-**Shipped v1.3 Image Auto-Play** (2026-02-13):
-- Auto-play slideshow for multi-image exercises on live tablet
-- Play/pause overlay, amber glow, gesture-aware stop behavior
-- 1 source file modified, +765 / -15 lines
+**Starting v1.4 Landing Page + Domini** (2026-02-17):
+- Landing page as third Vite entry point with hero, features, CTA
+- Manual IT/EN language toggle
+- Coach app migrates to coach.helix.toto-castaldi.com subdomain
+- Full infra: GitHub Actions, Nginx, DNS
 
 **Current codebase:**
 - ~13,000 LOC TypeScript
-- Two entry points: main app + live tablet PWA
+- Two entry points: main app (index.html) + live tablet PWA (live.html)
 - MCP server with 23 tools, 19 resources, 5 prompts
-- Realtime enabled on `session_exercises` for cross-tablet sync
-- Components: ImageGallery (swipeable images + auto-play), ExerciseCard (unified layout with image section)
+- Vite multi-entry config: vite.config.ts + vite.config.live.ts
+- Deploy: GitHub Actions → Digital Ocean (Nginx + HTTPS)
 
 ## Constraints
 
@@ -96,4 +101,4 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | 3-second interval with looping | Comfortable pace for hands-free exercise demonstration | ✓ Good — works well in practice |
 
 ---
-*Last updated: 2026-02-13 after v1.3 milestone completed*
+*Last updated: 2026-02-17 after v1.4 milestone started*
