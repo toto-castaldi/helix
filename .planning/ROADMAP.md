@@ -58,10 +58,10 @@ See `.planning/milestones/v1.3-ROADMAP.md` for details.
   2. `npm run build:landing` produces a working static build in a separate output directory
   3. `npm run dev:landing` starts a dev server that serves the landing page
   4. Existing `npm run dev` and `npm run dev:live` continue to work unchanged
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 12-01: Third Vite entry point (landing.html, vite.config.landing.ts, dev/build scripts)
+- [ ] 12-01-PLAN.md — Third Vite entry point (landing.html, vite.config.landing.ts, src/landing/, public-landing/, npm scripts)
 
 ### Phase 13: Landing Page Content
 **Goal**: Visitors see a professional bilingual landing page that communicates what Helix is and links to the apps
