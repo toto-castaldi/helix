@@ -21,8 +21,8 @@
 
 ### Infrastruttura
 
-- [ ] **INFRA-01**: GitHub Actions aggiornate per build e deploy landing + coach su domini separati
-- [ ] **INFRA-02**: Configurazione Nginx per i tre domini (landing, coach, live)
+- [x] **INFRA-01**: GitHub Actions aggiornate per build e deploy landing + coach su domini separati
+- [x] **INFRA-02**: Configurazione Nginx per i tre domini (landing, coach, live)
 - [ ] **INFRA-03**: Certificati HTTPS per coach.helix.toto-castaldi.com
 
 ## Future Requirements
@@ -50,8 +50,8 @@ None.
 | DOM-01 | Phase 14 | Pending |
 | DOM-02 | Phase 14 | Pending |
 | DOM-03 | Phase 14 | Pending |
-| INFRA-01 | Phase 15 | Pending |
-| INFRA-02 | Phase 15 | Pending |
+| INFRA-01 | Phase 15 | Complete |
+| INFRA-02 | Phase 15 | Complete |
 | INFRA-03 | Phase 15 | Pending |
 
 **Coverage:**
