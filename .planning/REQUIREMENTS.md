@@ -15,15 +15,15 @@
 
 ### Domini & Routing
 
-- [ ] **DOM-01**: Coach app servita su coach.helix.toto-castaldi.com
-- [ ] **DOM-02**: Landing page servita su helix.toto-castaldi.com
-- [ ] **DOM-03**: Live app resta su live.helix.toto-castaldi.com
+- [x] **DOM-01**: Coach app servita su coach.helix.toto-castaldi.com
+- [x] **DOM-02**: Landing page servita su helix.toto-castaldi.com
+- [x] **DOM-03**: Live app resta su live.helix.toto-castaldi.com
 
 ### Infrastruttura
 
 - [x] **INFRA-01**: GitHub Actions aggiornate per build e deploy landing + coach su domini separati
 - [x] **INFRA-02**: Configurazione Nginx per i tre domini (landing, coach, live)
-- [ ] **INFRA-03**: Certificati HTTPS per coach.helix.toto-castaldi.com
+- [x] **INFRA-03**: Certificati HTTPS per coach.helix.toto-castaldi.com
 
 ## Future Requirements
 
@@ -47,12 +47,12 @@ None.
 | LAND-03 | Phase 13 | Complete |
 | LAND-04 | Phase 13 | Complete |
 | LAND-05 | Phase 12 | Complete |
-| DOM-01 | Phase 14 | Pending |
-| DOM-02 | Phase 14 | Pending |
-| DOM-03 | Phase 14 | Pending |
+| DOM-01 | Phase 14 | Complete |
+| DOM-02 | Phase 14 | Complete |
+| DOM-03 | Phase 14 | Complete |
 | INFRA-01 | Phase 15 | Complete |
 | INFRA-02 | Phase 15 | Complete |
-| INFRA-03 | Phase 15 | Pending |
+| INFRA-03 | Phase 15 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 11 total
@@ -61,4 +61,4 @@ None.
 
 ---
 *Requirements defined: 2026-02-17*
-*Last updated: 2026-02-17 after roadmap creation (traceability added)*
+*Last updated: 2026-02-18 after v1.4 milestone completion (all requirements complete)*

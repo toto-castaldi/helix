@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** Professional landing page with domain separation for Helix apps
-**Current focus:** Phase 15 - Deploy Pipeline (IN PROGRESS)
+**Current focus:** v1.4 Landing Page + Domini (COMPLETE)
 
 ## Current Position
 
 Phase: 15 of 15 (Deploy Pipeline)
-Plan: 2 of 2 in current phase
-Status: Plan 15-01 complete, starting 15-02
-Last activity: 2026-02-18 — Completed 15-01 Deploy Pipeline
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: All plans complete -- v1.4 milestone shipped
+Last activity: 2026-02-18 — Completed 15-02 SSL & Server Setup
 
-Progress: [████████░░] 80% (4/5 plans)
+Progress: [██████████] 100% (5/5 plans)
 
 ## Performance Metrics
 
@@ -24,7 +24,7 @@ Progress: [████████░░] 80% (4/5 plans)
 
 **v1.4 Landing Page + Domini:**
 - Total plans: 5 across 4 phases
-- Completed: 4
+- Completed: 5
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -32,6 +32,7 @@ Progress: [████████░░] 80% (4/5 plans)
 | 13-01 | Landing Page Content | 3m | 2 | 3 |
 | 14-01 | Domain Routing | ~30m | 2 | 3 |
 | 15-01 | Deploy Pipeline | 2m | 1 | 1 |
+| 15-02 | SSL & Server Setup | ~30m | 1 | 0 |
 
 ## Accumulated Context
 
@@ -41,6 +42,7 @@ Progress: [████████░░] 80% (4/5 plans)
 - **13-01:** Italian default fallback language, language toggle as fixed pill (no navbar), inline SVG icons for features, full re-render on language switch
 - **14-01:** Three-domain split (landing at root domain, coach on subdomain, live unchanged); separate document roots (/var/www/helix-landing for landing, /var/www/helix for coach); certbot placeholders in source Nginx configs
 - **15-01:** Build steps grouped before deploy steps; Nginx live config excluded from sync; cert-aware approach disables 443 block when certs missing
+- **15-02:** Certbot with --nginx plugin for automatic SSL integration; deploy user sudo via /etc/sudoers.d/helix-deploy; SSL certs regenerated after initial HTTP-only deploy
 - Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -54,8 +56,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 15-01-PLAN.md (Deploy Pipeline)
+Stopped at: Completed 15-02-PLAN.md (SSL & Server Setup) -- v1.4 milestone complete
 Resume file: None
 
 ---
-*State tracking: v1.4 milestone — Phase 15 in progress, 15-01 complete, 15-02 next*
+*State tracking: v1.4 milestone COMPLETE -- all 5 plans across 4 phases shipped*

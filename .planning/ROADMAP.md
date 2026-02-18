@@ -6,7 +6,7 @@
 - ✅ **v1.1 Group Exercise Improvements** — Phases 5-9 (shipped 2026-02-02)
 - ✅ **v1.2 Lumio Exercise Images** — Phase 10 (shipped 2026-02-12)
 - ✅ **v1.3 Image Auto-Play** — Phase 11 (shipped 2026-02-13)
-- **v1.4 Landing Page + Domini** — Phases 12-15 (in progress)
+- **v1.4 Landing Page + Domini** — Phases 12-15 (shipped 2026-02-18)
 
 ## Phases
 
@@ -38,14 +38,14 @@ See `.planning/milestones/v1.3-ROADMAP.md` for details.
 
 </details>
 
-### v1.4 Landing Page + Domini (In Progress)
+### v1.4 Landing Page + Domini (SHIPPED 2026-02-18)
 
 **Milestone Goal:** Helix presents itself with a professional bilingual landing page at helix.toto-castaldi.com while the coach app moves to its own subdomain, with full infrastructure support.
 
 - [x] **Phase 12: Landing Build Setup** - Third Vite entry point for the landing page (completed 2026-02-18)
 - [x] **Phase 13: Landing Page Content** - Hero, features, CTA, and IT/EN toggle (completed 2026-02-18)
 - [x] **Phase 14: Domain Routing** - Three-domain architecture (landing, coach, live) (completed 2026-02-18)
-- [ ] **Phase 15: Deploy Pipeline** - GitHub Actions, Nginx, and HTTPS for all domains
+- [x] **Phase 15: Deploy Pipeline** - GitHub Actions, Nginx, and HTTPS for all domains (completed 2026-02-18)
 
 ## Phase Details
 
@@ -121,8 +121,8 @@ Phases execute in numeric order: 12 -> 13 -> 14 -> 15
 | 12. Landing Build Setup | v1.4 | 1/1 | Complete | 2026-02-18 |
 | 13. Landing Page Content | v1.4 | Complete    | 2026-02-18 | 2026-02-18 |
 | 14. Domain Routing | 1/1 | Complete    | 2026-02-18 | - |
-| 15. Deploy Pipeline | 1/2 | In Progress|  | - |
+| 15. Deploy Pipeline | 2/2 | Complete   | 2026-02-18 | - |
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-18 after Phase 13 completion*
+*Last updated: 2026-02-18 after v1.4 milestone completion*
