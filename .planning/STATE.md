@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-17)
 
 **Core value:** Professional landing page with domain separation for Helix apps
-**Current focus:** Phase 12 - Landing Build Setup
+**Current focus:** Phase 13 - Landing Page Content
 
 ## Current Position
 
-Phase: 12 of 15 (Landing Build Setup)
+Phase: 13 of 15 (Landing Page Content)
 Plan: 1 of 1 in current phase (COMPLETE)
-Status: Phase 12 complete
-Last activity: 2026-02-18 — Completed 12-01 Landing Build Setup
+Status: Phase 13 complete
+Last activity: 2026-02-18 — Completed 13-01 Landing Page Content
 
-Progress: [██░░░░░░░░] 20% (1/5 plans)
+Progress: [████░░░░░░] 40% (2/5 plans)
 
 ## Performance Metrics
 
@@ -24,17 +24,19 @@ Progress: [██░░░░░░░░] 20% (1/5 plans)
 
 **v1.4 Landing Page + Domini:**
 - Total plans: 5 across 4 phases
-- Completed: 1
+- Completed: 2
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 12-01 | Landing Build Setup | 2m 33s | 2 | 7 |
+| 13-01 | Landing Page Content | 3m | 2 | 3 |
 
 ## Accumulated Context
 
 ### Decisions
 
 - **12-01:** Landing page uses vanilla JS (no React), no PWA, port 5175, div#app instead of div#root
+- **13-01:** Italian default fallback language, language toggle as fixed pill (no navbar), inline SVG icons for features, full re-render on language switch
 - Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -48,8 +50,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 12-01-PLAN.md (Landing Build Setup)
+Stopped at: Completed 13-01-PLAN.md (Landing Page Content)
 Resume file: None
 
 ---
-*State tracking: v1.4 milestone — Phase 12 complete, ready for Phase 13*
+*State tracking: v1.4 milestone — Phase 13 complete, ready for Phase 14*

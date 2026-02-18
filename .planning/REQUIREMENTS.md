@@ -7,10 +7,10 @@
 
 ### Landing Page
 
-- [ ] **LAND-01**: Landing page con hero section, tagline e visual identity Helix
-- [ ] **LAND-02**: Sezione features/benefici che spiega il servizio
-- [ ] **LAND-03**: CTA buttons che linkano a Coach app e Live app
-- [ ] **LAND-04**: Toggle manuale IT/EN per multilingua
+- [x] **LAND-01**: Landing page con hero section, tagline e visual identity Helix
+- [x] **LAND-02**: Sezione features/benefici che spiega il servizio
+- [x] **LAND-03**: CTA buttons che linkano a Coach app e Live app
+- [x] **LAND-04**: Toggle manuale IT/EN per multilingua
 - [x] **LAND-05**: Terzo entry point Vite (landing.html + vite.config.landing.ts)
 
 ### Domini & Routing
@@ -42,10 +42,10 @@ None.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LAND-01 | Phase 13 | Pending |
-| LAND-02 | Phase 13 | Pending |
-| LAND-03 | Phase 13 | Pending |
-| LAND-04 | Phase 13 | Pending |
+| LAND-01 | Phase 13 | Complete |
+| LAND-02 | Phase 13 | Complete |
+| LAND-03 | Phase 13 | Complete |
+| LAND-04 | Phase 13 | Complete |
 | LAND-05 | Phase 12 | Complete |
 | DOM-01 | Phase 14 | Pending |
 | DOM-02 | Phase 14 | Pending |
