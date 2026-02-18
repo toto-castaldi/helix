@@ -101,11 +101,11 @@ Plans:
   2. Nginx serves all three domains with correct document roots and SPA fallback
   3. coach.helix.toto-castaldi.com has a valid HTTPS certificate (via Let's Encrypt / certbot)
   4. A push to main deploys all three apps without manual intervention
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 15-01: GitHub Actions update for three-app build and deploy
-- [ ] 15-02: Nginx and HTTPS configuration for all domains
+- [ ] 15-01-PLAN.md — Update deploy.yml for three-app build, deploy, and Nginx config sync
+- [ ] 15-02-PLAN.md — Add DEPLOY_PATH_LANDING secret and verify full pipeline end-to-end
 
 ## Progress
 
