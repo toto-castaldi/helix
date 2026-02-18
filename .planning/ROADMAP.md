@@ -73,10 +73,10 @@ Plans:
   3. CTA buttons link to Coach app (coach.helix.toto-castaldi.com) and Live app (live.helix.toto-castaldi.com)
   4. User can toggle between Italian and English, and all visible text changes accordingly
   5. Page is mobile-friendly and looks professional on both phone and desktop
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 13-01: Landing page layout, hero, features, CTA, and IT/EN language toggle
+- [ ] 13-01-PLAN.md — Complete bilingual landing page: hero, features, CTA, and IT/EN language toggle
 
 ### Phase 14: Domain Routing
 **Goal**: Each Helix application is served on its correct domain with proper separation
