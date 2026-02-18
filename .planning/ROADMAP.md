@@ -87,10 +87,10 @@ Plans:
   2. coach.helix.toto-castaldi.com serves the coach app (previously at helix.toto-castaldi.com)
   3. live.helix.toto-castaldi.com continues to serve the live tablet app unchanged
   4. Supabase auth redirect URLs work correctly for the new coach subdomain
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 14-01: Nginx configuration for three-domain routing and DNS setup
+- [ ] 14-01-PLAN.md — Nginx configs for three-domain routing, DNS setup, HTTPS, and auth migration runbook
 
 ### Phase 15: Deploy Pipeline
 **Goal**: All three apps build, deploy, and serve over HTTPS automatically on every push to main
