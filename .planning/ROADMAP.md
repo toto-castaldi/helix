@@ -118,7 +118,7 @@ Phases execute in numeric order: 12 -> 13 -> 14 -> 15
 | 5-9 | v1.1 | 10/10 | Complete | 2026-02-02 |
 | 10 | v1.2 | 2/2 | Complete | 2026-02-12 |
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
-| 12. Landing Build Setup | 1/1 | Complete   | 2026-02-18 | - |
+| 12. Landing Build Setup | 1/1 | Complete    | 2026-02-18 | - |
 | 13. Landing Page Content | v1.4 | 0/1 | Not started | - |
 | 14. Domain Routing | v1.4 | 0/1 | Not started | - |
 | 15. Deploy Pipeline | v1.4 | 0/2 | Not started | - |
