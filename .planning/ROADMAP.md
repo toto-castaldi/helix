@@ -42,7 +42,7 @@ See `.planning/milestones/v1.3-ROADMAP.md` for details.
 
 **Milestone Goal:** Helix presents itself with a professional bilingual landing page at helix.toto-castaldi.com while the coach app moves to its own subdomain, with full infrastructure support.
 
-- [ ] **Phase 12: Landing Build Setup** - Third Vite entry point for the landing page
+- [x] **Phase 12: Landing Build Setup** - Third Vite entry point for the landing page (completed 2026-02-18)
 - [ ] **Phase 13: Landing Page Content** - Hero, features, CTA, and IT/EN toggle
 - [ ] **Phase 14: Domain Routing** - Three-domain architecture (landing, coach, live)
 - [ ] **Phase 15: Deploy Pipeline** - GitHub Actions, Nginx, and HTTPS for all domains
@@ -118,7 +118,7 @@ Phases execute in numeric order: 12 -> 13 -> 14 -> 15
 | 5-9 | v1.1 | 10/10 | Complete | 2026-02-02 |
 | 10 | v1.2 | 2/2 | Complete | 2026-02-12 |
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
-| 12. Landing Build Setup | v1.4 | 0/1 | Not started | - |
+| 12. Landing Build Setup | 1/1 | Complete   | 2026-02-18 | - |
 | 13. Landing Page Content | v1.4 | 0/1 | Not started | - |
 | 14. Domain Routing | v1.4 | 0/1 | Not started | - |
 | 15. Deploy Pipeline | v1.4 | 0/2 | Not started | - |

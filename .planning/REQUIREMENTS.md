@@ -11,7 +11,7 @@
 - [ ] **LAND-02**: Sezione features/benefici che spiega il servizio
 - [ ] **LAND-03**: CTA buttons che linkano a Coach app e Live app
 - [ ] **LAND-04**: Toggle manuale IT/EN per multilingua
-- [ ] **LAND-05**: Terzo entry point Vite (landing.html + vite.config.landing.ts)
+- [x] **LAND-05**: Terzo entry point Vite (landing.html + vite.config.landing.ts)
 
 ### Domini & Routing
 
@@ -46,7 +46,7 @@ None.
 | LAND-02 | Phase 13 | Pending |
 | LAND-03 | Phase 13 | Pending |
 | LAND-04 | Phase 13 | Pending |
-| LAND-05 | Phase 12 | Pending |
+| LAND-05 | Phase 12 | Complete |
 | DOM-01 | Phase 14 | Pending |
 | DOM-02 | Phase 14 | Pending |
 | DOM-03 | Phase 14 | Pending |

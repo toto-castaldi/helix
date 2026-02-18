@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-17)
 ## Current Position
 
 Phase: 12 of 15 (Landing Build Setup)
-Plan: 0 of 1 in current phase
-Status: Ready to plan
-Last activity: 2026-02-17 — Roadmap created for v1.4
+Plan: 1 of 1 in current phase (COMPLETE)
+Status: Phase 12 complete
+Last activity: 2026-02-18 — Completed 12-01 Landing Build Setup
 
-Progress: [░░░░░░░░░░] 0% (0/5 plans)
+Progress: [██░░░░░░░░] 20% (1/5 plans)
 
 ## Performance Metrics
 
@@ -24,13 +24,18 @@ Progress: [░░░░░░░░░░] 0% (0/5 plans)
 
 **v1.4 Landing Page + Domini:**
 - Total plans: 5 across 4 phases
-- Completed: 0
+- Completed: 1
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 12-01 | Landing Build Setup | 2m 33s | 2 | 7 |
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
+- **12-01:** Landing page uses vanilla JS (no React), no PWA, port 5175, div#app instead of div#root
+- Decisions are also logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -42,9 +47,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-17
-Stopped at: Roadmap created for v1.4, ready to plan Phase 12
+Last session: 2026-02-18
+Stopped at: Completed 12-01-PLAN.md (Landing Build Setup)
 Resume file: None
 
 ---
-*State tracking: v1.4 milestone — ready to plan Phase 12*
+*State tracking: v1.4 milestone — Phase 12 complete, ready for Phase 13*
