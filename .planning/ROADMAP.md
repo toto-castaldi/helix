@@ -120,7 +120,7 @@ Phases execute in numeric order: 12 -> 13 -> 14 -> 15
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12. Landing Build Setup | v1.4 | 1/1 | Complete | 2026-02-18 |
 | 13. Landing Page Content | v1.4 | Complete    | 2026-02-18 | 2026-02-18 |
-| 14. Domain Routing | 1/1 | Complete   | 2026-02-18 | - |
+| 14. Domain Routing | 1/1 | Complete    | 2026-02-18 | - |
 | 15. Deploy Pipeline | v1.4 | 0/2 | Not started | - |
 
 ---
