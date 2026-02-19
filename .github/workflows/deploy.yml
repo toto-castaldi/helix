@@ -125,28 +125,23 @@ jobs:
             sudo ln -sf /etc/nginx/sites-available/nginx-helix-landing.conf /etc/nginx/sites-enabled/
             sudo ln -sf /etc/nginx/sites-available/nginx-helix-coach.conf /etc/nginx/sites-enabled/
 
-            # If SSL certs do NOT exist yet, comment out the 443 server blocks
-            # so nginx -t passes with HTTP-only config. Certbot will add SSL later.
+            # Configs ship with SSL enabled. If certs don't exist yet (first deploy),
+            # disable the 443 block so nginx -t passes. Certbot will add SSL later.
             for CONF in nginx-helix-landing.conf nginx-helix-coach.conf; do
               CONF_PATH="/etc/nginx/sites-available/$CONF"
-              # Extract domain from server_name in the file
               DOMAIN=$(grep -m1 'server_name' "$CONF_PATH" | awk '{print $2}' | tr -d ';')
               CERT_PATH="/etc/letsencrypt/live/$DOMAIN/fullchain.pem"
               if [ ! -f "$CERT_PATH" ]; then
-                echo "SSL cert not found for $DOMAIN — disabling 443 block and HTTP->HTTPS redirect"
-                # Comment out the 301 redirect so port 80 serves content directly
-                sudo sed -i 's|^\(\s*return 301 https://\)|#\1|' "$CONF_PATH"
-                # Disable the entire 443 server block by commenting it out
-                sudo sed -i '/^server {$/,/^}$/{
-                  /listen 443/,/^}$/ s/^/#NOSSL#/
-                }' "$CONF_PATH"
+                echo "SSL cert not found for $DOMAIN — disabling SSL for first-time setup"
+                # Comment out SSL directives
+                sudo sed -i 's|^\(\s*ssl_certificate\)|    # \1|' "$CONF_PATH"
+                sudo sed -i 's|^\(\s*ssl_certificate_key\)|    # \1|' "$CONF_PATH"
+                sudo sed -i 's|^\(\s*include /etc/letsencrypt\)|    # \1|' "$CONF_PATH"
+                sudo sed -i 's|^\(\s*ssl_dhparam\)|    # \1|' "$CONF_PATH"
+                # Comment out HTTPS redirect so port 80 serves content
+                sudo sed -i 's|^\(\s*return 301 https://\)|    # \1|' "$CONF_PATH"
               else
-                echo "SSL cert found for $DOMAIN — enabling SSL lines"
-                # Uncomment the certbot SSL lines if they are commented
-                sudo sed -i 's|^# \(ssl_certificate\)|    \1|' "$CONF_PATH"
-                sudo sed -i 's|^# \(ssl_certificate_key\)|    \1|' "$CONF_PATH"
-                sudo sed -i 's|^# \(include /etc/letsencrypt\)|    \1|' "$CONF_PATH"
-                sudo sed -i 's|^# \(ssl_dhparam\)|    \1|' "$CONF_PATH"
+                echo "SSL cert found for $DOMAIN — config ready"
               fi
             done
 
