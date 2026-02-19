@@ -148,15 +148,6 @@ function render(lang: Lang): void {
         `).join('')}
       </div>
     </section>
-
-    <!-- Bottom CTA Section -->
-    <section class="bottom-cta">
-      <p class="bottom-cta-text">${t.ctaMotivation}</p>
-      <div class="cta-group">
-        <a href="https://coach.helix.toto-castaldi.com" class="btn btn-primary">${t.ctaCoach}</a>
-        <a href="https://live.helix.toto-castaldi.com" class="btn btn-secondary">${t.ctaLive}</a>
-      </div>
-    </section>
   `
 
   // Bind language toggle clicks

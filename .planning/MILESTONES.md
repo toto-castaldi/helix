@@ -102,3 +102,29 @@
 
 ---
 
+
+## v1.4 Landing Page + Domini (Shipped: 2026-02-18)
+
+**Delivered:** Professional bilingual landing page at helix.toto-castaldi.com with three-domain architecture separating landing, coach app, and live tablet — all with automated CI/CD and HTTPS.
+
+**Phases completed:** 12-15 (5 plans total)
+
+**Key accomplishments:**
+- Third Vite entry point (landing.html) with vanilla JS + Tailwind CSS, independent build pipeline
+- Complete bilingual (IT/EN) landing page with hero, features grid, CTA, and language toggle with browser auto-detection
+- Three-domain Nginx architecture: landing at root domain, coach on subdomain, live unchanged
+- Extended CI/CD pipeline from 2-app to 3-app automated deployment with cert-aware Nginx sync
+- Let's Encrypt SSL certificates for all domains via certbot with auto-renewal
+
+**Stats:**
+- 29 files modified
+- +2,855 / -96 lines
+- 4 phases, 5 plans
+- 1 day (2026-02-18)
+
+**Git range:** `feat(12-01)` -> `docs(15-02)`
+
+**What's next:** TBD — next milestone goals
+
+---
+

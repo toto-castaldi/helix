@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, e un server MCP per pianificazione AI via Claude.
+Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, un server MCP per pianificazione AI via Claude, e una landing page multilingua che presenta il prodotto su tre domini separati.
 
 ## Core Value
 
@@ -36,14 +36,13 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 - ✓ Auto-play slideshow per immagini Lumio multi-image (tap per start/stop, 3 sec, loop) — v1.3
 - ✓ Play/pause overlay con amber glow durante auto-play — v1.3
 - ✓ Swipe manuale ferma auto-play e naviga (gesture-aware) — v1.3
+- ✓ Landing page multilingua (IT/EN) con hero, features, CTA — v1.4
+- ✓ Coach app su coach.helix.toto-castaldi.com (three-domain split) — v1.4
+- ✓ Infrastruttura tre domini con CI/CD e HTTPS automatico — v1.4
 
 ### Active
 
-**Milestone v1.4: Landing Page + Domini**
-
-- [ ] Landing page multilingua (IT/EN) su helix.toto-castaldi.com
-- [ ] Coach app spostata su coach.helix.toto-castaldi.com
-- [ ] Infrastruttura aggiornata (GitHub Actions, Nginx, DNS)
+(No active milestone — use `/gsd:new-milestone` to start next)
 
 ### Out of Scope
 
@@ -58,18 +57,18 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ## Context
 
-**Starting v1.4 Landing Page + Domini** (2026-02-17):
-- Landing page as third Vite entry point with hero, features, CTA
-- Manual IT/EN language toggle
-- Coach app migrates to coach.helix.toto-castaldi.com subdomain
-- Full infra: GitHub Actions, Nginx, DNS
+**Shipped v1.4 Landing Page + Domini** (2026-02-18):
+- Professional bilingual landing page at helix.toto-castaldi.com
+- Coach app migrated to coach.helix.toto-castaldi.com
+- Three-domain Nginx architecture with automated CI/CD and HTTPS
 
 **Current codebase:**
-- ~13,000 LOC TypeScript
-- Two entry points: main app (index.html) + live tablet PWA (live.html)
+- ~13,500 LOC TypeScript
+- Three entry points: coach app (index.html) + live tablet PWA (live.html) + landing page (landing.html)
 - MCP server with 23 tools, 19 resources, 5 prompts
-- Vite multi-entry config: vite.config.ts + vite.config.live.ts
-- Deploy: GitHub Actions → Digital Ocean (Nginx + HTTPS)
+- Vite multi-entry config: vite.config.ts + vite.config.live.ts + vite.config.landing.ts
+- Deploy: GitHub Actions → Digital Ocean (3 domains, Nginx + HTTPS, cert-aware sync)
+- Domains: helix.toto-castaldi.com (landing), coach.helix.toto-castaldi.com (app), live.helix.toto-castaldi.com (tablet)
 
 ## Constraints
 
@@ -99,6 +98,10 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | Full image area as tap target for auto-play | Best for tablet ergonomics during coaching | ✓ Good — easy to tap during session |
 | Swipe during auto-play stops + navigates | Coach gets both behaviors in one gesture | ✓ Good — intuitive dual behavior |
 | 3-second interval with looping | Comfortable pace for hands-free exercise demonstration | ✓ Good — works well in practice |
+| Vanilla JS for landing page (no React) | Simpler, faster, no framework overhead for static page | ✓ Good — minimal bundle, fast load |
+| Three-domain split (landing/coach/live) | Clean separation of concerns per application | ✓ Good — independent deployments |
+| Cert-aware Nginx sync in CI/CD | Handles pre/post-certbot states without manual intervention | ✓ Good — zero-touch SSL transitions |
+| IT/EN toggle with browser auto-detection | Detects navigator.language, Italian fallback default | ✓ Good — smooth multilingual UX |
 
 ---
-*Last updated: 2026-02-17 after v1.4 milestone started*
+*Last updated: 2026-02-18 after v1.4 milestone*
