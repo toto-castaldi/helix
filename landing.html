@@ -9,6 +9,16 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      // Unregister any Service Worker left from when this domain served the app
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          registrations.forEach(function(registration) {
+            registration.unregister();
+          });
+        });
+      }
+    </script>
     <script type="module" src="/src/landing/main.ts"></script>
   </body>
 </html>
