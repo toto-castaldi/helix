@@ -54,7 +54,7 @@ See `.planning/milestones/v1.4-ROADMAP.md` for details.
 - [x] **Phase 16: CI/CD Pipeline Cleanup** - Remove date-time versioning and extract milestone version from MILESTONES.md (completed 2026-02-21)
 
 #### Phase 17: Version Display
-- [ ] **Phase 17: Version Display** - Show milestone version on coach, live, and landing apps with GitHub link
+- [x] **Phase 17: Version Display** - Show milestone version on coach, live, and landing apps with GitHub link (completed 2026-02-21)
 
 ## Phase Details
 
@@ -99,7 +99,7 @@ Phases execute in numeric order: 16 -> 17
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
 | 16 | v1.5 | Complete    | 2026-02-21 | 2026-02-21 |
-| 17 | v1.5 | 0/1 | Not started | - |
+| 17 | 1/1 | Complete   | 2026-02-21 | - |
 
 ---
 *Roadmap created: 2026-01-28*

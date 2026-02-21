@@ -16,10 +16,10 @@ Requirements for milestone v1.5 Versioning GSD.
 
 ### Version Display
 
-- [ ] **VDSP-01**: Coach app mostra versione milestone (es. `v1.5`) nel menu utente
-- [ ] **VDSP-02**: Live tablet mostra versione milestone nell'header/toolbar
-- [ ] **VDSP-03**: Landing page mostra versione milestone
-- [ ] **VDSP-04**: Landing page include link al repository GitHub (`github.com/toto-castaldi/helix`)
+- [x] **VDSP-01**: Coach app mostra versione milestone (es. `v1.5`) nel menu utente
+- [x] **VDSP-02**: Live tablet mostra versione milestone nell'header/toolbar
+- [x] **VDSP-03**: Landing page mostra versione milestone
+- [x] **VDSP-04**: Landing page include link al repository GitHub (`github.com/toto-castaldi/helix`)
 
 ## Future Requirements
 
@@ -41,10 +41,10 @@ None for this milestone.
 | CICD-02 | Phase 16 | Complete |
 | CICD-03 | Phase 16 | Complete |
 | CICD-04 | Phase 16 | Complete |
-| VDSP-01 | Phase 17 | Pending |
-| VDSP-02 | Phase 17 | Pending |
-| VDSP-03 | Phase 17 | Pending |
-| VDSP-04 | Phase 17 | Pending |
+| VDSP-01 | Phase 17 | Complete |
+| VDSP-02 | Phase 17 | Complete |
+| VDSP-03 | Phase 17 | Complete |
+| VDSP-04 | Phase 17 | Complete |
 
 **Coverage:**
 - v1.5 requirements: 8 total
