@@ -99,7 +99,7 @@ Phases execute in numeric order: 16 -> 17
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
 | 16 | v1.5 | Complete    | 2026-02-21 | 2026-02-21 |
-| 17 | 1/1 | Complete   | 2026-02-21 | - |
+| 17 | 1/1 | Complete    | 2026-02-21 | - |
 
 ---
 *Roadmap created: 2026-01-28*
