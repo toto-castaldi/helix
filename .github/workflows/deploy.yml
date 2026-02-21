@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-permissions:
-  contents: write
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -15,31 +12,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate version
+      - name: Extract milestone version
         id: version
         run: |
-          VERSION=$(date -u +'%Y.%m.%d.%H%M')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Generated version: $VERSION"
-
-      - name: Update README with version
-        run: |
-          sed -i 's/\*\*Versione:\*\* .*/\*\*Versione:\*\* ${{ steps.version.outputs.version }}/' README.md
-          if ! grep -q "Versione:" README.md; then
-            echo "" >> README.md
-            echo "**Versione:** ${{ steps.version.outputs.version }}" >> README.md
+          VERSION=$(grep -oP 'Current Milestone: \Kv\d+\.\d+' .planning/PROJECT.md 2>/dev/null || true)
+          if [ -z "$VERSION" ]; then
+            VERSION=$(grep -oP '## \Kv\d+\.\d+' .planning/MILESTONES.md 2>/dev/null | sort -rV | head -1 || true)
           fi
-
-      - name: Commit version update
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add README.md
-          git diff --staged --quiet || git commit -m "chore: update version to ${{ steps.version.outputs.version }} [skip ci]"
-          git push || true
+          if [ -z "$VERSION" ]; then
+            VERSION="dev"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Milestone version: $VERSION"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
