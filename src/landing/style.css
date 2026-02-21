@@ -331,3 +331,41 @@ body {
     font-size: 1.75rem;
   }
 }
+
+/* --- Site Footer --- */
+
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1.5rem 2.5rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.footer-version {
+  font-weight: 500;
+}
+
+.footer-separator {
+  color: #d1d5db;
+}
+
+.footer-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #9ca3af;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-github:hover {
+  color: #6b7280;
+}
+
+.footer-github-icon {
+  width: 16px;
+  height: 16px;
+}
