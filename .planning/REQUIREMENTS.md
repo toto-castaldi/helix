@@ -9,10 +9,10 @@ Requirements for milestone v1.5 Versioning GSD.
 
 ### CI/CD
 
-- [ ] **CICD-01**: Il build estrae automaticamente la versione dall'ultima milestone in `.planning/MILESTONES.md`
-- [ ] **CICD-02**: Rimossa la generazione versione date-time (`YYYY.MM.DD.HHMM`)
-- [ ] **CICD-03**: Rimosso lo step di update README con versione
-- [ ] **CICD-04**: Rimosso il commit automatico `chore: update version to...`
+- [x] **CICD-01**: Il build estrae automaticamente la versione dall'ultima milestone in `.planning/MILESTONES.md`
+- [x] **CICD-02**: Rimossa la generazione versione date-time (`YYYY.MM.DD.HHMM`)
+- [x] **CICD-03**: Rimosso lo step di update README con versione
+- [x] **CICD-04**: Rimosso il commit automatico `chore: update version to...`
 
 ### Version Display
 
@@ -37,10 +37,10 @@ None for this milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CICD-01 | Phase 16 | Pending |
-| CICD-02 | Phase 16 | Pending |
-| CICD-03 | Phase 16 | Pending |
-| CICD-04 | Phase 16 | Pending |
+| CICD-01 | Phase 16 | Complete |
+| CICD-02 | Phase 16 | Complete |
+| CICD-03 | Phase 16 | Complete |
+| CICD-04 | Phase 16 | Complete |
 | VDSP-01 | Phase 17 | Pending |
 | VDSP-02 | Phase 17 | Pending |
 | VDSP-03 | Phase 17 | Pending |

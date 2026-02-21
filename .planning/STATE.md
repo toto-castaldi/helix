@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 16 of 17 (CI/CD Pipeline Cleanup)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-02-21 — Roadmap created for v1.5
+Plan: 1 of 1 in current phase
+Status: Plan 16-01 complete
+Last activity: 2026-02-21 — Completed 16-01 CI/CD pipeline cleanup
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -27,6 +27,7 @@ Progress: [░░░░░░░░░░] 0%
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
+- [Phase 16]: Version source: PROJECT.md (active milestone) with MILESTONES.md fallback and dev default
 
 ### Pending Todos
 
@@ -39,7 +40,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Roadmap created for v1.5, ready to plan Phase 16
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None
 
 ---

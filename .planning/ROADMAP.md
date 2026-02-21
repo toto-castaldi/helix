@@ -51,7 +51,7 @@ See `.planning/milestones/v1.4-ROADMAP.md` for details.
 **Milestone Goal:** Replace automatic date-time versioning with GSD milestone version, visible across all three apps.
 
 #### Phase 16: CI/CD Pipeline Cleanup
-- [ ] **Phase 16: CI/CD Pipeline Cleanup** - Remove date-time versioning and extract milestone version from MILESTONES.md
+- [x] **Phase 16: CI/CD Pipeline Cleanup** - Remove date-time versioning and extract milestone version from MILESTONES.md (completed 2026-02-21)
 
 #### Phase 17: Version Display
 - [ ] **Phase 17: Version Display** - Show milestone version on coach, live, and landing apps with GitHub link
@@ -70,7 +70,7 @@ See `.planning/milestones/v1.4-ROADMAP.md` for details.
 **Plans**: 1 plan
 
 Plans:
-- [ ] 16-01-PLAN.md — Replace date-time versioning with milestone extraction and clean up README
+- [x] 16-01-PLAN.md — Replace date-time versioning with milestone extraction and clean up README
 
 ### Phase 17: Version Display
 **Goal**: Users can see the current Helix version on every app surface and access the source repository
@@ -98,7 +98,7 @@ Phases execute in numeric order: 16 -> 17
 | 10 | v1.2 | 2/2 | Complete | 2026-02-12 |
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
-| 16 | v1.5 | 0/1 | Not started | - |
+| 16 | v1.5 | 1/1 | Complete | 2026-02-21 |
 | 17 | v1.5 | 0/? | Not started | - |
 
 ---
