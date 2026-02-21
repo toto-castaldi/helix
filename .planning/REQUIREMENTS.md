@@ -53,25 +53,25 @@ None — scope is fix and polish only.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Pending | Pending |
-| SEC-02 | Pending | Pending |
-| PROTO-01 | Pending | Pending |
-| PROTO-02 | Pending | Pending |
-| PROTO-03 | Pending | Pending |
-| TOOL-01 | Pending | Pending |
-| TOOL-02 | Pending | Pending |
-| TOOL-03 | Pending | Pending |
-| TOOL-04 | Pending | Pending |
-| POL-01 | Pending | Pending |
-| POL-02 | Pending | Pending |
-| TEST-01 | Pending | Pending |
-| TEST-02 | Pending | Pending |
+| SEC-01 | Phase 18 | Pending |
+| SEC-02 | Phase 18 | Pending |
+| PROTO-01 | Phase 19 | Pending |
+| PROTO-02 | Phase 19 | Pending |
+| PROTO-03 | Phase 19 | Pending |
+| TOOL-01 | Phase 20 | Pending |
+| TOOL-02 | Phase 20 | Pending |
+| TOOL-03 | Phase 20 | Pending |
+| TOOL-04 | Phase 20 | Pending |
+| POL-01 | Phase 21 | Pending |
+| POL-02 | Phase 21 | Pending |
+| TEST-01 | Phase 22 | Pending |
+| TEST-02 | Phase 22 | Pending |
 
 **Coverage:**
 - v1.6 requirements: 13 total
-- Mapped to phases: 0
-- Unmapped: 13 (pending roadmap creation)
+- Mapped to phases: 13
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-21 after initial definition*
+*Last updated: 2026-02-21 after roadmap creation (traceability added)*
