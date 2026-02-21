@@ -7,6 +7,7 @@
 - ✅ **v1.2 Lumio Exercise Images** — Phase 10 (shipped 2026-02-12)
 - ✅ **v1.3 Image Auto-Play** — Phase 11 (shipped 2026-02-13)
 - ✅ **v1.4 Landing Page + Domini** — Phases 12-15 (shipped 2026-02-18)
+- 🚧 **v1.5 Versioning GSD** — Phases 16-17 (in progress)
 
 ## Phases
 
@@ -45,7 +46,50 @@ See `.planning/milestones/v1.4-ROADMAP.md` for details.
 
 </details>
 
+### 🚧 v1.5 Versioning GSD (In Progress)
+
+**Milestone Goal:** Replace automatic date-time versioning with GSD milestone version, visible across all three apps.
+
+#### Phase 16: CI/CD Pipeline Cleanup
+- [ ] **Phase 16: CI/CD Pipeline Cleanup** - Remove date-time versioning and extract milestone version from MILESTONES.md
+
+#### Phase 17: Version Display
+- [ ] **Phase 17: Version Display** - Show milestone version on coach, live, and landing apps with GitHub link
+
+## Phase Details
+
+### Phase 16: CI/CD Pipeline Cleanup
+**Goal**: Build pipeline extracts version from GSD milestones instead of generating date-time stamps
+**Depends on**: Nothing (first phase of v1.5)
+**Requirements**: CICD-01, CICD-02, CICD-03, CICD-04
+**Success Criteria** (what must be TRUE):
+  1. Running `npm run build` produces a build that knows the current milestone version (e.g., `v1.5`) without any date-time stamp
+  2. The deploy workflow no longer generates a `YYYY.MM.DD.HHMM` version string
+  3. The deploy workflow no longer commits `chore: update version to...` after each deploy
+  4. The deploy workflow no longer updates README with a version badge/string
+**Plans**: TBD
+
+Plans:
+- [ ] 16-01: TBD
+
+### Phase 17: Version Display
+**Goal**: Users can see the current Helix version on every app surface and access the source repository
+**Depends on**: Phase 16
+**Requirements**: VDSP-01, VDSP-02, VDSP-03, VDSP-04
+**Success Criteria** (what must be TRUE):
+  1. Coach app displays the milestone version (e.g., `v1.5`) in the user menu
+  2. Live tablet app displays the milestone version in the header or toolbar area
+  3. Landing page displays the milestone version
+  4. Landing page contains a clickable link to the GitHub repository (`github.com/toto-castaldi/helix`)
+**Plans**: TBD
+
+Plans:
+- [ ] 17-01: TBD
+
 ## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 16 -> 17
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -54,7 +98,9 @@ See `.planning/milestones/v1.4-ROADMAP.md` for details.
 | 10 | v1.2 | 2/2 | Complete | 2026-02-12 |
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
+| 16 | v1.5 | 0/? | Not started | - |
+| 17 | v1.5 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-18 after v1.4 milestone completion*
+*Last updated: 2026-02-21 after v1.5 milestone roadmap created*
