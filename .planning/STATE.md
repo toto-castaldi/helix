@@ -5,16 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** During group lessons, the coach can manage shared exercises from a single view, completing them once for all participants
-**Current focus:** Planning next milestone
+**Current focus:** v1.6 MCP Assessment & Fix
 
 ## Current Position
 
-Phase: 17 of 17 (all complete)
-Plan: All plans complete
-Status: v1.5 milestone shipped
-Last activity: 2026-02-21 — Milestone v1.5 Versioning GSD archived
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-21 — Milestone v1.6 started
 
 ## Performance Metrics
 
@@ -39,8 +37,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: v1.5 milestone archived
+Stopped at: Milestone v1.6 started
 Resume file: None
 
 ---
-*State tracking: v1.5 milestone SHIPPED — use /gsd:new-milestone to start next*
+*State tracking: v1.6 milestone STARTED — defining requirements*

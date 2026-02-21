@@ -45,7 +45,16 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ### Active
 
-(No active milestone — use `/gsd:new-milestone` to start next)
+## Current Milestone: v1.6 MCP Assessment & Fix
+
+**Goal:** Audit completo, fix e polish del server MCP per farlo funzionare bene con Claude Code, rimuovendo il codice OAuth/Claude Web non funzionante.
+
+**Target features:**
+- Audit completo del server MCP (codice, tools, resources, prompts)
+- Test sistematico di tutti i tool/resources/prompts con Claude Code
+- Fix di tutto quello che è rotto o non funziona
+- Rimozione codice OAuth/Claude Web (dead code)
+- Polish per esperienza fluida con Claude Code
 
 ### Out of Scope
 
@@ -109,4 +118,4 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | Version on date-select screen (not TabletLive) | Avoids cluttering compact coaching interface | ✓ Good — visible but non-intrusive |
 
 ---
-*Last updated: 2026-02-21 after v1.5 milestone shipped*
+*Last updated: 2026-02-21 after v1.6 milestone started*
