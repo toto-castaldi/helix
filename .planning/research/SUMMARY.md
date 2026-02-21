@@ -1,231 +1,188 @@
 # Project Research Summary
 
-**Project:** Helix - Group Exercise Functionality
-**Domain:** Fitness coaching app - shared exercise management
-**Researched:** 2026-01-28
+**Project:** Helix v1.6 — MCP Assessment & Fix
+**Domain:** MCP server audit, protocol compliance, and Claude Code integration
+**Researched:** 2026-02-21
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Adding group exercise functionality to Helix requires no new technology stack. The feature allows coaches to mark exercises as "group" across multiple individual client sessions and complete them with a single action during live coaching. Research confirms that the existing React 19 + Supabase architecture fully supports this pattern with minimal additions: a boolean flag on the database, an RPC function for atomic batch updates, and a tab toggle in the UI.
+Helix has a working MCP server (23 tools, 19 resources, 5 prompts) running as a Supabase Edge Function, but it was built for a Claude Web OAuth flow that never worked. The server has accumulated ~150 lines of dead OAuth code, Italian-language tool descriptions, missing error flags, security gaps in write tools, and an outdated protocol version (`2024-11-05`, two revisions behind). Research confirms the fix is surgical: keep the existing 2,500-line hand-rolled JSON-RPC implementation and make targeted protocol-layer corrections. Do NOT adopt the MCP TypeScript SDK or rewrite the business logic.
 
-The recommended approach preserves Helix's individual-session-per-client model while adding group functionality as a filtered view. This avoids the complexity of class scheduling, gym management, or social features common in fitness software but inappropriate for personal training use cases. The core technical pattern is straightforward: flag exercises as group, aggregate by exercise ID in a separate view, and use PostgreSQL RPC with SECURITY INVOKER for atomic cross-session updates that respect existing Row Level Security policies.
+The recommended approach is a three-phase cleanup: first remove dead code and fix security (OAuth removal, ownership checks, auth simplification), then upgrade protocol compliance and tool quality (English descriptions, `isError` flags, tool annotations, resource template separation, protocol version bump to `2025-03-26`), and finally polish for optimal Claude Code experience (compact responses, input validation, timezone handling). The most dangerous finding is that Claude Code has recurring bugs where custom HTTP headers are silently dropped (issues #7290, #14977, #17069), causing it to enter OAuth discovery flows. The existing OAuth code actively makes this worse by responding to `.well-known` requests. Removing OAuth endpoints is the single highest-priority fix.
 
-The main risk is race conditions when multiple tablets modify the same exercises concurrently. This is mitigated by using optimistic updates with Supabase Realtime subscriptions, batching all group updates in a single transactional RPC call, and potentially adding version-based optimistic locking if conflicts emerge. Secondary risks include unclear UI semantics when exercises have different parameters across clients, and performance degradation with many concurrent sessions. Both are addressable through careful UI design and database indexing.
+The security audit found 6 write tools that lack ownership verification while operating with a service-role key that bypasses RLS. Any authenticated user could modify another user's sessions. This must be fixed alongside the OAuth removal as a P0 priority before any other improvements.
 
 ## Key Findings
 
 ### Recommended Stack
 
-No changes to the existing stack are needed. Helix already has all required technologies:
+No new technologies needed. The existing hand-rolled JSON-RPC implementation on Supabase Edge Functions (Deno) is the correct approach. The MCP TypeScript SDK (v1.27.0, with v2 pre-alpha in progress) was evaluated and rejected -- it would require rewriting all 2,500 lines of working business logic for no functional gain. The `mcp-lite` package (v0.10.0) was similarly rejected for immaturity and refactor cost.
 
-**Core technologies:**
-- **React 19**: Frontend framework — already handles optimistic updates in useLiveCoaching hook
-- **TypeScript 5.x**: Type safety — existing types extend trivially for `is_group` flag
-- **Supabase (PostgreSQL + Realtime)**: Backend — native batch updates via `.in()`, RPC for transactions, Realtime for cross-tablet sync
-- **Tailwind CSS + shadcn/ui**: Styling — Tabs component ready for individual/group toggle
-- **Supabase Edge Functions**: Not required but available if complex logic emerges
+**Core technologies (no changes):**
+- **Supabase Edge Functions (Deno):** Server runtime -- already deployed, working, correct for stateless MCP
+- **`@supabase/supabase-js` v2:** Database access -- works with service role for API key auth pattern
+- **Hand-rolled JSON-RPC:** Transport layer -- ~100 lines need protocol fixes, ~2,400 lines of business logic untouched
 
-**Database pattern:**
-- Boolean `is_group` flag on `session_exercises` table (simplest approach, no new tables)
-- PostgreSQL RPC function for batch completion (single query updates all matching exercises)
-- Realtime subscription to `session_exercises` for live updates across tablets
+**Protocol changes needed:**
+- **Protocol version:** `2024-11-05` to `2025-03-26` -- adds tool annotations, Streamable HTTP compliance; skip `2025-06-18` (adds complexity without benefit)
+- **Auth:** API key only (`X-Helix-API-Key`) -- remove OAuth 2.1 and Bearer token fallback entirely
+- **Transport:** Stateless Streamable HTTP -- JSON responses (no SSE), 202 for notifications, 405 for GET
 
 ### Expected Features
 
-Research identifies clear feature tiers for launch prioritization:
+**Must fix (table stakes -- broken or missing):**
+- English tool descriptions -- Italian descriptions degrade Claude Code's tool selection accuracy
+- `isError: true` flag on all tool error responses -- enables LLM error recovery
+- Ownership verification on 6 write tools -- security gap, service role bypasses RLS
+- Remove dead OAuth code (~150 lines) -- actively interferes with authentication
+- Remove verbose debug logging (~25 lines) -- security risk and log noise
+- Consistent English field names in responses -- `name` not `nome`, `status` not `stato`
 
-**Must have (table stakes):**
-- Flag exercise as group — core functionality, boolean flag on session_exercises
-- Toggle individual/group view — tab or toggle in live coaching UI
-- Group exercise list for day — filtered query of flagged exercises
-- Complete once for all — cross-session batch update via RPC
-- Visual indicator of group status — icon/badge on exercise cards
-- Participant list per group exercise — see which clients share the exercise
+**Should fix (quality improvement):**
+- Tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`) -- improves Claude Code approval flow
+- Separate resources vs resource templates in protocol responses -- currently mixed incorrectly
+- Actionable English error messages -- help Claude recover from failures
+- Compact JSON responses (strip null fields) -- reduce token usage toward 10k warning threshold
 
-**Should have (competitive):**
-- Participant count badge — "3/4 present" quick status view
-- Group notes/comments — shared context visible to coach
-- Timeline view — visual schedule of group exercises throughout day
+**Defer (nice-to-have):**
+- `title` field on tools and resources (spec `2025-06-18` feature)
+- Resource annotations (audience, priority)
+- Server instructions for Tool Search optimization
+- Structured output schemas
 
-**Defer (v2+):**
-- Auto-detect group exercises — smart suggestions when same exercise appears across sessions
-- Bulk parameter adjustment — change reps/weight for all participants at once
-- Group exercise templates — save common groups for reuse
-- Skip for individual within group — per-client override of group completion
-
-**Anti-features (explicitly avoid):**
-- Class booking/scheduling — out of scope, adds massive complexity (payments, waitlists)
-- Client-facing group view — clients don't need to know about groups, this is coach workflow optimization
-- Automatic session creation — "create group session" that generates sessions for all clients is error-prone
-- Attendance tracking, capacity limits, recurring schedules — gym management features inappropriate for PT workflow
+**Anti-features (do NOT build):**
+- OAuth 2.1 / Claude Web support -- remove existing dead code
+- SSE streaming -- not needed, JSON responses are correct for stateless server
+- Session management (`Mcp-Session-Id`) -- Edge Functions are stateless, this is correct behavior
+- JSON-RPC batching -- added in `2025-03-26` but removed in `2025-06-18`, not worth implementing
 
 ### Architecture Approach
 
-The recommended architecture uses PostgreSQL RPC functions with SECURITY INVOKER for atomic group exercise updates. This pattern runs in a single transaction, respects existing RLS policies, and triggers realtime events for all updated rows. The frontend hook applies optimistic updates before calling RPC and subscribes to realtime for cross-tablet synchronization.
+The architecture stays identical: single Edge Function file, stateless HTTP POST handler, API key auth with SHA-256 hash lookup, service-role Supabase client filtered by `userId`. The file drops from ~2,516 to ~2,200 lines after removing dead code. No new files, tables, or infrastructure needed.
 
-**Major components:**
-1. **TabletLive UI** — adds tab toggle for individual/group mode, reuses existing ExerciseCarousel component with grouped data
-2. **useLiveCoaching hook** — extends with `completeGroupExercise()` method, manages optimistic updates + realtime sync
-3. **PostgreSQL RPC function** — `complete_group_exercise(session_exercise_id, session_date, exercise_id)` performs atomic batch update
-4. **Supabase Realtime** — broadcasts `postgres_changes` events on `session_exercises` table to all subscribed tablets
+**Major components (unchanged, reorganized):**
+1. **Authentication** -- API key only, ~30 lines (down from ~130 with OAuth fallbacks)
+2. **Protocol Handler** -- initialize, notification detection (202 for `initialized`), method routing
+3. **Resource/Tool/Prompt Handlers** -- all existing business logic preserved, descriptions translated to English
+4. **HTTP Entry Point** -- POST handler (JSON-RPC), GET returns 405, CORS headers updated for MCP spec
 
-**Key patterns:**
-- **RPC over client-side loops** — ensures atomicity, single round-trip, prevents partial updates
-- **SECURITY INVOKER over DEFINER** — respects existing RLS without custom authorization logic
-- **Optimistic updates + Realtime** — instant UI feedback, eventual consistency across devices
-- **Table-level subscriptions** — simpler than broadcast channels, sufficient for single-coach scale
+**Key patterns to follow:**
+- Notification detection: messages without `id` field get HTTP 202, no JSON-RPC body
+- Tool error responses: always include `isError: true` with actionable English message
+- Ownership verification: fetch record, check `user_id` matches authenticated coach, then mutate
+- Stateless operation: no `Mcp-Session-Id`, authenticate every request independently
 
 ### Critical Pitfalls
 
-1. **Race Conditions on Concurrent Updates** — Multiple tablets updating same exercises simultaneously causes data loss. **Mitigation:** Use PostgreSQL RPC for atomic batch updates, enable Realtime on session_exercises for consistent state, consider adding version column for optimistic locking if conflicts emerge.
+1. **Claude Code header bugs drop API keys** -- Claude Code has documented regressions (#7290, #14977, #17069) where custom headers are silently dropped, causing it to enter OAuth discovery. **Prevention:** Remove all `.well-known` and OAuth endpoints so Claude Code cannot enter OAuth flow; test with exact `claude mcp add --header` command; consider query parameter fallback as backup.
 
-2. **Aggregation Logic Divergence** — Same exercise with different parameters across clients (e.g., Client A: 10kg, Client B: 8kg) causes confusing UI. **Mitigation:** Display parameter variance explicitly ("3x12 varies"), show per-client breakdown when parameters differ, "complete for all" only marks completion status without overwriting individual parameters.
+2. **OAuth dead code actively interferes with auth** -- The existing `.well-known/oauth-protected-resource` endpoint and `WWW-Authenticate: Bearer resource_metadata=` response header tell Claude Code to use OAuth instead of API keys, creating an unrecoverable auth loop. **Prevention:** Remove ALL OAuth code paths as P0 priority.
 
-3. **Completed Session State Confusion** — Group view includes exercises from already-completed sessions, allowing accidental modifications to historical data. **Mitigation:** Filter group view to `status = 'planned'` by default, block mutations on completed sessions, require explicit "replan" action to re-enable editing.
+3. **6 write tools lack ownership verification** -- `update_session`, `delete_session`, `complete_session`, `update_session_exercise`, `remove_session_exercise`, `reorder_session_exercises` operate by ID without checking the session belongs to the authenticated coach. Service role key bypasses RLS. **Prevention:** Add explicit ownership check (fetch + verify `user_id`) to every write tool.
 
-4. **Mid-Session Exercise Modifications** — Coach adds/removes exercise on individual session while group view active, causing stale data. **Mitigation:** Subscribe to Realtime for full exercise list changes (not just completion), re-aggregate on any change, clearly separate individual vs group actions in UI.
+4. **Italian descriptions degrade tool selection** -- All 23 tool descriptions and error messages are in Italian, reducing Claude Code's ability to select the right tool. **Prevention:** Rewrite all descriptions in English following MCP best practices (what it does, when to use it, what it returns).
 
-5. **`is_group` Flag Semantic Ambiguity** — Unclear meaning leads to inconsistent code paths. **Mitigation:** Document exact semantics before implementation ("exercise appears in group aggregation"), test all permutations of flag transitions.
+5. **Missing `isError` flag masks failures** -- Tool errors return as normal text content without `isError: true`, so Claude treats failures as successful results. **Prevention:** Add `isError: true` to every error response across all tool handlers.
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure prioritizes foundational changes before UI features:
+Based on research, suggested phase structure prioritizes security and auth fixes before protocol and quality improvements.
 
-### Phase 1: Database Schema & RPC Functions
-**Rationale:** Non-destructive schema change must come first. Adding `is_group` flag is additive (no data loss risk), and RPC functions define the group completion contract that UI will depend on. This follows project rules: "SQL migrations must never cause data loss."
+### Phase 1: Security & Dead Code Removal
+**Rationale:** OAuth dead code actively breaks authentication (Pitfall 1 + 3), and ownership gaps are a security vulnerability. These block all other improvements because you cannot test quality fixes if auth is unreliable.
+**Delivers:** Clean, secure, working auth with Claude Code
+**Addresses:** Remove OAuth code, remove debug logging, simplify auth to API-key-only, add ownership checks to 6 write tools, fix `list_sessions` join bug
+**Avoids:** Pitfall 1 (header bugs), Pitfall 2 (OAuth interference), Pitfall 9 (RLS bypass)
 
-**Delivers:**
-- Migration adding `is_group BOOLEAN DEFAULT false` to session_exercises
-- Index on `is_group` for query performance
-- `complete_group_exercise()` RPC function with SECURITY INVOKER
-- `skip_group_exercise()` RPC function for symmetry
-- Realtime enabled on session_exercises table
-- Updated TypeScript types for SessionExercise interface
+### Phase 2: Protocol Compliance
+**Rationale:** With auth working, upgrade the protocol layer to be spec-compliant. This is prerequisite for tool annotations (Phase 3) which require `2025-03-26`.
+**Delivers:** Streamable HTTP compliant server at protocol version `2025-03-26`
+**Addresses:** Protocol version bump, 202 for notifications, proper 405 for GET, CORS header updates, `Accept` header validation, `MCP-Protocol-Version` header handling
+**Avoids:** Pitfall 2 (version mismatch causing connection rejection)
 
-**Addresses:** Foundation for all group features, prevents race conditions (Pitfall 1)
+### Phase 3: Tool & Resource Quality
+**Rationale:** With protocol compliance done, the descriptions and error handling improvements make Claude Code's tool selection and error recovery work well. This is the highest-impact phase for user experience.
+**Delivers:** English descriptions, `isError` flags, tool annotations, clean error messages, consistent field names
+**Addresses:** All "must fix" and "should fix" items from FEATURES.md -- English descriptions, isError flag, tool annotations, resource template separation, consistent response format, actionable errors
+**Avoids:** Pitfall 4 (Italian descriptions), Pitfall 5 (duplicate tools confusion), Pitfall 7 (missing isError)
 
-**Avoids:** Semantic ambiguity (Pitfall 5) by documenting flag meaning in migration comments
+### Phase 4: Response Optimization & Polish
+**Rationale:** With everything working correctly, optimize for Claude Code's token limits and edge cases.
+**Delivers:** Compact responses, input validation, timezone handling, documentation updates
+**Addresses:** Token budget optimization (strip nulls, compact JSON), input validation on tool parameters, timezone awareness for `helix://today`, CLAUDE.md updates to remove OAuth references
+**Avoids:** Pitfall 10 (token limit exceeded), Pitfall 14 (timezone mismatch), Pitfall 15 (no input validation)
 
-### Phase 2: Hook Extensions & Realtime Sync
-**Rationale:** State management layer must be solid before UI relies on it. Extending useLiveCoaching hook with group methods establishes the contract for optimistic updates, RPC calls, and realtime reconciliation. This phase addresses the core concurrency concerns.
-
-**Delivers:**
-- `completeGroupExercise()` method in useLiveCoaching
-- `skipGroupExercise()` method
-- Optimistic update logic for group actions
-- Realtime subscription to session_exercises changes
-- Error handling and rollback for failed group operations
-
-**Uses:** Supabase RPC pattern, SECURITY INVOKER functions from Phase 1
-
-**Implements:** Optimistic updates + Realtime pattern (Architecture component 2)
-
-**Addresses:** Race conditions (Pitfall 1), real-time sync (Pitfall 7)
-
-### Phase 3: Group View UI & Tab Toggle
-**Rationale:** With database and state management stable, UI can safely consume group data. Tab toggle provides coach with clear mode switching. This phase focuses on visual clarity and workflow.
-
-**Delivers:**
-- Tab toggle component (Individual | Gruppo) using shadcn/ui Tabs
-- Group exercise list view showing aggregated exercises
-- Visual indicator (icon/badge) on group exercise cards
-- Participant list display for each group exercise
-- Filtering logic to show only group exercises in group mode
-
-**Addresses:** Toggle individual/group view, group exercise list, visual indicators (table stakes)
-
-**Avoids:** Parameter divergence confusion (Pitfall 2) by showing "varies" indicator when parameters differ
-
-### Phase 4: Session Planning Integration
-**Rationale:** Coaches need to flag exercises as group during session creation, not just during live coaching. This phase integrates group functionality into the planning workflow.
-
-**Delivers:**
-- "Mark as group" toggle in exercise selection UI
-- Bulk flag operation (mark multiple exercises as group at once)
-- Visual indication in session plan view
-- Warning when flagging exercises with divergent parameters
-
-**Addresses:** Flag exercise as group (table stakes), workflow integration
-
-**Avoids:** Completed session confusion (Pitfall 3) by preventing group flag on completed sessions
-
-### Phase 5: Polish & Edge Cases
-**Rationale:** After core functionality works, address edge cases and UX refinements identified in research.
-
-**Delivers:**
-- Per-client feedback for group actions ("Completed: 4/5 clients")
-- Confirmation dialog for destructive group actions
-- Participant count badge in timeline
-- Group exercise filtering by completed/planned status
-- Performance monitoring for query optimization
-
-**Addresses:** UI feedback (Pitfall 9), performance concerns (Pitfall 8)
-
-**Avoids:** Order index conflicts (Pitfall 6) through careful state management testing
+### Phase 5: End-to-End Testing & Documentation
+**Rationale:** Final phase verifies the complete flow with Claude Code and documents the configuration for coaches.
+**Delivers:** Verified Claude Code integration, coach-facing setup documentation, `.mcp.json` template
+**Addresses:** Full test sequence (initialize, tool calls, resource reads, prompt invocations), documentation of `claude mcp add` command and configuration scopes
 
 ### Phase Ordering Rationale
 
-- **Database first** prevents code from depending on missing schema, follows project migration rules
-- **Hook before UI** ensures state management is stable and testable independently
-- **Core UI before polish** delivers MVP functionality quickly, defers enhancements
-- **Planning integration after live coaching** validates pattern with real usage before extending to more surfaces
-- **Dependencies flow down:** Each phase uses artifacts from previous phases (RPC functions → hook methods → UI components)
+- **Security first (Phase 1):** Cannot test anything reliably while OAuth code interferes with auth and write tools have security gaps
+- **Protocol before quality (Phase 2 before 3):** Tool annotations require `2025-03-26` protocol version; notification handling must be correct before testing tool calls
+- **Quality before optimization (Phase 3 before 4):** English descriptions and error flags have much higher impact than response size optimization
+- **Testing last (Phase 5):** Only meaningful after all fixes are in place; testing earlier would just find known issues
 
-**Critical path:** Phase 1 → Phase 2 → Phase 3 is the minimum viable feature. Phases 4-5 are enhancements.
+**Critical path:** Phase 1 -> Phase 2 -> Phase 3 is the minimum viable fix. Phases 4-5 are important but could ship after initial release if needed.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 4 (Session Planning Integration):** May need research on bulk operation UX patterns if flagging many exercises at once becomes cumbersome. Current research focused on live coaching, not planning workflow.
+- **Phase 1 (Security):** Needs phase research to audit all 23 tools and 19 resources for ownership verification gaps. The 6 identified are confirmed, but there may be more.
+- **Phase 3 (Tool Quality):** Needs research on MCP best practices for tool descriptions (SEP-1382 patterns) and on whether to keep or remove the 7 duplicate read tools vs resources.
 
 Phases with standard patterns (skip research-phase):
-- **Phase 1 (Database Schema):** Straightforward migration, well-documented Supabase patterns
-- **Phase 2 (Hook Extensions):** Extends existing useLiveCoaching pattern, no new concepts
-- **Phase 3 (Group View UI):** Standard React component work, shadcn/ui Tabs already used in codebase
-- **Phase 5 (Polish):** Incremental improvements, no architectural decisions
+- **Phase 2 (Protocol Compliance):** Well-documented in MCP spec `2025-03-26`. Changes are mechanical (version string, status codes, headers).
+- **Phase 4 (Response Optimization):** Straightforward engineering -- strip nulls, add validation, parameterize timezone.
+- **Phase 5 (Testing):** Standard verification, documented test sequence in ARCHITECTURE.md.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All required technologies already in use. Supabase RPC, Realtime, and React patterns verified in official docs. |
-| Features | MEDIUM | Competitor analysis shows gap in market for this workflow. Feature list derived from domain logic, but some prioritization based on inference rather than direct user research. |
-| Architecture | HIGH | PostgreSQL RPC + SECURITY INVOKER pattern verified in Supabase documentation. Existing codebase analysis confirms compatibility. |
-| Pitfalls | HIGH | Race conditions, RLS, and concurrency patterns well-documented in PostgreSQL and Supabase resources. Edge cases derived from existing codebase structure. |
+| Stack | HIGH | Decision to keep hand-rolled implementation is well-justified. SDK evaluation thorough. Protocol version choice (`2025-03-26`) backed by spec analysis. |
+| Features | HIGH | Issues identified through direct codebase analysis + MCP spec comparison. Security gaps confirmed by code line references. |
+| Architecture | HIGH | Stateless Streamable HTTP pattern verified against official Supabase and MCP docs. No architectural changes needed. |
+| Pitfalls | HIGH | Claude Code header bugs confirmed via 3 GitHub issues with specific version numbers. OAuth interference identified through code analysis. Security gaps verified with line numbers. |
 
 **Overall confidence:** HIGH
 
-Research is comprehensive across stack, features, architecture, and risks. Primary uncertainty is feature prioritization (what coaches need most), which can be validated during implementation.
+All four research files drew from official MCP specifications (`2025-03-26`, `2025-06-18`), Claude Code documentation, Supabase official docs, and direct codebase analysis. The findings are concrete (specific line numbers, specific issue numbers, specific code examples) rather than theoretical.
 
 ### Gaps to Address
 
-- **Parameter synchronization strategy:** Research identified that exercises may have different parameters across clients, but didn't specify detailed UX for how coaches reconcile this. Should be validated with user testing during Phase 3.
+- **Claude Code header bug status:** Issue #7290 was closed as NOT_PLANNED on 2026-02-20. Need to verify whether current Claude Code version actually sends headers correctly. If headers still fail, the query parameter fallback (`?api_key=xxx`) becomes necessary rather than optional.
 
-- **Multi-coach concurrency:** Current research assumes single coach. If multi-coach support is added later, realtime subscription patterns may need refinement to handle higher event volume. Monitor performance in Phase 5.
+- **Duplicate read tools decision:** Research identifies 7 read-only tools that duplicate resource functionality (added for Claude Web compatibility). The recommendation is to keep both but make them consistent. However, removing read tools entirely would reduce context token consumption. This needs validation during Phase 3 by testing whether Claude Code effectively uses resources via `@` mentions for read operations.
 
-- **Offline handling:** Research flagged tablet connectivity loss as a concern but didn't specify full offline sync strategy. If this becomes critical, may need additional research on Supabase offline capabilities and conflict resolution patterns.
+- **Prompt language strategy:** Tool descriptions should be English (machine-facing), but prompt templates are user-facing content for Italian-speaking coaches. The boundary between "machine-facing" and "user-facing" in prompt templates needs clarification during Phase 3.
 
-- **Group exercise history:** How coaches review past group sessions not fully specified. May need additional research on historical aggregation queries if this becomes a requested feature.
+- **`exercises/tags/{tag}` resource:** Declared in CLAUDE.md but never implemented in code. Needs decision: implement or remove from documentation.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Supabase JavaScript RPC Reference](https://supabase.com/docs/reference/javascript/rpc) — RPC function calls, array parameters
-- [Supabase Realtime Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes) — Performance, filtering, subscription patterns
-- [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) — SECURITY INVOKER vs DEFINER
-- [PostgreSQL MVCC](https://www.postgresql.org/docs/current/mvcc.html) — Concurrency control fundamentals
-- Helix codebase analysis — Existing useLiveCoaching hook, TabletLive component, migration patterns
+- [MCP Specification 2025-03-26](https://modelcontextprotocol.io/specification/2025-03-26/) -- Transport, lifecycle, tool annotations
+- [MCP Specification 2025-06-18](https://modelcontextprotocol.io/specification/2025-06-18/) -- Changelog, transport updates, version negotiation
+- [Claude Code MCP Documentation](https://code.claude.com/docs/en/mcp) -- Transport types, headers, scopes, Tool Search, output limits
+- [Supabase Deploy MCP Servers](https://supabase.com/docs/guides/getting-started/byo-mcp) -- Edge Function patterns
+- Helix codebase analysis -- `supabase/functions/helix-mcp/index.ts` (2,516 lines)
 
 ### Secondary (MEDIUM confidence)
-- [Bootstrapped Supabase: Concurrent Writes](https://bootstrapped.app/guide/how-to-handle-concurrent-writes-in-supabase) — Version-based optimistic locking
-- [Fitness App Database Patterns](https://www.back4app.com/tutorials/how-to-build-a-database-schema-for-a-fitness-tracking-application) — Entity relationships
-- [Bulk Action UX Guidelines](https://www.eleken.co/blog-posts/bulk-actions-ux) — UI patterns for multi-item operations
-- Competitor analysis — Hevy Coach, TrueCoach, TeamBuildr (features, not implementation)
+- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) -- v1.27.0 evaluation, v2 pre-alpha status
+- [Claude Code issue #7290](https://github.com/anthropics/claude-code/issues/7290) -- Header bug (CLOSED/NOT_PLANNED)
+- [Claude Code issue #14977](https://github.com/anthropics/claude-code/issues/14977) -- Custom headers not sent
+- [Claude Code issue #17069](https://github.com/anthropics/claude-code/issues/17069) -- Header not added in config
+- [SEP-1382: MCP Tool Description Best Practices](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1382)
+- [Anthropic Engineering: Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
 
 ### Tertiary (LOW confidence)
-- Various fitness app UX case studies — General patterns, needs validation against actual coach workflows
+- [Why MCP Deprecated SSE](https://blog.fka.dev/blog/2025-06-06-why-mcp-deprecated-sse-and-go-with-streamable-http/) -- Background context
+- [15 Best Practices for Building MCP Servers](https://thenewstack.io/15-best-practices-for-building-mcp-servers-in-production/) -- Production patterns
+- Various Claude Code GitHub issues on token management (#7172, #3406, #2638)
 
 ---
-*Research completed: 2026-01-28*
+*Research completed: 2026-02-21*
 *Ready for roadmap: yes*

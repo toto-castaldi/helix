@@ -1,344 +1,391 @@
-# Domain Pitfalls: Group Exercise Functionality
+# Domain Pitfalls: MCP Server for Claude Code
 
-**Domain:** Group exercise / shared workout features for fitness coaching app
-**Researched:** 2026-01-28
-**Confidence:** HIGH (based on existing codebase analysis + domain research)
+**Domain:** MCP server on Supabase Edge Functions, targeting Claude Code as primary client
+**Researched:** 2026-02-21
+**Confidence:** HIGH (official docs, existing codebase analysis, confirmed bug reports)
+
+---
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites or major issues.
+Mistakes that cause the MCP server to not work at all with Claude Code, or that require fundamental rearchitecting.
 
 ---
 
-### Pitfall 1: Race Conditions on Concurrent Exercise Updates
+### Pitfall 1: Claude Code HTTP Header Bugs Break Custom Authentication
 
-**What goes wrong:** Multiple tablets update the same `session_exercises` row simultaneously. Coach A marks exercise complete while Coach B modifies reps. Database receives both updates, last one wins, losing data.
+**What goes wrong:** Claude Code has documented, recurring bugs where custom HTTP headers configured via `.mcp.json` or `claude mcp add --header` are silently dropped. Instead of sending the configured `X-Helix-API-Key` header, Claude Code attempts OAuth 2.0 Dynamic Client Registration, hitting `/.well-known/oauth-protected-resource`, `/.well-known/oauth-authorization-server`, etc.
 
-**Why it happens:** Current `useLiveCoaching` hook uses optimistic updates without any locking mechanism. When the same exercise appears in a group view across multiple client sessions, a "complete for all" action fires multiple concurrent Supabase updates.
+**Why it happens:** Claude Code's HTTP transport client has had regressions across multiple versions. The issue was supposedly fixed in v1.0.40, regressed by v1.0.85, was still broken in v1.0.108, and bug reports from December 2025 (issues #14977, #7290, #17069) confirm it persists. The issue #7290 was closed as "NOT_PLANNED" on February 20, 2026.
 
 **Consequences:**
-- Lost exercise completion timestamps
-- Incorrect parameter values (sets/reps/weight)
-- Inconsistent state between tablets
-- Coach confusion when UI shows different states
+- The Helix MCP server returns 401 on every request
+- Claude Code shows "Connected" status but all tool calls fail
+- The server's OAuth endpoints (`/.well-known/oauth-protected-resource`) respond successfully, creating a confusing state where OAuth discovery works but actual auth fails because Helix uses API keys, not OAuth tokens
+- The existing OAuth code in `helix-mcp` may actually be making things worse by responding to OAuth discovery requests
 
 **Prevention:**
-1. **Use optimistic locking with version column:** Add `version` column to `session_exercises`. Include `WHERE version = $currentVersion` in updates. Increment version on each update.
-   ```sql
-   ALTER TABLE session_exercises ADD COLUMN version integer NOT NULL DEFAULT 0;
-   ```
-2. **Batch group updates in single transaction:** When "complete for all" is triggered, use a Supabase Edge Function to perform all updates atomically.
-3. **Enable Supabase Realtime on session_exercises:** Subscribe to changes so all tablets see consistent state after any update.
+1. **Test with `claude mcp add --header` CLI approach first** -- the CLI approach may behave differently from manual `.mcp.json` editing
+2. **Implement a fallback: also accept auth via query parameter** -- as a backup when headers are dropped, allow `?api_key=xxx` (less secure but functional)
+3. **Remove all OAuth/`.well-known` endpoints** -- if Claude Code sees OAuth discovery responses, it may enter the OAuth flow instead of sending headers. Returning 404 on all `.well-known` paths forces Claude Code to fall back to plain header-based auth
+4. **Test extensively with the current Claude Code version** at each phase -- this bug has regressed multiple times
+5. **Document the exact `claude mcp add` command** the user should run, and verify it works
 
-**Detection:**
-- Test with two browser tabs updating same exercise simultaneously
-- Check if `completed_at` timestamps vary unexpectedly
-- Monitor for Supabase update conflicts in logs
+**Detection:** Run `claude mcp add` with headers, then check server logs for incoming requests. If you see `GET /.well-known/oauth-protected-resource` instead of `POST` with `X-Helix-API-Key`, the header bug is active.
 
-**Phase to address:** Database Migration phase (add version column) + Group View implementation phase
+**Sources:**
+- [Claude Code issue #7290](https://github.com/anthropics/claude-code/issues/7290) -- HTTP/SSE Transport Ignores Authentication Headers (CLOSED/NOT_PLANNED)
+- [Claude Code issue #14977](https://github.com/anthropics/claude-code/issues/14977) -- HTTP MCP server custom headers not being sent
+- [Claude Code issue #17069](https://github.com/anthropics/claude-code/issues/17069) -- MCP header not added in ~/.claude.json
 
 ---
 
-### Pitfall 2: Aggregation Logic Divergence
+### Pitfall 2: Protocol Version Mismatch -- Server Says 2024-11-05, Client May Expect 2025-03-26
 
-**What goes wrong:** When same exercise appears across multiple client sessions with different parameters (e.g., Client A: 3x12 @ 10kg, Client B: 3x10 @ 8kg), the group view shows confusing or incorrect information.
+**What goes wrong:** The existing `helix-mcp` server responds to `initialize` with `protocolVersion: "2024-11-05"`. Claude Code may negotiate or expect the newer `2025-03-26` protocol, which introduces Streamable HTTP transport, JSON-RPC batching, and session management via `Mcp-Session-Id` headers.
 
-**Why it happens:** Naive aggregation assumes exercises are identical. Real-world coaching has individualized parameters per client.
+**Why it happens:** The server was built for the original protocol spec. The MCP spec evolved significantly in March 2025 with the 2025-03-26 version and again in June 2025. Claude Code's MCP client implementation tracks the latest spec.
 
 **Consequences:**
-- UI shows wrong parameters in group view
-- Coach loses track of individual client needs
-- "Complete for all" applies wrong values to some clients
-- Data integrity issues when parameters don't match
+- Claude Code may reject the connection if it requires the newer protocol version
+- Missing `Mcp-Session-Id` header handling may confuse stateful features
+- Claude Code may send JSON-RPC batched requests that the current single-request parser cannot handle
+- The server may not handle GET requests correctly for SSE stream initiation
 
 **Prevention:**
-1. **Display parameter variance explicitly:** Show "3x12 (varies)" or expand to show per-client breakdown when parameters differ.
-2. **Flag parameter conflicts:** Add visual indicator when same exercise has different parameters across sessions.
-3. **"Complete for all" preserves individual parameters:** Only mark completion status, don't overwrite per-client parameters.
-4. **Consider "sync parameters" as explicit action:** Let coach deliberately synchronize parameters rather than assuming they should match.
+1. **Check which protocol version Claude Code actually requests** in the `initialize` call's `protocolVersion` parameter
+2. **Support both protocol versions** -- the spec allows version negotiation where the server returns the highest version it supports
+3. **At minimum, parse and handle the `Mcp-Session-Id` header** if Claude Code sends one
+4. **Handle JSON-RPC batch requests** (array of requests in a single POST body) even if you just process them sequentially
 
-**Detection:**
-- Create test data with same exercise, different parameters across clients
-- Verify group view displays correct information
-- Confirm "complete for all" doesn't corrupt individual parameter values
+**Detection:** Look at Claude Code's `initialize` request to see what `protocolVersion` it sends. If the server responds with a version Claude Code does not support, initialization will fail.
 
-**Phase to address:** Group View UI implementation phase
+**Sources:**
+- [MCP Protocol Changelog 2025-03-26](https://modelcontextprotocol.io/specification/2025-03-26/changelog)
+- [MCP Transports Specification](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports)
 
 ---
 
-### Pitfall 3: Completed Session State Confusion
+### Pitfall 3: OAuth Dead Code Actively Interferes with Authentication
 
-**What goes wrong:** Some clients' sessions are already `status: 'completed'` while others are `status: 'planned'`. Group view shows exercises from completed sessions that shouldn't be modified.
+**What goes wrong:** The existing `helix-mcp` has extensive OAuth 2.1 support code (RFC 9728 Protected Resource Metadata, Authorization Server Metadata proxy, `WWW-Authenticate` headers with `resource_metadata` hints). When Claude Code discovers these OAuth endpoints, it may enter the OAuth flow instead of using the API key. This is especially dangerous combined with Pitfall 1.
 
-**Why it happens:** Coach may have already finished with one client, or client session was auto-completed (all exercises done). Group aggregation doesn't distinguish completed vs planned sessions.
-
-**Consequences:**
-- Coach accidentally modifies completed session data
-- Audit trail becomes unreliable (completed sessions should be immutable)
-- UI shows stale/irrelevant exercises in active group view
-- Historical data gets corrupted
-
-**Prevention:**
-1. **Exclude completed sessions from group view by default:** Filter query to `WHERE status = 'planned'`.
-2. **Visual differentiation:** If showing all sessions, clearly mark completed ones as read-only with distinct styling.
-3. **Block mutations on completed sessions:** "Complete for all" should skip sessions with `status: 'completed'`.
-4. **Require explicit "replan" action:** Current `replanSession` function exists - make it the only way to re-enable editing.
-
-**Detection:**
-- Create test scenario with mixed session states
-- Verify UI prevents accidental edits to completed sessions
-- Test "complete for all" with pre-completed sessions in the group
-
-**Phase to address:** Group View query/filter phase
-
----
-
-### Pitfall 4: Mid-Session Exercise Modifications Causing Inconsistency
-
-**What goes wrong:** Coach adds/removes/reorders exercise on one client's session while group view is active. Group view doesn't reflect the change, or worse, applies changes intended for individual to entire group.
-
-**Why it happens:** `addExerciseToSession`, `deleteExerciseFromSession` operate on individual session. Group view may cache exercise list or not subscribe to changes. User expects group action but performs individual action.
+**Why it happens:** The OAuth code was added for Claude Web integration that never worked. It remains in the server, actively responding to OAuth discovery requests. Claude Code hits `GET /.well-known/oauth-protected-resource`, gets a valid response, and enters OAuth mode instead of sending the `X-Helix-API-Key` header.
 
 **Consequences:**
-- Group view shows stale data
-- Coach confusion about which clients have which exercises
-- Order indices get out of sync
-- "Complete for all" targets wrong exercise
+- Claude Code enters an OAuth dance with Supabase Auth that will never complete successfully
+- The `unauthorizedWithOAuthHint()` function returns `WWW-Authenticate: Bearer resource_metadata="..."` on 401, which tells Claude Code to use OAuth rather than retry with API key
+- Authentication is permanently broken for Claude Code clients because they follow the OAuth hints
 
 **Prevention:**
-1. **Clearly separate "individual" vs "group" actions in UI:** Different buttons, different visual zones, confirmation dialogs for group actions.
-2. **Subscribe to Realtime for exercise list changes:** Not just completion status, but full exercise list with order.
-3. **Re-aggregate on any change:** When any session_exercise changes, recalculate group view.
-4. **Add `is_group` flag semantics:** An exercise marked as group exercise should only be modifiable via group actions, with clear UI indication.
+1. **Remove ALL OAuth-related code paths immediately** -- this is the highest priority fix
+2. **Return plain 401 with a simple JSON error** on auth failure, no `WWW-Authenticate` header
+3. **Return 404 on all `.well-known/*` GET requests** -- do not respond to OAuth discovery
+4. **Remove the `getProtectedResourceMetadata()` function and the authorization server metadata proxy**
 
-**Detection:**
-- Add exercise to one session while group view is open
-- Delete exercise from one session while group view active
-- Verify group view updates or clearly indicates stale state
-
-**Phase to address:** Group View real-time subscription phase
+**Detection:** If server logs show `[OAUTH] Protected Resource Metadata request` when Claude Code connects, the OAuth code is interfering.
 
 ---
 
 ## Moderate Pitfalls
 
-Mistakes that cause delays or technical debt.
+Issues that degrade the Claude Code experience, cause tools to work poorly, or produce confusing behavior.
 
 ---
 
-### Pitfall 5: `is_group` Flag Semantic Ambiguity
+### Pitfall 4: Tool Descriptions in Italian Confuse Claude's Tool Selection
 
-**What goes wrong:** Flag `is_group: true` on `session_exercises` is added but its meaning is unclear. Does it mean "show in group view"? "Can only be modified as group"? "Was created via group action"?
+**What goes wrong:** All tool descriptions and error messages in `helix-mcp` are in Italian (e.g., `"Elenca tutti i clienti del coach con i loro dati base"`, `"Errore: Cliente non trovato"`). Claude Code's model may not optimally route to tools with non-English descriptions, especially when the user is interacting in English.
 
-**Why it happens:** Flag added without clear specification of all use cases and edge cases.
+**Why it happens:** The original developer wrote descriptions matching the app's Italian UI language. This is fine for human-readable docs but suboptimal for LLM tool selection.
 
 **Consequences:**
-- Different code paths interpret flag differently
-- UI behaves inconsistently
-- Flag becomes meaningless over time
-- Technical debt accumulates
+- Claude may fail to select the right tool when the user asks in English
+- Error messages like `"Errore: Cliente non trovato"` are less actionable for Claude to interpret and relay
+- Tool descriptions consume context tokens less efficiently when they do not match the conversation language
+- Field names like `nome`, `stato`, `palestra` in tool output require Claude to translate before presenting to the user
 
 **Prevention:**
-1. **Document exact semantics before implementation:**
-   - `is_group = true`: This exercise appears in group view aggregation
-   - `is_group = false`: Individual exercise, excluded from group view
-2. **Consider additional fields if needed:**
-   - `group_exercise_id`: Links to a canonical "template" exercise for the group
-   - `created_via_group`: Audit flag for how exercise was added
-3. **Test all permutations:**
-   - Add as group -> modify individually: allowed?
-   - Add as individual -> add to group view: allowed?
-   - Remove from group view: what happens to flag?
+1. **Write all tool descriptions in English** -- this is the language Claude's tool-use training optimizes for
+2. **Write error messages in English** -- Claude needs to understand them to provide useful error handling
+3. **Use English field names in tool responses** -- `name` not `nome`, `status` not `stato`
+4. **Keep the prompt templates in Italian if they target Italian-speaking coaches** -- prompts are user-facing content, tool descriptions are machine-facing
 
-**Detection:**
-- Write test cases covering all combinations
-- Review all code paths that read/write `is_group`
+**Detection:** Ask Claude Code to "list all clients" and observe whether it selects the right tool. If it hesitates or fails, language mismatch is likely the cause.
 
-**Phase to address:** Schema Design phase (before migration)
+**Sources:**
+- [Anthropic Engineering: Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
 
 ---
 
-### Pitfall 6: Order Index Conflicts in Group View
+### Pitfall 5: Duplicate Read Tools and Resources Create Ambiguity
 
-**What goes wrong:** Each client's session has `order_index` for exercises. Group view shows all clients' exercises in one carousel. Current exercise pointer (`current_exercise_index`) per session conflicts with group-wide "current" concept.
+**What goes wrong:** The server exposes both MCP Resources (like `helix://clients`) AND read-only Tools (like `list_clients`) that return the same data. Claude Code cannot determine which mechanism to use, and the duplication wastes context tokens on redundant tool definitions.
 
-**Why it happens:** Current data model is session-centric, not group-centric. `current_exercise_index` on `sessions` table assumes one client at a time.
+**Why it happens:** The resources were built for the original MCP protocol. Read tools (marked `// ===== READ TOOLS (for Claude Web compatibility) =====`) were added later for Claude Web, which at the time may not have supported resources well. Now the server has 19 resources AND 7 read-only tools with overlapping functionality.
 
 **Consequences:**
-- Unclear which exercise is "current" in group view
-- Navigation (next/previous) behaves unexpectedly
-- Complete/skip actions affect wrong exercises
+- 23 tools + 19 resources = massive context window consumption (Claude Code warns at 10,000 tokens)
+- Claude may call a tool when reading a resource would suffice, or vice versa
+- Inconsistent data: the `list_clients` tool returns `nome` field while the `helix://clients` resource returns `first_name`/`last_name` separately
+- More tools = more confusion for the LLM about which to choose
 
 **Prevention:**
-1. **Group view uses exercise type as aggregation key, not index:** Group by `exercise_id`, not `order_index`.
-2. **Maintain separate group navigation state:** In-memory group pointer separate from per-session `current_exercise_index`.
-3. **Update all sessions' indices together for group navigation:** When coach advances group, update all sessions' `current_exercise_index` in batch.
+1. **Decide: tools OR resources for read operations, not both** -- for Claude Code, tools are generally better because they are actively callable, while resources require @ mentions
+2. **Remove the 7 read-only tools** (`list_clients`, `get_client`, `list_exercises`, `list_sessions`, `get_session`, `list_gyms`, `get_coach_summary`) and keep only the write tools + resources
+3. **Or alternatively: remove resources entirely** and keep only tools (simpler, all data access through one mechanism)
+4. **Ensure consistent field naming** across all responses regardless of mechanism chosen
 
-**Detection:**
-- Sessions with same exercises in different order
-- Navigate in group view, verify per-session state updates correctly
-
-**Phase to address:** Group View state management phase
+**Detection:** Run `/mcp` in Claude Code and count total tools. If the list is overwhelming, there is redundancy to eliminate.
 
 ---
 
-### Pitfall 7: No Realtime Subscription on session_exercises
+### Pitfall 6: Excessive Console Logging Creates Noise and Leaks Data
 
-**What goes wrong:** Currently only `lumio_repositories` has Realtime enabled. Changes to exercises don't propagate to other tablets.
+**What goes wrong:** The server has extensive `console.log` debugging throughout -- logging every request header, body content, authentication attempts, and user IDs. This creates massive log output that:
+- Leaks sensitive data (API key lengths, user IDs, token prefixes) to Supabase function logs
+- May slow down the function under load
+- Makes real errors hard to find in production logs
 
-**Why it happens:** Realtime was added for Docora webhook integration, not live coaching sync.
+**Why it happens:** Debug logging was added during OAuth troubleshooting and never removed.
 
 **Consequences:**
-- Tablets show stale exercise data
-- No conflict awareness
-- Coach must manually refresh
-- "Already completed" errors when UI shows incomplete
+- Security risk: token prefixes, user IDs, and API key metadata are logged
+- Performance: string concatenation and `console.log` calls on every request add latency
+- Log noise: 20+ log lines per request makes debugging actual issues harder
+- Cost: Supabase may charge for excessive log volume
 
 **Prevention:**
-1. **Enable Realtime on session_exercises:**
-   ```sql
-   ALTER PUBLICATION supabase_realtime ADD TABLE session_exercises;
-   ALTER TABLE session_exercises REPLICA IDENTITY FULL;
+1. **Remove all debug console.log statements** except for actual error conditions
+2. **Never log token/key values** even partially -- log `"API key authentication: success/failure"` not `"Token prefix: eyJ..."`
+3. **Keep error logging** (`console.error`) for genuine failures
+4. **Use structured logging** if you need request tracing: `console.error(JSON.stringify({ event: "auth_failed", method: req.method }))`
+
+**Detection:** Check Supabase function logs after a few Claude Code interactions. If there are dozens of log lines per request, cleanup is needed.
+
+---
+
+### Pitfall 7: Tool Responses Lack `isError` Flag
+
+**What goes wrong:** When tool execution fails (e.g., client not found, database error), the server returns a successful JSON-RPC response with error text in the content. It never sets `isError: true` in the tool result. This means Claude Code treats tool failures as successful operations with error-flavored text.
+
+**Why it happens:** The original implementation returns `{ content: [{ type: "text", text: "Errore: ..." }] }` for errors, which is a valid MCP tool response. But without `isError: true`, Claude has no structured signal that the operation failed.
+
+**Consequences:**
+- Claude may try to use the "error" text as real data
+- Claude cannot distinguish between "this operation failed, try a different approach" and "here is the result"
+- Error recovery patterns do not trigger -- Claude may not retry or ask for corrected input
+- Tool annotations (readOnlyHint, destructiveHint) are also missing, so Claude cannot gauge risk
+
+**Prevention:**
+1. **Return `isError: true` in all error responses:**
+   ```typescript
+   return { content: [{ type: "text", text: "Client not found" }], isError: true }
    ```
-2. **Subscribe in useLiveCoaching hook:** Watch for INSERT, UPDATE, DELETE events.
-3. **Merge realtime updates with optimistic state:** Handle race between optimistic update and realtime confirmation.
+2. **Add tool annotations** to tool definitions to indicate which tools are read-only vs destructive:
+   ```typescript
+   annotations: { readOnlyHint: true }  // for list_clients
+   annotations: { destructiveHint: true }  // for delete_session
+   ```
+3. **Write error messages that help Claude recover** -- not `"Errore: ${error.message}"` but `"Client with ID xxx not found. Use list_clients to find valid client IDs."`
 
-**Detection:**
-- Open same session on two tablets
-- Modify on tablet A, verify tablet B updates
+**Detection:** Intentionally call a tool with invalid parameters and check if Claude Code recognizes it as a failure or tries to use the error text as data.
 
-**Phase to address:** Real-time sync implementation phase
+**Sources:**
+- [MCP Error Handling Guide](https://mcpcat.io/guides/error-handling-custom-mcp-servers/)
+- [MCP Error Codes Reference](https://www.mcpevals.io/blog/mcp-error-codes)
 
 ---
 
-### Pitfall 8: Performance Degradation with Many Sessions
+### Pitfall 8: Supabase Edge Function Statelessness vs MCP Session Expectations
 
-**What goes wrong:** Group view queries all sessions for a date, then aggregates. With 10+ clients, each with 15+ exercises, query becomes slow and UI sluggish.
+**What goes wrong:** The MCP Streamable HTTP transport (2025-03-26) supports session management via `Mcp-Session-Id` headers. Supabase Edge Functions are stateless -- each request may hit a different worker with no shared memory. If the server tries to maintain in-memory session state, it will be lost between requests.
 
-**Why it happens:** Current query fetches full session_exercises with nested exercise details. No pagination, no lazy loading.
+**Why it happens:** The `per_worker` policy in `config.toml` means each request gets its own isolated Deno worker. There is no way to share state between invocations except through the database.
 
 **Consequences:**
-- Slow initial load
-- UI freezes on updates
-- Poor tablet performance
-- Coach frustration
+- If the server assigns a session ID but cannot track it, subsequent requests with that session ID will fail validation
+- Client state accumulated during a session (like conversation context) would be lost
+- Claude Code may expect session continuity and behave oddly when it does not exist
 
 **Prevention:**
-1. **Aggregate at database level:** Create view or function that returns pre-aggregated group exercise data.
-2. **Index on exercise_id + session_date:** Speed up group aggregation queries.
-3. **Limit detail fetch to current/visible exercises:** Lazy load full exercise details.
-4. **Cache exercise catalog:** Don't re-fetch exercise definitions on every query.
+1. **Do not implement MCP session management** -- the server should be fully stateless, treating each request independently
+2. **Do not return `Mcp-Session-Id` in the initialize response** -- this tells Claude Code the server is sessionless, which is correct
+3. **Authenticate each request independently** using the API key -- the current approach is correct for stateless operation
+4. **If session state is ever needed, use the database** (e.g., a `mcp_sessions` table) rather than in-memory state
 
-**Detection:**
-- Performance test with 15 sessions, 20 exercises each
-- Monitor query time and UI responsiveness
-- Profile with React DevTools
+**Detection:** The current code does not implement sessions, which is correct. Verify it stays that way.
 
-**Phase to address:** Performance optimization phase (after MVP)
+---
+
+### Pitfall 9: Missing RLS Bypass with Service Role Key
+
+**What goes wrong:** The current authentication code uses `SUPABASE_SERVICE_ROLE_KEY` to create the Supabase client after API key auth succeeds (line 88: `const supabase = createClient(supabaseUrl, supabaseServiceKey)`). This bypasses Row Level Security (RLS) entirely. All data for all users is accessible.
+
+**Why it happens:** The API key auth flow cannot use the anon key with a user JWT (there is no JWT). So it uses the service role key, which has full database access. The code manually filters by `user_id` in queries, but this is defense-in-depth lost.
+
+**Consequences:**
+- A bug in any query filter (missing `.eq("user_id", userId)`) exposes other coaches' data
+- New tools or resources added without the `user_id` filter will leak data
+- The `update_session` and `delete_session` tools do NOT verify ownership -- they just filter by `session_id` without checking `user_id`
+
+**Prevention:**
+1. **Audit every query in every tool and resource handler** for proper `user_id` filtering
+2. **The `update_session`, `delete_session`, and `complete_session` tools are vulnerable** -- they operate on `session_id` without verifying the session belongs to the authenticated user
+3. **Consider using Supabase's `auth.uid()` impersonation** if possible, or at minimum add a helper function that wraps every query with `user_id` filtering
+4. **Add ownership verification** to all write tools: fetch the record first, check `user_id`, then modify
+
+**Detection:** Try calling `delete_session` with a session ID belonging to a different user. If it succeeds, the RLS bypass is exploitable.
+
+---
+
+### Pitfall 10: Large Tool Responses Exceed Token Limits
+
+**What goes wrong:** Resources like `helix://exercises` return ALL exercises (default + custom) as a single JSON blob. Resources like `helix://sessions` return 50 sessions with full details. Claude Code warns when MCP tool output exceeds 10,000 tokens and has a default maximum of 25,000 tokens.
+
+**Why it happens:** No pagination or result limiting on resource/tool responses. The queries fetch everything and serialize it all.
+
+**Consequences:**
+- Claude Code displays token warnings that confuse users
+- Large responses consume significant context window space, reducing room for conversation
+- Very large responses may be truncated, losing data
+- Claude Code may refuse to use the tool again if it previously produced too-large output
+
+**Prevention:**
+1. **Add pagination to all list endpoints** -- accept `limit` and `offset` parameters
+2. **Default to small result sets** (e.g., 20 items) with explicit pagination
+3. **For the exercises list, return only IDs and names** in the summary, with details available per-exercise
+4. **Include a `total_count` field** so Claude knows there are more results
+5. **Consider setting `MAX_MCP_OUTPUT_TOKENS=50000`** in the Claude Code config as a safety net
+
+**Detection:** Read `helix://exercises` and count the response size. If the exercise catalog grows beyond 50 items, this will become a problem.
+
+**Sources:**
+- [Claude Code MCP docs](https://code.claude.com/docs/en/mcp) -- "Claude Code will display a warning when MCP tool output exceeds 10,000 tokens"
 
 ---
 
 ## Minor Pitfalls
 
-Mistakes that cause annoyance but are fixable.
+Issues that cause friction but do not break functionality.
 
 ---
 
-### Pitfall 9: Unclear UI Feedback for Group Actions
+### Pitfall 11: `new URL(uri)` Fails on Custom Scheme URIs
 
-**What goes wrong:** Coach clicks "complete for all" but unclear if action succeeded for all clients or just some.
+**What goes wrong:** In `readResource()`, the code does `const url = new URL(uri)` on URIs like `helix://clients/123`. The `URL` constructor handles this because `helix:` is parsed as a scheme, but `url.pathname` may not work as expected across all environments. The code then falls through to regex matching anyway, making the URL parsing dead code.
 
-**Why it happens:** Current SaveIndicator shows single status. Group actions have multiple outcomes.
-
-**Prevention:**
-1. **Show per-client feedback:** "Completed: 4/5 clients" with option to see failures.
-2. **Distinct group action indicator:** Different visual treatment for group vs individual actions.
-
-**Phase to address:** UI polish phase
+**Prevention:** Remove the `const url = new URL(uri)` and `const path = url.pathname` lines -- they are unused (all matching is done via regex). This avoids potential edge-case parsing issues.
 
 ---
 
-### Pitfall 10: Missing Undo for Group Actions
+### Pitfall 12: resources/list Returns uriTemplate as uri for Templated Resources
 
-**What goes wrong:** Coach accidentally completes exercise for all clients. No easy way to reverse except manually uncompleting each.
+**What goes wrong:** In the `resources/list` handler (line 2192), the code maps `uri: r.uri || r.uriTemplate` -- this returns URI templates (like `helix://clients/{clientId}`) as if they were concrete URIs. Claude Code may try to read `helix://clients/{clientId}` literally.
 
-**Why it happens:** Current system has no undo mechanism.
+**Why it happens:** MCP distinguishes between `resources/list` (concrete, readable URIs) and `resourceTemplates/list` (parameterized templates). The server conflates them.
 
 **Prevention:**
-1. **Add "undo last group action" feature:** Store last action for quick reversal.
-2. **Confirmation dialog for destructive group actions:** "Complete for all 6 clients?"
-
-**Phase to address:** UX improvement phase
+1. **Separate resource templates from concrete resources** in the list response
+2. **Implement `resourceTemplates/list`** for parameterized resources
+3. **Only return concrete URIs** (like `helix://clients`, `helix://gyms`, `helix://exercises`, `helix://sessions`, `helix://sessions/planned`, `helix://coach/summary`, `helix://today`, `helix://group-templates`) in `resources/list`
+4. **Return parameterized URIs** (like `helix://clients/{clientId}`) in `resourceTemplates/list`
 
 ---
 
-### Pitfall 11: Tablet Offline Handling
+### Pitfall 13: CORS Headers Are Unnecessary for Claude Code
 
-**What goes wrong:** Tablet loses connectivity mid-session. Optimistic updates accumulate. When reconnecting, conflicts arise with changes from other tablets.
+**What goes wrong:** The server adds CORS headers (`Access-Control-Allow-Origin: *`) to every response and handles OPTIONS preflight requests. Claude Code uses HTTP transport (not browser-based), so CORS is irrelevant.
 
-**Why it happens:** Current implementation assumes always-online.
+**Prevention:** CORS headers are harmless but add noise. Keep them only if the server might also be accessed from browser contexts. Remove the OPTIONS handler if Claude Code is the only client.
+
+---
+
+### Pitfall 14: `helix://today` Uses Server Timezone, Not Coach Timezone
+
+**What goes wrong:** The `helix://today` resource and `daily-briefing` prompt use `new Date().toISOString().split("T")[0]` to determine "today." Supabase Edge Functions run in UTC. If a coach is in Italy (CET/CEST, UTC+1 or UTC+2), "today" may be wrong by a day.
 
 **Prevention:**
-1. **Queue offline changes:** Store pending updates locally.
-2. **Conflict resolution on reconnect:** Last-write-wins or prompt coach.
-3. **Visual offline indicator:** Coach knows when changes aren't syncing.
+1. **Accept a `timezone` parameter** in the daily-briefing prompt
+2. **Or accept an explicit `date` parameter** and let Claude/user specify the date
+3. **Document this limitation** so the coach knows to specify dates explicitly
 
-**Phase to address:** Offline support phase (post-MVP)
+---
+
+### Pitfall 15: No Input Validation on Tool Parameters
+
+**What goes wrong:** Tool handlers cast `args` directly to expected types without validation:
+```typescript
+const { client_id } = args as { client_id: string }
+```
+If Claude passes unexpected values (wrong type, missing field, UUID format violation), the error comes from Supabase as a cryptic database error rather than a clear validation message.
+
+**Prevention:**
+1. **Validate required parameters explicitly** before database calls
+2. **Return clear, actionable errors** -- `"client_id is required and must be a valid UUID"` not the raw Postgres error
+3. **Validate date format** (YYYY-MM-DD) for session_date parameters
+4. **Validate enum values** for status fields
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Schema Design | `is_group` flag ambiguity (#5) | Document exact semantics in migration comments |
-| Database Migration | Version column breaks existing queries (#1) | Update all session_exercises queries to handle version |
-| Group View Query | Completed session inclusion (#3) | Add explicit `status = 'planned'` filter, test with mixed states |
-| Group View UI | Parameter variance confusion (#2) | Design for divergence, show "varies" indicator |
-| "Complete for All" | Race conditions (#1) | Use Edge Function for atomic batch update |
-| Realtime Subscription | No subscription exists (#7) | Add migration to enable Realtime |
-| State Management | Order index conflicts (#6) | Separate group pointer from session pointer |
-| Performance | Query slowness (#8) | Monitor query time, add indices early |
+| Phase Topic | Likely Pitfall | Mitigation | Priority |
+|-------------|---------------|------------|----------|
+| OAuth removal | Pitfall 3: OAuth code interferes with auth | Remove ALL `.well-known` handlers and OAuth response code | P0 -- do first |
+| Authentication testing | Pitfall 1: Claude Code header bugs | Test with exact Claude Code version, document working command | P0 -- blocks everything |
+| Protocol compliance | Pitfall 2: Version mismatch | Check what Claude Code sends, respond appropriately | P1 |
+| Tool cleanup | Pitfall 5: Duplicate tools/resources | Choose one mechanism, remove the other | P1 |
+| Tool descriptions | Pitfall 4: Italian descriptions | Rewrite all in English | P1 |
+| Error handling | Pitfall 7: Missing isError | Add `isError: true` to all error returns | P1 |
+| Security audit | Pitfall 9: RLS bypass | Audit every write tool for ownership check | P1 |
+| Response size | Pitfall 10: Token limit exceeded | Add pagination, limit defaults | P2 |
+| Logging cleanup | Pitfall 6: Debug logging | Remove sensitive logs | P2 |
+| Resource templates | Pitfall 12: URI vs template confusion | Implement resourceTemplates/list | P2 |
+| Timezone | Pitfall 14: UTC vs local | Accept explicit dates | P3 |
+| Input validation | Pitfall 15: No validation | Add parameter validation | P3 |
+| URL parsing | Pitfall 11: Dead URL code | Remove unused code | P3 |
+| CORS | Pitfall 13: Unnecessary CORS | Optional cleanup | P3 |
 
 ---
 
-## Edge Cases Checklist
+## Helix-Specific Code Issues Found During Research
 
-Test these specific scenarios before shipping:
+These are concrete issues found in the existing `supabase/functions/helix-mcp/index.ts`:
 
-- [ ] Two tablets update same exercise simultaneously
-- [ ] Same exercise, different parameters across 3 clients
-- [ ] One session completed, two sessions planned, same exercises
-- [ ] Add exercise to individual session while group view open
-- [ ] Delete exercise from individual session while group view open
-- [ ] Network disconnection during "complete for all"
-- [ ] 10+ sessions on same date
-- [ ] Empty session in group (no exercises)
-- [ ] All sessions already completed for the date
-- [ ] Session with only one exercise (edge for delete prevention)
-- [ ] Different exercise order across sessions (same exercises, different sequence)
+### Security Issues (Current Code)
+
+1. **`update_session` (line 1163-1188):** Updates session by `session_id` only -- no user ownership check. Any authenticated user could modify another user's session.
+
+2. **`delete_session` (line 1190-1203):** Deletes by `session_id` only -- no ownership check. Same vulnerability.
+
+3. **`complete_session` (line 1205-1218):** Marks complete by `session_id` only -- no ownership check.
+
+4. **`update_session_exercise` (line 1342-1375):** Updates by `session_exercise_id` only -- no ownership check.
+
+5. **`remove_session_exercise` (line 1377-1390):** Deletes by `session_exercise_id` only -- no ownership check.
+
+6. **`reorder_session_exercises` (line 1392-1407):** Reorders by IDs only -- no session ownership check.
+
+Note: RLS is disabled for this function (`verify_jwt = false`), and the service role key bypasses RLS. These tools are exploitable if an attacker obtains any valid API key.
+
+### Functional Issues (Current Code)
+
+7. **`list_sessions` tool (line 1015-1055):** Uses `query.eq("clients.user_id", userId)` on a non-inner join, which may return sessions without filtering properly (Supabase returns null clients instead of filtering them out). The resource version uses `clients!inner` correctly.
+
+8. **`exercises/tags/{tag}` resource is declared in CLAUDE.md** but never implemented in the code -- no handler matches this URI pattern.
 
 ---
 
 ## Sources
 
-**Confidence Level Key:**
-- HIGH: Verified via codebase analysis or authoritative documentation
-- MEDIUM: Multiple sources agree or verified with official docs
-- LOW: Single source, needs validation
-
-### HIGH Confidence Sources
-- Existing Helix codebase analysis (migrations, hooks, components)
-- [Supabase Realtime Documentation](https://supabase.com/docs/guides/realtime)
-- [PostgreSQL Concurrency Control](https://www.postgresql.org/docs/current/mvcc.html)
-
-### MEDIUM Confidence Sources
-- [Bootstrapped Supabase: Concurrent Writes Guide](https://bootstrapped.app/guide/how-to-handle-concurrent-writes-in-supabase)
-- [Optimistic Locking in PostgreSQL](https://reintech.io/blog/implementing-optimistic-locking-postgresql)
-- [Race Conditions in Software](https://www.akamai.com/glossary/what-is-a-race-condition)
-- [Bulk Editing Design Patterns](https://design.basis.com/patterns/bulk-editing)
-- [Bulk Action UX Guidelines](https://www.eleken.co/blog-posts/bulk-actions-ux)
-- [Collaborative Editing Challenges](https://medium.com/@mehulgala77/concurrent-collaborative-editing-d10192e55d2e)
-
-### LOW Confidence Sources (needs validation)
-- General fitness app UX patterns from various design case studies
+- [Claude Code MCP Documentation](https://code.claude.com/docs/en/mcp)
+- [MCP Specification 2025-03-26 Transports](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports)
+- [MCP Build Server Guide](https://modelcontextprotocol.io/docs/develop/build-server)
+- [Anthropic Engineering: Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
+- [Claude Code issue #7290: HTTP/SSE Transport Ignores Authentication Headers](https://github.com/anthropics/claude-code/issues/7290)
+- [Claude Code issue #14977: HTTP MCP custom headers not sent](https://github.com/anthropics/claude-code/issues/14977)
+- [Supabase Edge Functions Limits](https://supabase.com/docs/guides/functions/limits)
+- [Supabase Deploy MCP Servers Guide](https://supabase.com/docs/guides/getting-started/byo-mcp)
+- [MCP Error Handling Best Practices](https://mcpcat.io/guides/error-handling-custom-mcp-servers/)
+- [MCP Error Codes Reference](https://www.mcpevals.io/blog/mcp-error-codes)

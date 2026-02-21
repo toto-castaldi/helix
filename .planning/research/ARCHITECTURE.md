@@ -1,479 +1,463 @@
-# Architecture Patterns: Group Exercise Completion
+# Architecture Patterns: MCP Server for Claude Code
 
-**Domain:** Group exercise completion in fitness coaching app
-**Researched:** 2026-01-28
+**Domain:** MCP server architecture for Claude Code integration
+**Researched:** 2026-02-21
 **Confidence:** HIGH
 
-## Problem Statement
+## Current State Analysis
 
-When a coach marks a group exercise as "done," the system must update multiple `session_exercises` rows atomically:
-- Find all `session_exercises` for the same date + same `exercise_id` + `is_group=true`
-- Mark all as `completed=true` with `completed_at` timestamp
-- Propagate changes in real-time to all subscribed tablet clients
-- Respect RLS (coach can only update their own clients' sessions)
+The existing `helix-mcp` Edge Function is a single 2500-line file implementing a custom JSON-RPC handler over HTTP POST. It works with Claude Desktop (API key in headers), but contains dead OAuth 2.1 code for Claude Web that never functioned correctly.
+
+### What Works
+
+- **API key authentication** via `X-Helix-API-Key` header (SHA-256 hashed, stored in `coach_ai_settings`)
+- **JSON-RPC over POST**: Client sends JSON-RPC request, server returns JSON response
+- **Tool/Resource/Prompt definitions and handlers**: 23 tools, 19 resources, 5 prompts all working
+- **Supabase integration**: Service role client for data access, user isolation via userId
+
+### What Needs Fixing
+
+1. **Protocol version is outdated**: Reports `2024-11-05`, current is `2025-03-26` (with `2025-06-18` and `2025-11-25` also released)
+2. **No Streamable HTTP compliance**: Does not send `Accept` headers, no SSE support, no `Mcp-Session-Id` handling
+3. **Dead OAuth code**: ~140 lines of OAuth 2.1 / RFC 9728 code that never worked (`.well-known/oauth-protected-resource`, `.well-known/oauth-authorization-server`, `unauthorizedWithOAuthHint`)
+4. **Bearer token fallback auth**: Two unused Bearer token auth paths that are dead code
+5. **Excessive debug logging**: Every request logs all headers, body, etc.
+6. **No `Accept` header handling**: Responses are always `application/json`, never SSE
+7. **GET handler returns 405 for SSE**: Should return 405 per spec (this is actually correct for a stateless server), but the response format is wrong (JSON-RPC error body instead of simple 405)
+8. **`initialized` notification returns a response**: Per spec, `initialized` is a notification (no `id`), server should return 202 Accepted with no body, not a JSON-RPC response
 
 ## Recommended Architecture
 
+### Transport: Streamable HTTP (Stateless)
+
+Use the **Streamable HTTP** transport as defined in MCP spec `2025-03-26`. Because Supabase Edge Functions are serverless (no persistent processes), use the **stateless** variant:
+
+- Each HTTP POST creates a fresh handler context
+- No session management (`Mcp-Session-Id` not issued)
+- No SSE streaming (responses are single JSON objects)
+- GET requests return 405 Method Not Allowed (no server-initiated streams)
+
+This is the correct pattern for serverless deployments. Claude Code handles this gracefully -- when the server responds with `Content-Type: application/json` instead of opening an SSE stream, Claude Code processes the single JSON response directly.
+
+**Confidence: HIGH** -- Supabase official docs recommend this exact pattern. The stateless reference implementation confirms it works on serverless platforms.
+
+### Architecture: Two Approaches
+
+#### Approach A: Refactor Current Custom Handler (RECOMMENDED)
+
+Keep the existing custom JSON-RPC handler but fix protocol compliance:
+
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         Tablet UI (TabletLive.tsx)                       │
-│                                                                          │
-│  ┌──────────────────┐        ┌────────────────────────────────────────┐ │
-│  │ ClientStripBar   │        │         ExerciseCarousel               │ │
-│  │ (multi-client)   │        │  [group badge on grouped exercises]    │ │
-│  └──────────────────┘        └────────────────────────────────────────┘ │
-│           │                              │                               │
-│           └──────────────┬───────────────┘                               │
-│                          ▼                                               │
-│               ┌─────────────────────┐                                    │
-│               │  useLiveCoaching    │ ◄── completeGroupExercise()       │
-│               │      (hook)         │     (new method)                   │
-│               └──────────┬──────────┘                                    │
-└──────────────────────────┼───────────────────────────────────────────────┘
-                           │
-                           │ supabase.rpc('complete_group_exercise', {...})
-                           ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                    PostgreSQL (RPC Function)                              │
-│                                                                          │
-│  complete_group_exercise(                                                │
-│    p_session_exercise_id UUID,                                          │
-│    p_session_date DATE,                                                 │
-│    p_exercise_id UUID                                                   │
-│  ) RETURNS TABLE(updated_session_exercise_id UUID)                      │
-│                                                                          │
-│  [SECURITY INVOKER - respects RLS]                                      │
-│  [Entire function runs in single transaction]                            │
-└──────────────────────────┬───────────────────────────────────────────────┘
-                           │
-                           │ UPDATE triggers postgres_changes
-                           ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                    Supabase Realtime                                      │
-│                                                                          │
-│  Channel: 'session_exercises_changes'                                    │
-│  Event: postgres_changes on session_exercises table                      │
-│  Filter: session_date=eq.{date}                                          │
-│                                                                          │
-│  [Each updated row emits separate event]                                 │
-│  [All subscribed tablets receive updates]                                │
-└──────────────────────────────────────────────────────────────────────────┘
+Claude Code                    Supabase Edge Function
+    |                               |
+    |-- POST /helix-mcp ----------->|
+    |   Content-Type: application/json
+    |   Accept: application/json, text/event-stream
+    |   X-Helix-API-Key: hx_...     |
+    |                               |-- authenticate (API key hash lookup)
+    |                               |-- parse JSON-RPC request
+    |                               |-- route to handler
+    |                               |-- execute (Supabase queries)
+    |                               |
+    |<-- 200 OK --------------------|
+    |   Content-Type: application/json
+    |   { jsonrpc: "2.0", id: N, result: ... }
 ```
 
-### Component Boundaries
+**Why this approach**: The current code is well-structured and battle-tested. The business logic (23 tools, 19 resources, 5 prompts) is solid. The fixes needed are at the protocol layer, not the application layer. Introducing the MCP SDK would require rewriting all handlers to match SDK patterns, adding a dependency for no practical benefit.
 
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| `TabletLive.tsx` | UI rendering, user interactions | useLiveCoaching hook |
-| `useLiveCoaching` hook | State management, optimistic updates, DB calls | Supabase client, Realtime |
-| `complete_group_exercise` RPC | Atomic batch update, date/exercise matching | PostgreSQL tables |
-| Supabase Realtime | Push notifications for row changes | All subscribed clients |
+#### Approach B: Migrate to MCP TypeScript SDK
 
-### Data Flow
+Use `@modelcontextprotocol/sdk` with `WebStandardStreamableHTTPServerTransport`:
 
-1. **User Action**: Coach taps "Complete" on a group exercise
-2. **Hook Detection**: `useLiveCoaching.completeExercise()` checks if `is_group=true`
-3. **Optimistic Update**: Hook immediately updates local state for ALL matching exercises across all sessions
-4. **RPC Call**: Hook calls `supabase.rpc('complete_group_exercise', {...})`
-5. **Atomic Update**: PostgreSQL function updates all matching rows in single transaction
-6. **Realtime Events**: Each updated row triggers a `postgres_changes` event
-7. **State Reconciliation**: Other tablets receive events and update their local state
+```typescript
+import { McpServer } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/mcp.js'
+import { WebStandardStreamableHTTPServerTransport } from 'npm:@modelcontextprotocol/sdk@1.25.3/server/webStandardStreamableHttp.js'
+```
+
+**Why NOT this approach**: Adds ~100KB+ dependency, requires rewriting all 23 tool registrations to match SDK's `registerTool()` API with Zod schemas, and the SDK's transport creates a fresh McpServer instance per request (same stateless pattern we already have). The benefit is automatic protocol compliance, but the cost is a full rewrite of working business logic.
+
+### Recommendation: Approach A
+
+Fix the existing handler for protocol compliance. The changes are surgical:
+
+1. Update protocol version string
+2. Fix notification handling (return 202 for `initialized`)
+3. Handle `Accept` header properly
+4. Return correct 405 for GET
+5. Remove OAuth dead code
+6. Clean up logging
+7. Handle JSON-RPC batch arrays (even if just rejecting them cleanly)
+
+## Component Boundaries
+
+### Current (Monolith)
+
+```
+supabase/functions/helix-mcp/index.ts (2516 lines)
+  - Types (lines 1-52)
+  - Authentication (lines 54-130)
+  - Helper Functions (lines 132-166)
+  - MCP Protocol Constants (lines 168-206)
+  - Resource Definitions (lines 184-206)
+  - Tool Definitions (lines 208-522)
+  - Prompt Definitions (lines 525-566)
+  - Resource Handlers (lines 568-927)
+  - Tool Handlers (lines 929-1799)
+  - Prompt Handlers (lines 1801-2157)
+  - JSON-RPC Router (lines 2159-2275)
+  - OAuth Dead Code (lines 2278-2342)
+  - Main HTTP Handler (lines 2344-2515)
+```
+
+### Recommended (Same file, cleaned up)
+
+Supabase Edge Functions are single-file by convention (shared code goes in `_shared/`). Keep it as one file but reorganize:
+
+```
+supabase/functions/helix-mcp/index.ts (~2200 lines after cleanup)
+  - Types & Constants
+  - Authentication (API key only, ~30 lines)
+  - Protocol Handler (initialize, notifications, method routing)
+  - Resource Handlers
+  - Tool Handlers
+  - Prompt Handlers
+  - HTTP Entry Point (POST handler, GET 405, CORS)
+```
+
+Remove:
+- OAuth metadata endpoints (~60 lines)
+- Bearer token auth paths (~30 lines)
+- `unauthorizedWithOAuthHint` function (~25 lines)
+- Excessive debug logging (~30 lines)
+
+Total removal: ~145 lines of dead code.
+
+## Data Flow
+
+### Claude Code Configuration
+
+Claude Code connects to the MCP server via this command:
+
+```bash
+claude mcp add --transport http helix \
+  https://<project>.supabase.co/functions/v1/helix-mcp \
+  --header "X-Helix-API-Key: hx_..."
+```
+
+This stores the configuration in `~/.claude.json`:
+
+```json
+{
+  "mcpServers": {
+    "helix": {
+      "type": "http",
+      "url": "https://<project>.supabase.co/functions/v1/helix-mcp",
+      "headers": {
+        "X-Helix-API-Key": "hx_..."
+      }
+    }
+  }
+}
+```
+
+Or in `.mcp.json` at project root (for team sharing):
+
+```json
+{
+  "mcpServers": {
+    "helix": {
+      "type": "http",
+      "url": "${HELIX_MCP_URL}",
+      "headers": {
+        "X-Helix-API-Key": "${HELIX_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### Request/Response Flow (Streamable HTTP Spec Compliant)
+
+#### 1. Initialization
+
+```
+Claude Code -> POST /helix-mcp
+  Content-Type: application/json
+  Accept: application/json, text/event-stream
+  X-Helix-API-Key: hx_...
+
+  {"jsonrpc":"2.0","id":1,"method":"initialize","params":{
+    "protocolVersion":"2025-03-26",
+    "capabilities":{},
+    "clientInfo":{"name":"claude-code","version":"1.0"}
+  }}
+
+Server -> 200 OK
+  Content-Type: application/json
+
+  {"jsonrpc":"2.0","id":1,"result":{
+    "protocolVersion":"2025-03-26",
+    "serverInfo":{"name":"helix-fitness-coach","version":"1.0.0"},
+    "capabilities":{
+      "resources":{"listChanged":false},
+      "tools":{},
+      "prompts":{"listChanged":false}
+    }
+  }}
+```
+
+Note: Server does NOT issue `Mcp-Session-Id` (stateless). This is valid per spec -- session management is optional.
+
+#### 2. Initialized Notification
+
+```
+Claude Code -> POST /helix-mcp
+  Content-Type: application/json
+  Accept: application/json, text/event-stream
+  X-Helix-API-Key: hx_...
+
+  {"jsonrpc":"2.0","method":"initialized"}
+
+Server -> 202 Accepted
+  (no body)
+```
+
+**CRITICAL FIX**: Current code returns `{"jsonrpc":"2.0","id":null,"result":{}}` with 200. Per spec, notifications (no `id` field) get 202 Accepted with no body.
+
+#### 3. Tool/Resource/Prompt Calls
+
+```
+Claude Code -> POST /helix-mcp
+  Content-Type: application/json
+  Accept: application/json, text/event-stream
+  X-Helix-API-Key: hx_...
+
+  {"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
+
+Server -> 200 OK
+  Content-Type: application/json
+
+  {"jsonrpc":"2.0","id":2,"result":{"tools":[...]}}
+```
+
+#### 4. GET Requests (Not Supported)
+
+```
+Claude Code -> GET /helix-mcp
+  Accept: text/event-stream
+  X-Helix-API-Key: hx_...
+
+Server -> 405 Method Not Allowed
+  (no body, or simple error)
+```
+
+Per spec: "The server MUST either return Content-Type: text/event-stream in response to this HTTP GET, or else return HTTP 405 Method Not Allowed, indicating that the server does not offer an SSE stream at this endpoint."
+
+### Authentication Flow
+
+```
+Request arrives
+  |
+  v
+Check X-Helix-API-Key header
+  |
+  +-- Present: Hash with SHA-256
+  |     |
+  |     v
+  |   Query coach_ai_settings.helix_mcp_api_key_hash
+  |     |
+  |     +-- Match: Return { userId, supabase (service role client) }
+  |     +-- No match: Return 401
+  |
+  +-- Absent: Return 401
+```
+
+**SIMPLIFICATION**: Remove Bearer token and OAuth paths entirely. Claude Code uses custom headers for auth with remote MCP servers. The `--header` flag in `claude mcp add` is the standard mechanism.
+
+## Protocol Compliance Checklist
+
+### MCP 2025-03-26 Streamable HTTP Requirements
+
+| Requirement | Current Status | Fix Needed |
+|-------------|---------------|------------|
+| POST for JSON-RPC messages | YES | None |
+| Client sends Accept: application/json, text/event-stream | Not checked | Validate but don't require (permissive) |
+| Response Content-Type: application/json (for non-streaming) | YES | None |
+| Notifications get 202 Accepted | NO (returns 200 with body) | Fix `initialized` handler |
+| GET returns 405 or SSE stream | Partially (returns 405 but with JSON-RPC error body) | Simplify to clean 405 |
+| Protocol version 2025-03-26 | NO (reports 2024-11-05) | Update string |
+| Session ID optional | YES (not issued) | None |
+| No embedded newlines in messages | YES | None |
+
+### JSON-RPC Compliance
+
+| Requirement | Current Status | Fix Needed |
+|-------------|---------------|------------|
+| Requests have id field | Handled | None |
+| Notifications have no id field | Not distinguished | Detect and return 202 |
+| Error codes follow spec | Mostly | Review error codes |
+| Batch arrays | Not handled | Return -32600 Invalid Request for batches |
 
 ## Patterns to Follow
 
-### Pattern 1: PostgreSQL RPC for Atomic Batch Updates
+### Pattern 1: Notification Detection
 
-**What:** Use a PostgreSQL function called via `supabase.rpc()` for multi-row updates that must be atomic.
-
-**Why:** PostgREST wraps RPC calls in a transaction automatically. All operations inside the function succeed or fail together.
-
-**When:** Any operation that must update multiple rows atomically (group exercise completion, bulk status changes).
-
-**Example:**
-
-```sql
--- Migration: Create RPC function for group exercise completion
-CREATE OR REPLACE FUNCTION public.complete_group_exercise(
-  p_session_exercise_id UUID,
-  p_session_date DATE,
-  p_exercise_id UUID
-)
-RETURNS TABLE(updated_id UUID)
-LANGUAGE plpgsql
-SECURITY INVOKER  -- IMPORTANT: Respects RLS policies
-AS $$
-DECLARE
-  v_completed_at TIMESTAMPTZ := NOW();
-BEGIN
-  -- Update all matching group exercises for this date
-  -- RLS automatically filters to coach's clients only
-  RETURN QUERY
-  UPDATE public.session_exercises se
-  SET
-    completed = true,
-    completed_at = v_completed_at,
-    skipped = false
-  FROM public.sessions s
-  WHERE se.session_id = s.id
-    AND s.session_date = p_session_date
-    AND se.exercise_id = p_exercise_id
-    AND se.is_group = true
-  RETURNING se.id AS updated_id;
-END;
-$$;
-
--- Grant execute to authenticated users
-GRANT EXECUTE ON FUNCTION public.complete_group_exercise TO authenticated;
-```
-
-**Hook Integration:**
+Notifications in JSON-RPC are messages without an `id` field. The server must not return a JSON-RPC response for notifications.
 
 ```typescript
-const completeGroupExercise = useCallback(
-  async (
-    sessionExerciseId: string,
-    sessionDate: string,
-    exerciseId: string
-  ): Promise<string[]> => {
-    // Optimistic update for ALL matching exercises
-    const completedAt = new Date().toISOString();
-    setSessions((prev) =>
-      prev.map((session) => ({
-        ...session,
-        exercises: session.exercises?.map((ex) =>
-          ex.exercise_id === exerciseId && ex.is_group
-            ? { ...ex, completed: true, skipped: false, completed_at: completedAt }
-            : ex
-        ),
-      }))
-    );
+// Detect if message is a notification (no id field)
+function isNotification(body: Record<string, unknown>): boolean {
+  return !('id' in body)
+}
 
-    // Single atomic RPC call
-    const { data, error } = await supabase.rpc('complete_group_exercise', {
-      p_session_exercise_id: sessionExerciseId,
-      p_session_date: sessionDate,
-      p_exercise_id: exerciseId,
-    });
-
-    if (error) {
-      // Rollback optimistic update on error
-      await fetchSessionsForDate(sessionDate);
-      throw error;
-    }
-
-    return data?.map((r: { updated_id: string }) => r.updated_id) || [];
-  },
-  [fetchSessionsForDate]
-);
+// In main handler:
+if (isNotification(body)) {
+  // Process notification (e.g., "initialized")
+  // Return 202 Accepted with no body
+  return new Response(null, { status: 202, headers: corsHeaders })
+}
 ```
 
-### Pattern 2: SECURITY INVOKER for RLS Compliance
+**Confidence: HIGH** -- Directly from MCP spec and JSON-RPC 2.0 spec.
 
-**What:** Use `SECURITY INVOKER` (not `SECURITY DEFINER`) for RPC functions that should respect Row Level Security.
-
-**Why:** With `SECURITY INVOKER`, the function runs with the privileges of the calling user, so existing RLS policies on `session_exercises` and `sessions` are enforced. The coach can only update exercises belonging to their own clients.
-
-**When:** Any RPC function that modifies user-owned data and must respect tenant isolation.
-
-**Example:**
-
-```sql
--- SECURITY INVOKER makes this function respect RLS
-CREATE OR REPLACE FUNCTION public.complete_group_exercise(...)
-LANGUAGE plpgsql
-SECURITY INVOKER  -- Runs as the authenticated user
-AS $$
-  -- RLS policy "Users can update exercises of their sessions" is enforced
-  UPDATE public.session_exercises ...
-$$;
-```
-
-**Verification:**
-The existing RLS policy on `session_exercises`:
-```sql
-create policy "Users can update exercises of their sessions"
-  on public.session_exercises for update
-  using (exists (
-    select 1 from public.sessions s
-    join public.clients c on c.id = s.client_id
-    where s.id = session_exercises.session_id
-    and c.user_id = auth.uid()
-  ));
-```
-
-This policy is automatically applied to updates within the RPC function when using `SECURITY INVOKER`.
-
-### Pattern 3: Realtime Subscription with Table Filter
-
-**What:** Subscribe to `postgres_changes` on `session_exercises` with a filter for the current date.
-
-**Why:** Only receive events relevant to the current coaching session, reducing noise and improving performance.
-
-**When:** Real-time sync is needed but you want to limit the event stream.
-
-**Example:**
+### Pattern 2: Clean Error Responses
 
 ```typescript
-// In useLiveCoaching hook
-useEffect(() => {
-  if (!currentDate) return;
-
-  const channel = supabase
-    .channel(`session_exercises_${currentDate}`)
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'session_exercises',
-        // Note: Cannot filter by session_date directly as it's on sessions table
-        // Will filter in the handler
-      },
-      (payload) => {
-        const updated = payload.new as SessionExercise;
-        setSessions((prev) =>
-          prev.map((session) => ({
-            ...session,
-            exercises: session.exercises?.map((ex) =>
-              ex.id === updated.id ? { ...ex, ...updated } : ex
-            ),
-          }))
-        );
-      }
-    )
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [currentDate]);
+function jsonRpcError(id: string | number | null, code: number, message: string): Response {
+  return new Response(JSON.stringify({
+    jsonrpc: "2.0",
+    id,
+    error: { code, message }
+  }), {
+    status: 200,  // JSON-RPC errors use HTTP 200
+    headers: { ...corsHeaders, "Content-Type": "application/json" }
+  })
+}
 ```
 
-### Pattern 4: Optimistic Updates with Rollback
+Standard JSON-RPC error codes:
+- `-32700`: Parse error
+- `-32600`: Invalid Request
+- `-32601`: Method not found
+- `-32602`: Invalid params
+- `-32000` to `-32099`: Server error (implementation-defined)
 
-**What:** Update local state immediately before the database call, then reconcile if the call fails.
-
-**Why:** Provides instant feedback to the user. The coach sees the group exercise marked complete immediately, without waiting for the round-trip.
-
-**When:** Any user action that modifies data and has a clear expected outcome.
-
-**Example:**
+### Pattern 3: Minimal Authentication
 
 ```typescript
-const completeGroupExercise = async (...) => {
-  // 1. Optimistic update
-  const previousSessions = sessions; // Store for rollback
-  setSessions((prev) => /* apply optimistic changes */);
+async function authenticate(req: Request): Promise<string | null> {
+  const apiKey = req.headers.get("X-Helix-API-Key")
+  if (!apiKey) return null
 
-  try {
-    // 2. Database call
-    const { error } = await supabase.rpc('complete_group_exercise', {...});
-    if (error) throw error;
+  const hash = await hashApiKey(apiKey)
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  const client = createClient(supabaseUrl, serviceKey)
 
-    // 3. Success - optimistic update was correct
-    setSaveStatus('saved');
-  } catch (err) {
-    // 4. Rollback on error
-    setSessions(previousSessions);
-    // OR: Refetch to get authoritative state
-    await fetchSessionsForDate(sessionDate);
-    setSaveStatus('error');
-  }
-};
+  const { data } = await client
+    .from("coach_ai_settings")
+    .select("user_id")
+    .eq("helix_mcp_api_key_hash", hash)
+    .single()
+
+  return data?.user_id || null
+}
 ```
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Multiple Sequential Updates from Client
+### Anti-Pattern 1: Returning Responses for Notifications
 
-**What:** Calling `supabase.from('session_exercises').update()` in a loop for each matching exercise.
+**What:** Current code returns `{ jsonrpc: "2.0", id: null, result: {} }` for `initialized`.
+**Why bad:** Violates JSON-RPC spec. Notifications MUST NOT receive responses. MCP spec says notifications get HTTP 202.
+**Instead:** Detect notifications by absence of `id` field, return 202 with no body.
 
-**Why Bad:**
-- Not atomic: Some updates may succeed while others fail
-- Slow: N round trips for N exercises
-- Race conditions: Other clients may see partial updates
+### Anti-Pattern 2: OAuth Discovery Endpoints on MCP Server
 
-**Instead:** Use a single RPC function that updates all matching rows in one transaction.
+**What:** Serving `.well-known/oauth-protected-resource` and `.well-known/oauth-authorization-server` from the Edge Function.
+**Why bad:** These are dead code (Claude Web OAuth never worked), add complexity, confuse the request routing, and are not needed for Claude Code which uses header-based auth.
+**Instead:** Remove entirely. If OAuth is ever needed again, implement it properly on the auth server, not the resource server.
 
-```typescript
-// BAD - multiple round trips, not atomic
-for (const exercise of groupExercises) {
-  await supabase
-    .from('session_exercises')
-    .update({ completed: true })
-    .eq('id', exercise.id);
-}
+### Anti-Pattern 3: Multiple Auth Fallback Chains
 
-// GOOD - single atomic call
-await supabase.rpc('complete_group_exercise', {
-  p_session_date: date,
-  p_exercise_id: exerciseId,
-});
-```
+**What:** Try API key -> try Bearer with getUser -> try Bearer with header-based auth.
+**Why bad:** Three auth paths means three potential failure modes, confusing logs, and security surface. Only one path is actually used (API key).
+**Instead:** Single auth path: API key or 401. Period.
 
-### Anti-Pattern 2: SECURITY DEFINER for User Data
+### Anti-Pattern 4: Verbose Debug Logging in Production
 
-**What:** Creating RPC functions with `SECURITY DEFINER` that modify user-owned data.
-
-**Why Bad:**
-- Bypasses RLS, allowing potential access to other users' data
-- Security vulnerability if function parameters are not properly validated
-- Must manually implement access checks inside the function
-
-**Instead:** Use `SECURITY INVOKER` and let RLS handle authorization automatically.
-
-### Anti-Pattern 3: Polling Instead of Realtime
-
-**What:** Using `setInterval` to repeatedly fetch session data instead of subscribing to realtime updates.
-
-**Why Bad:**
-- Wastes bandwidth and database resources
-- Updates are delayed by poll interval
-- Doesn't scale with number of clients
-
-**Instead:** Subscribe to `postgres_changes` for the relevant table.
-
-### Anti-Pattern 4: Realtime Without Optimistic Updates
-
-**What:** Waiting for realtime events before updating the UI.
-
-**Why Bad:**
-- User experiences delay between action and feedback
-- Feels unresponsive on slow connections
-
-**Instead:** Apply optimistic updates immediately, use realtime to sync other clients and handle conflicts.
-
-## Migration Requirements
-
-### Database Migration
-
-```sql
--- 1. Add is_group column to session_exercises
-ALTER TABLE public.session_exercises
-ADD COLUMN is_group BOOLEAN NOT NULL DEFAULT false;
-
--- 2. Add index for efficient group exercise queries
-CREATE INDEX session_exercises_is_group_idx
-ON public.session_exercises(is_group)
-WHERE is_group = true;
-
--- 3. Create RPC function
-CREATE OR REPLACE FUNCTION public.complete_group_exercise(
-  p_session_exercise_id UUID,
-  p_session_date DATE,
-  p_exercise_id UUID
-)
-RETURNS TABLE(updated_id UUID)
-LANGUAGE plpgsql
-SECURITY INVOKER
-AS $$
-DECLARE
-  v_completed_at TIMESTAMPTZ := NOW();
-BEGIN
-  RETURN QUERY
-  UPDATE public.session_exercises se
-  SET
-    completed = true,
-    completed_at = v_completed_at,
-    skipped = false
-  FROM public.sessions s
-  WHERE se.session_id = s.id
-    AND s.session_date = p_session_date
-    AND se.exercise_id = p_exercise_id
-    AND se.is_group = true
-  RETURNING se.id AS updated_id;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.complete_group_exercise TO authenticated;
-
--- 4. Create similar function for skip_group_exercise
-CREATE OR REPLACE FUNCTION public.skip_group_exercise(
-  p_session_exercise_id UUID,
-  p_session_date DATE,
-  p_exercise_id UUID
-)
-RETURNS TABLE(updated_id UUID)
-LANGUAGE plpgsql
-SECURITY INVOKER
-AS $$
-BEGIN
-  RETURN QUERY
-  UPDATE public.session_exercises se
-  SET
-    skipped = true,
-    completed = false,
-    completed_at = NULL
-  FROM public.sessions s
-  WHERE se.session_id = s.id
-    AND s.session_date = p_session_date
-    AND se.exercise_id = p_exercise_id
-    AND se.is_group = true
-  RETURNING se.id AS updated_id;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.skip_group_exercise TO authenticated;
-
--- 5. Enable realtime for session_exercises
-ALTER PUBLICATION supabase_realtime ADD TABLE session_exercises;
-ALTER TABLE session_exercises REPLICA IDENTITY FULL;
-```
-
-### Hook Modifications
-
-The `useLiveCoaching` hook needs:
-
-1. **New method `completeGroupExercise`**: Calls RPC, handles optimistic updates
-2. **New method `skipGroupExercise`**: Similar for skip action
-3. **Modified `completeExercise`**: Detect `is_group` and delegate to group method
-4. **Modified `skipExercise`**: Detect `is_group` and delegate to group method
-5. **Realtime subscription**: Subscribe to `session_exercises` changes for current date
-
-### Type Updates
-
-```typescript
-// In types/index.ts
-export interface SessionExercise {
-  // ... existing fields
-  is_group: boolean;  // NEW
-}
-
-export interface SessionExerciseInsert {
-  // ... existing fields
-  is_group?: boolean;  // NEW
-}
-```
+**What:** Every request logs all headers, body, auth attempts.
+**Why bad:** Performance overhead, log noise, potential PII exposure (logging Bearer tokens even masked).
+**Instead:** Log only errors and important state transitions. Use structured logging (JSON) if needed.
 
 ## Scalability Considerations
 
-| Concern | Current Scale (1 coach) | 10 Coaches | 100 Coaches |
-|---------|-------------------------|------------|-------------|
-| Realtime subscriptions | 1-2 tablets | 10-20 tablets | 100-200 tablets |
-| Events per group complete | 2-5 rows | 2-5 rows per coach | Same (isolated by RLS) |
-| RPC function execution | < 10ms | < 10ms | < 10ms |
-| Realtime delivery | < 100ms | < 100ms | May need Broadcast |
+| Concern | Current (1 coach) | 10 coaches | 100 coaches |
+|---------|-------------------|------------|-------------|
+| Edge Function cold start | ~100ms | Same (isolated) | Same (isolated) |
+| Auth lookup (per request) | 1 DB query | 1 DB query | 1 DB query |
+| Tool execution | 1-5 DB queries | Same | Same |
+| Concurrent requests | Supabase handles | Supabase handles | May need connection pooling |
 
-**At 100+ concurrent tablets:**
-- Consider using `realtime.broadcast_changes()` trigger instead of `postgres_changes`
-- Allows custom payloads and better control over what's sent
-- See [Realtime Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database)
+The stateless architecture scales naturally with Supabase Edge Functions. No session state means no horizontal scaling concerns.
+
+## Integration Points
+
+### New Components: None
+
+No new files, tables, or infrastructure needed. This is a refactor of an existing Edge Function.
+
+### Modified Components
+
+| Component | Changes |
+|-----------|---------|
+| `supabase/functions/helix-mcp/index.ts` | Protocol compliance fixes, OAuth removal, auth simplification, logging cleanup |
+| `CLAUDE.md` | Update MCP section to reflect simplified auth, remove OAuth references |
+
+### Unchanged Components
+
+| Component | Why Unchanged |
+|-----------|---------------|
+| `coach_ai_settings` table | API key hash storage works correctly |
+| Settings page (API key generation) | Works correctly |
+| All tool handlers | Business logic is correct |
+| All resource handlers | Business logic is correct |
+| All prompt handlers | Business logic is correct |
+| `supabase/config.toml` | `verify_jwt = false` is correct for custom auth |
+| CI/CD pipeline | Edge Function deployment unchanged |
+
+## Claude Code Connection Verification
+
+After fixes, the connection should work with this test sequence:
+
+```bash
+# 1. Add the MCP server
+claude mcp add --transport http helix \
+  https://<project>.supabase.co/functions/v1/helix-mcp \
+  --header "X-Helix-API-Key: hx_..."
+
+# 2. Verify in Claude Code
+> /mcp
+# Should show "helix" as connected with tools/resources/prompts listed
+
+# 3. Test a resource read
+> @helix:helix://coach/summary
+
+# 4. Test a tool call
+> Use helix to list my clients
+
+# 5. Test a prompt
+> /mcp__helix__daily-briefing
+```
 
 ## Sources
 
-- [Supabase RPC JavaScript Reference](https://supabase.com/docs/reference/javascript/rpc) - HIGH confidence
-- [Supabase Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes) - HIGH confidence
-- [Supabase Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) - HIGH confidence
-- [Supabase Realtime Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database) - MEDIUM confidence (for scaling recommendations)
-- [Database Transactions Discussion](https://github.com/supabase/supabase/discussions/526) - MEDIUM confidence
-- [Transactions and RLS in Edge Functions](https://marmelab.com/blog/2025/12/08/supabase-edge-function-transaction-rls.html) - LOW confidence (external source)
-
-## Summary
-
-**Recommendation:** Use PostgreSQL RPC functions with `SECURITY INVOKER` for atomic group exercise updates. The function runs in a single transaction, respects existing RLS policies, and triggers realtime events for all updated rows. The hook applies optimistic updates before calling RPC and subscribes to realtime for cross-tablet sync.
-
-**Key architectural decisions:**
-1. **RPC over multiple client-side updates** - Atomicity guarantee
-2. **SECURITY INVOKER over DEFINER** - RLS compliance without custom auth logic
-3. **Optimistic updates + Realtime** - Instant feedback + eventual consistency
-4. **Table-level realtime subscription** - Simpler than broadcast, sufficient at current scale
+- [MCP Specification 2025-03-26: Transports](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports) -- HIGH confidence, authoritative spec
+- [Claude Code MCP Documentation](https://code.claude.com/docs/en/mcp) -- HIGH confidence, official Anthropic docs
+- [Supabase: Deploy MCP servers on Edge Functions](https://supabase.com/docs/guides/getting-started/byo-mcp) -- HIGH confidence, official Supabase docs
+- [Supabase: MCP server with mcp-lite](https://supabase.com/docs/guides/functions/examples/mcp-server-mcp-lite) -- HIGH confidence, official Supabase example
+- [Stateless MCP server reference](https://github.com/yigitkonur/example-mcp-server-streamable-http-stateless) -- MEDIUM confidence, community reference implementation
+- [MCP Streamable HTTP deep dive](https://www.claudemcp.com/blog/mcp-streamable-http) -- MEDIUM confidence, community blog
+- [Claude Code gains remote MCP support](https://www.infoq.com/news/2025/06/anthropic-claude-remote-mcp/) -- MEDIUM confidence, industry reporting
+- [MCP Specification Changelog](https://modelcontextprotocol.io/specification/2025-11-25/changelog) -- HIGH confidence, authoritative changelog
