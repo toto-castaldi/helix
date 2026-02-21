@@ -128,3 +128,29 @@
 
 ---
 
+
+## v1.5 Versioning GSD (Shipped: 2026-02-21)
+
+**Delivered:** GSD milestone-based versioning replacing date-time stamps, with version display across all three apps (coach, live tablet, landing) and GitHub link on landing page.
+
+**Phases completed:** 16-17 (2 plans total)
+
+**Key accomplishments:**
+- Replaced date-time version generation with milestone extraction from PROJECT.md/MILESTONES.md in CI/CD
+- Removed 3 unnecessary workflow steps (README update, version commit, git push) and write permissions
+- Live tablet shows milestone version (e.g. "v1.5") in date-select header
+- Landing page footer displays version with clickable GitHub repository link
+- Consistent `VITE_APP_VERSION || 'dev'` pattern across all three apps
+
+**Stats:**
+- 5 files modified (code)
+- +907 / -37 lines
+- 2 phases, 2 plans
+- 1 day (2026-02-21)
+
+**Git range:** `f91600c` -> `6a15f94`
+
+**What's next:** TBD — next milestone goals
+
+---
+

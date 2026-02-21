@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, un server MCP per pianificazione AI via Claude, e una landing page multilingua che presenta il prodotto su tre domini separati.
+Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, un server MCP per pianificazione AI via Claude, una landing page multilingua che presenta il prodotto su tre domini separati, e versioning basato su milestone GSD visibile su tutte le app.
 
 ## Core Value
 
@@ -39,18 +39,13 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 - ✓ Landing page multilingua (IT/EN) con hero, features, CTA — v1.4
 - ✓ Coach app su coach.helix.toto-castaldi.com (three-domain split) — v1.4
 - ✓ Infrastruttura tre domini con CI/CD e HTTPS automatico — v1.4
+- ✓ CI/CD versioning basato su milestone GSD (no date-time stamps) — v1.5
+- ✓ Version display su coach, live tablet, e landing page — v1.5
+- ✓ Landing page link al repository GitHub — v1.5
 
 ### Active
 
-**Current Milestone: v1.5 Versioning GSD**
-
-**Goal:** Sostituire il versioning date-time automatico con la versione milestone GSD, visibile su coach e live.
-
-**Target features:**
-- Rimozione versioning date-time dal CI/CD (generazione, README update, commit automatico)
-- Estrazione automatica versione da `.planning/MILESTONES.md` nel build
-- Display versione su coach app (gia presente, cambio formato)
-- Display versione su live tablet app (nuovo)
+(No active milestone — use `/gsd:new-milestone` to start next)
 
 ### Out of Scope
 
@@ -65,17 +60,17 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ## Context
 
-**Shipped v1.4 Landing Page + Domini** (2026-02-18):
-- Professional bilingual landing page at helix.toto-castaldi.com
-- Coach app migrated to coach.helix.toto-castaldi.com
-- Three-domain Nginx architecture with automated CI/CD and HTTPS
+**Shipped v1.5 Versioning GSD** (2026-02-21):
+- Milestone-based versioning replacing date-time stamps in CI/CD
+- Version display across all three apps with GitHub link on landing page
+- Cleaner deploy pipeline (no auto-commits, no write permissions)
 
 **Current codebase:**
-- ~13,500 LOC TypeScript
+- ~13,550 LOC TypeScript
 - Three entry points: coach app (index.html) + live tablet PWA (live.html) + landing page (landing.html)
 - MCP server with 23 tools, 19 resources, 5 prompts
 - Vite multi-entry config: vite.config.ts + vite.config.live.ts + vite.config.landing.ts
-- Deploy: GitHub Actions → Digital Ocean (3 domains, Nginx + HTTPS, cert-aware sync)
+- Deploy: GitHub Actions → Digital Ocean (3 domains, Nginx + HTTPS, milestone versioning)
 - Domains: helix.toto-castaldi.com (landing), coach.helix.toto-castaldi.com (app), live.helix.toto-castaldi.com (tablet)
 
 ## Constraints
@@ -110,6 +105,8 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | Three-domain split (landing/coach/live) | Clean separation of concerns per application | ✓ Good — independent deployments |
 | Cert-aware Nginx sync in CI/CD | Handles pre/post-certbot states without manual intervention | ✓ Good — zero-touch SSL transitions |
 | IT/EN toggle with browser auto-detection | Detects navigator.language, Italian fallback default | ✓ Good — smooth multilingual UX |
+| Version from PROJECT.md with MILESTONES.md fallback | Active milestone is primary source, shipped milestones as fallback, "dev" default | ✓ Good — works for both in-progress and shipped states |
+| Version on date-select screen (not TabletLive) | Avoids cluttering compact coaching interface | ✓ Good — visible but non-intrusive |
 
 ---
-*Last updated: 2026-02-21 after v1.5 milestone started*
+*Last updated: 2026-02-21 after v1.5 milestone shipped*
