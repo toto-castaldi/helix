@@ -8,6 +8,8 @@ import { Input } from '@/shared/components/ui/input'
 import { cn, getInitials, stringToHue } from '@/shared/lib/utils'
 import { LogOut, Calendar, Play } from 'lucide-react'
 
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'dev'
+
 export function TabletDateSelect() {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
@@ -43,6 +45,7 @@ export function TabletDateSelect() {
           <h1 className="text-2xl font-bold">Helix Live</h1>
         </div>
         <div className="flex items-center gap-4">
+          <span className="text-xs text-gray-500">{APP_VERSION}</span>
           <span className="text-gray-400">{user?.email}</span>
           <Button variant="ghost" size="icon-lg" onClick={handleLogout}>
             <LogOut className="w-6 h-6" />
