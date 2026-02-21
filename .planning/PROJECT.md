@@ -42,7 +42,15 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ### Active
 
-(No active milestone — use `/gsd:new-milestone` to start next)
+**Current Milestone: v1.5 Versioning GSD**
+
+**Goal:** Sostituire il versioning date-time automatico con la versione milestone GSD, visibile su coach e live.
+
+**Target features:**
+- Rimozione versioning date-time dal CI/CD (generazione, README update, commit automatico)
+- Estrazione automatica versione da `.planning/MILESTONES.md` nel build
+- Display versione su coach app (gia presente, cambio formato)
+- Display versione su live tablet app (nuovo)
 
 ### Out of Scope
 
@@ -104,4 +112,4 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | IT/EN toggle with browser auto-detection | Detects navigator.language, Italian fallback default | ✓ Good — smooth multilingual UX |
 
 ---
-*Last updated: 2026-02-18 after v1.4 milestone*
+*Last updated: 2026-02-21 after v1.5 milestone started*
