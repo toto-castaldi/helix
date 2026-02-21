@@ -81,10 +81,10 @@ Plans:
   2. Live tablet app displays the milestone version in the header or toolbar area
   3. Landing page displays the milestone version
   4. Landing page contains a clickable link to the GitHub repository (`github.com/toto-castaldi/helix`)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 17-01: TBD
+- [ ] 17-01-PLAN.md — Add version display to live tablet and landing page with GitHub link
 
 ## Progress
 
@@ -99,8 +99,8 @@ Phases execute in numeric order: 16 -> 17
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
 | 16 | v1.5 | Complete    | 2026-02-21 | 2026-02-21 |
-| 17 | v1.5 | 0/? | Not started | - |
+| 17 | v1.5 | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-21 after Phase 16 planning*
+*Last updated: 2026-02-21 after Phase 17 planning*
