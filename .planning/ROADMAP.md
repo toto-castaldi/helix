@@ -67,10 +67,10 @@ See `.planning/milestones/v1.4-ROADMAP.md` for details.
   2. The deploy workflow no longer generates a `YYYY.MM.DD.HHMM` version string
   3. The deploy workflow no longer commits `chore: update version to...` after each deploy
   4. The deploy workflow no longer updates README with a version badge/string
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 16-01: TBD
+- [ ] 16-01-PLAN.md — Replace date-time versioning with milestone extraction and clean up README
 
 ### Phase 17: Version Display
 **Goal**: Users can see the current Helix version on every app surface and access the source repository
@@ -98,9 +98,9 @@ Phases execute in numeric order: 16 -> 17
 | 10 | v1.2 | 2/2 | Complete | 2026-02-12 |
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
-| 16 | v1.5 | 0/? | Not started | - |
+| 16 | v1.5 | 0/1 | Not started | - |
 | 17 | v1.5 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-21 after v1.5 milestone roadmap created*
+*Last updated: 2026-02-21 after Phase 16 planning*
