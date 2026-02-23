@@ -1220,6 +1220,12 @@ async function executeTool(
         status?: string
       }
 
+      // Verify ownership before mutation
+      const ownership = await verifySessionOwnership(supabase, userId, session_id)
+      if (!ownership.owned) {
+        return { content: [{ type: "text", text: "Session not found" }] }
+      }
+
       const updates: Record<string, unknown> = {}
       if (session_date !== undefined) updates.session_date = session_date
       if (gym_id !== undefined) updates.gym_id = gym_id
@@ -1241,6 +1247,12 @@ async function executeTool(
     case "delete_session": {
       const { session_id } = args as { session_id: string }
 
+      // Verify ownership before mutation
+      const ownership = await verifySessionOwnership(supabase, userId, session_id)
+      if (!ownership.owned) {
+        return { content: [{ type: "text", text: "Session not found" }] }
+      }
+
       const { error } = await supabase
         .from("sessions")
         .delete()
@@ -1255,6 +1267,12 @@ async function executeTool(
 
     case "complete_session": {
       const { session_id } = args as { session_id: string }
+
+      // Verify ownership before mutation
+      const ownership = await verifySessionOwnership(supabase, userId, session_id)
+      if (!ownership.owned) {
+        return { content: [{ type: "text", text: "Session not found" }] }
+      }
 
       const { error } = await supabase
         .from("sessions")
@@ -1273,6 +1291,20 @@ async function executeTool(
         session_id: string
         new_date: string
         new_client_id?: string
+      }
+
+      // Verify ownership of source session
+      const sessionOwnership = await verifySessionOwnership(supabase, userId, session_id)
+      if (!sessionOwnership.owned) {
+        return { content: [{ type: "text", text: "Session not found" }] }
+      }
+
+      // If new_client_id provided, verify ownership of target client
+      if (new_client_id) {
+        const clientOwnership = await verifyClientOwnership(supabase, userId, new_client_id)
+        if (!clientOwnership.owned) {
+          return { content: [{ type: "text", text: "Client not found" }] }
+        }
       }
 
       // Fetch original session
@@ -1352,6 +1384,12 @@ async function executeTool(
         is_group?: boolean
       }
 
+      // Verify ownership before mutation
+      const ownership = await verifySessionOwnership(supabase, userId, session_id)
+      if (!ownership.owned) {
+        return { content: [{ type: "text", text: "Session not found" }] }
+      }
+
       // Get max order_index if not provided
       let finalOrderIndex = order_index
       if (finalOrderIndex === undefined) {
@@ -1403,6 +1441,12 @@ async function executeTool(
         is_group?: boolean
       }
 
+      // Verify ownership before mutation
+      const ownership = await verifySessionExerciseOwnership(supabase, userId, session_exercise_id)
+      if (!ownership.owned) {
+        return { content: [{ type: "text", text: "Exercise not found" }] }
+      }
+
       const updates: Record<string, unknown> = {}
       if (sets !== undefined) updates.sets = sets
       if (reps !== undefined) updates.reps = reps
@@ -1428,6 +1472,12 @@ async function executeTool(
     case "remove_session_exercise": {
       const { session_exercise_id } = args as { session_exercise_id: string }
 
+      // Verify ownership before mutation
+      const ownership = await verifySessionExerciseOwnership(supabase, userId, session_exercise_id)
+      if (!ownership.owned) {
+        return { content: [{ type: "text", text: "Exercise not found" }] }
+      }
+
       const { error } = await supabase
         .from("session_exercises")
         .delete()
@@ -1442,6 +1492,12 @@ async function executeTool(
 
     case "reorder_session_exercises": {
       const { session_id, exercise_ids } = args as { session_id: string; exercise_ids: string[] }
+
+      // Verify ownership before mutation
+      const ownership = await verifySessionOwnership(supabase, userId, session_id)
+      if (!ownership.owned) {
+        return { content: [{ type: "text", text: "Session not found" }] }
+      }
 
       // Update each exercise with new order_index
       const updates = exercise_ids.map((id, index) =>
