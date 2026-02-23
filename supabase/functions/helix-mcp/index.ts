@@ -132,6 +132,91 @@ async function fetchClientWithDetails(supabase: SupabaseClient, userId: string, 
 }
 
 // ============================================
+// Ownership Verification Helpers
+// ============================================
+
+async function verifySessionOwnership(
+  supabase: SupabaseClient,
+  userId: string,
+  sessionId: string
+): Promise<{ owned: boolean }> {
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("id, client:clients!inner(user_id)")
+    .eq("id", sessionId)
+    .single()
+
+  if (error || !data) {
+    return { owned: false }
+  }
+
+  const client = data.client as { user_id: string }
+  if (client.user_id !== userId) {
+    console.warn(`[SECURITY] Ownership violation: user=${userId} attempted to access session=${sessionId}`)
+    return { owned: false }
+  }
+
+  return { owned: true }
+}
+
+async function verifySessionExerciseOwnership(
+  supabase: SupabaseClient,
+  userId: string,
+  sessionExerciseId: string
+): Promise<{ owned: boolean; sessionId?: string }> {
+  const { data, error } = await supabase
+    .from("session_exercises")
+    .select("id, session_id, session:sessions!inner(client:clients!inner(user_id))")
+    .eq("id", sessionExerciseId)
+    .single()
+
+  if (error || !data) {
+    return { owned: false }
+  }
+
+  const session = data.session as { client: { user_id: string } }
+  if (session.client.user_id !== userId) {
+    console.warn(`[SECURITY] Ownership violation: user=${userId} attempted to access session_exercise=${sessionExerciseId}`)
+    return { owned: false }
+  }
+
+  return { owned: true, sessionId: data.session_id }
+}
+
+async function verifyClientOwnership(
+  supabase: SupabaseClient,
+  userId: string,
+  clientId: string
+): Promise<{ owned: boolean }> {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id")
+    .eq("id", clientId)
+    .eq("user_id", userId)
+    .single()
+
+  if (error || !data) {
+    if (error && error.code !== "PGRST116") {
+      // PGRST116 = "not found" - only log if the client exists but belongs to someone else
+      // For simplicity, we log on any failure that isn't a missing record
+    }
+    // Check if client exists to determine if this is a violation or just not found
+    const { data: exists } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("id", clientId)
+      .single()
+
+    if (exists) {
+      console.warn(`[SECURITY] Ownership violation: user=${userId} attempted to access client=${clientId}`)
+    }
+    return { owned: false }
+  }
+
+  return { owned: true }
+}
+
+// ============================================
 // MCP Protocol Implementation
 // ============================================
 
