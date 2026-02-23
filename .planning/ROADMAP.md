@@ -58,7 +58,7 @@ See `.planning/milestones/v1.5-ROADMAP.md` for details.
 
 **Milestone Goal:** Audit, fix, and polish the MCP server for reliable Claude Code integration, removing dead OAuth code and fixing security gaps.
 
-- [ ] **Phase 18: Security & Dead Code Removal** - Remove OAuth dead code and fix ownership verification on write tools
+- [x] **Phase 18: Security & Dead Code Removal** - Remove OAuth dead code and fix ownership verification on write tools (completed 2026-02-23)
 - [ ] **Phase 19: Protocol Compliance** - Upgrade to MCP 2025-03-26 with correct HTTP semantics
 - [ ] **Phase 20: Tool & Resource Quality** - English descriptions, error flags, annotations, and deduplication
 - [ ] **Phase 21: Response Polish** - Input validation and compact JSON responses
@@ -78,9 +78,9 @@ See `.planning/milestones/v1.5-ROADMAP.md` for details.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 18-01-PLAN.md — Frontend OAuth removal + CLAUDE.md documentation cleanup
-- [ ] 18-02-PLAN.md — Edge Function OAuth removal + auth error cleanup
-- [ ] 18-03-PLAN.md — Write tool ownership verification (8 tools)
+- [x] 18-01-PLAN.md — Frontend OAuth removal + CLAUDE.md documentation cleanup
+- [x] 18-02-PLAN.md — Edge Function OAuth removal + auth error cleanup
+- [x] 18-03-PLAN.md — Write tool ownership verification (8 tools)
 
 ### Phase 19: Protocol Compliance
 **Goal**: MCP server speaks spec-compliant Streamable HTTP at protocol version 2025-03-26
@@ -148,7 +148,7 @@ Phases execute in numeric order: 18 -> 19 -> 20 -> 21 -> 22
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
 | 16-17 | v1.5 | 2/2 | Complete | 2026-02-21 |
-| 18. Security & Dead Code Removal | 2/3 | In Progress|  | - |
+| 18. Security & Dead Code Removal | 3/3 | Complete   | 2026-02-23 | - |
 | 19. Protocol Compliance | v1.6 | 0/? | Not started | - |
 | 20. Tool & Resource Quality | v1.6 | 0/? | Not started | - |
 | 21. Response Polish | v1.6 | 0/? | Not started | - |
