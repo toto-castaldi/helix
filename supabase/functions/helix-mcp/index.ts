@@ -89,43 +89,10 @@ async function authenticateRequest(req: Request): Promise<{ userId: string; supa
       return { userId: data.user_id, supabase }
     }
     console.log("[AUTH] API key invalid:", error?.message)
+    return null
   }
 
-  // Fall back to Bearer token (Authorization header)
-  const authHeader = req.headers.get("Authorization")
-  console.log("[AUTH] Authorization header present:", !!authHeader)
-
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.substring(7)
-    console.log("[AUTH] Bearer token length:", token.length)
-    console.log("[AUTH] Token prefix:", token.substring(0, 50) + "...")
-
-    // Try to validate with getUser(token) - works for OAuth access tokens
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey)
-    console.log("[AUTH] Trying getUser(token) with service role...")
-    const { data: { user }, error } = await adminClient.auth.getUser(token)
-
-    if (user && !error) {
-      console.log("[AUTH] OAuth token valid! user_id:", user.id)
-      return { userId: user.id, supabase: adminClient }
-    }
-    console.log("[AUTH] getUser(token) failed:", error?.message, error?.status)
-
-    // If that fails, try the old method with header-based auth
-    console.log("[AUTH] Trying header-based auth...")
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: authHeader } },
-    })
-
-    const { data: { user: user2 }, error: error2 } = await supabase.auth.getUser()
-    if (user2 && !error2) {
-      console.log("[AUTH] Header-based auth valid! user_id:", user2.id)
-      return { userId: user2.id, supabase }
-    }
-    console.log("[AUTH] Header-based auth failed:", error2?.message, error2?.status)
-  }
-
-  console.log("[AUTH] All authentication methods failed")
+  console.log("[AUTH] No API key provided")
   return null
 }
 
@@ -2272,73 +2239,6 @@ async function handleJsonRpc(
       },
     }
   }
-}
-
-// ============================================
-// OAuth 2.1 Support for Claude Web
-// ============================================
-
-function getProtectedResourceMetadata(): Response {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!
-
-  // RFC 9728 Protected Resource Metadata
-  // https://datatracker.ietf.org/doc/html/rfc9728
-  const metadata = {
-    // The resource identifier (this MCP server)
-    resource: `${supabaseUrl}/functions/v1/helix-mcp`,
-
-    // Authorization servers that can issue tokens for this resource
-    // Supabase OAuth 2.1 Server endpoint
-    authorization_servers: [`${supabaseUrl}/auth/v1`],
-
-    // How bearer tokens can be sent
-    bearer_methods_supported: ["header"],
-
-    // Scopes this resource understands
-    scopes_supported: ["openid", "email", "profile"],
-
-    // Resource documentation (optional)
-    resource_documentation: "https://helix.toto-castaldi.com",
-
-    // Human-readable name
-    resource_name: "Helix Fitness Coach MCP",
-  }
-
-  console.log("[OAUTH] Protected Resource Metadata:", JSON.stringify(metadata, null, 2))
-
-  return new Response(JSON.stringify(metadata, null, 2), {
-    status: 200,
-    headers: {
-      ...corsHeaders,
-      "Content-Type": "application/json",
-      // Also add Cache-Control for discovery
-      "Cache-Control": "max-age=3600",
-    },
-  })
-}
-
-function unauthorizedWithOAuthHint(): Response {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!
-  const metadataUrl = `${supabaseUrl}/functions/v1/helix-mcp/.well-known/oauth-protected-resource`
-
-  return new Response(
-    JSON.stringify({
-      jsonrpc: "2.0",
-      id: null,
-      error: {
-        code: -32000,
-        message: "Unauthorized - Invalid API key or token",
-      },
-    }),
-    {
-      status: 401,
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "application/json",
-        "WWW-Authenticate": `Bearer resource_metadata="${metadataUrl}"`,
-      },
-    }
-  )
 }
 
 // ============================================
