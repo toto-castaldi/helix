@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 18 of 22 (Security & Dead Code Removal)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-02-21 — v1.6 roadmap created
+Plan: 1 of 3 in current phase
+Status: Executing
+Last activity: 2026-02-23 — Completed 18-01 (Frontend OAuth Dead Code Removal)
 
-Progress: [██████████████████████████░░░░] 86% (26/30 plans across all milestones, 0/5 v1.6 phases)
+Progress: [██████████████████████████░░░░] 87% (27/31 plans across all milestones, 1/3 phase 18 plans)
 
 ## Performance Metrics
 
@@ -36,6 +36,7 @@ Recent decisions affecting current work:
 - [v1.6]: Keep hand-rolled JSON-RPC, do NOT adopt MCP SDK (2,500 lines business logic preserved)
 - [v1.6]: Target MCP protocol version 2025-03-26 (skip 2025-06-18)
 - [v1.6]: API key auth only, remove all OAuth 2.1 code
+- [18-01]: Kept Google OAuth refs in CLAUDE.md (Supabase Auth, not MCP); API key is sole MCP auth
 
 ### Pending Todos
 
@@ -49,8 +50,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 18 context gathered, ready to plan
-Resume file: .planning/phases/18-security-dead-code-removal/18-CONTEXT.md
+Stopped at: Completed 18-01-PLAN.md (Frontend OAuth Dead Code Removal)
+Resume file: .planning/phases/18-security-dead-code-removal/18-01-SUMMARY.md
 
 ---
-*State tracking: v1.6 milestone — roadmap created, ready to plan*
+*State tracking: v1.6 milestone — phase 18, plan 01 complete*

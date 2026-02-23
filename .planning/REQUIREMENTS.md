@@ -9,7 +9,7 @@ Requirements for MCP Assessment & Fix milestone. Each maps to roadmap phases.
 
 ### Security & Auth
 
-- [ ] **SEC-01**: OAuth 2.1 dead code removed (endpoints, Bearer auth, discovery, ~150 lines)
+- [x] **SEC-01**: OAuth 2.1 dead code removed (endpoints, Bearer auth, discovery, ~150 lines)
 - [ ] **SEC-02**: Write tools verify coach ownership before executing mutations (6 tools: update_session, delete_session, complete_session, update_session_exercise, remove_session_exercise, reorder_session_exercises)
 
 ### Protocol Compliance
@@ -53,7 +53,7 @@ None — scope is fix and polish only.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 18 | Pending |
+| SEC-01 | Phase 18 | Complete |
 | SEC-02 | Phase 18 | Pending |
 | PROTO-01 | Phase 19 | Pending |
 | PROTO-02 | Phase 19 | Pending |

@@ -148,7 +148,7 @@ Phases execute in numeric order: 18 -> 19 -> 20 -> 21 -> 22
 | 11 | v1.3 | 1/1 | Complete | 2026-02-13 |
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
 | 16-17 | v1.5 | 2/2 | Complete | 2026-02-21 |
-| 18. Security & Dead Code Removal | v1.6 | 0/? | Not started | - |
+| 18. Security & Dead Code Removal | 2/3 | In Progress|  | - |
 | 19. Protocol Compliance | v1.6 | 0/? | Not started | - |
 | 20. Tool & Resource Quality | v1.6 | 0/? | Not started | - |
 | 21. Response Polish | v1.6 | 0/? | Not started | - |
