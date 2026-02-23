@@ -2281,13 +2281,13 @@ async function handleJsonRpc(
           jsonrpc: "2.0",
           id,
           result: {
-            protocolVersion: "2024-11-05",
+            protocolVersion: "2025-03-26",
             serverInfo: SERVER_INFO,
             capabilities: CAPABILITIES,
           },
         }
 
-      case "initialized":
+      case "notifications/initialized":
         return { jsonrpc: "2.0", id, result: {} }
 
       case "resources/list":
@@ -2444,6 +2444,22 @@ Deno.serve(async (req: Request) => {
     console.log("[RPC] Method:", body.method)
     console.log("[RPC] ID:", body.id)
 
+    // Detect JSON-RPC notification (no "id" field) — MCP 2025-03-26 Streamable HTTP
+    // Spec: "If the input consists solely of JSON-RPC notifications,
+    // the server MUST return HTTP status code 202 Accepted with no body."
+    const isNotification = !Array.isArray(body) && typeof body === "object" && body !== null && !("id" in body)
+    const isBatchNotification = Array.isArray(body) && body.length > 0 && body.every((msg: unknown) =>
+      typeof msg === "object" && msg !== null && !("id" in (msg as Record<string, unknown>))
+    )
+
+    if (isNotification || isBatchNotification) {
+      console.log("[RPC] Notification received:", isNotification ? (body as Record<string, unknown>).method : "batch")
+      return new Response(null, {
+        status: 202,
+        headers: corsHeaders,
+      })
+    }
+
     // Allow initialize without authentication (clients can discover server info)
     if (body.method === "initialize") {
       console.log("[RPC] Initialize request - no auth required")
@@ -2451,7 +2467,7 @@ Deno.serve(async (req: Request) => {
         jsonrpc: "2.0",
         id: body.id,
         result: {
-          protocolVersion: "2024-11-05",
+          protocolVersion: "2025-03-26",
           serverInfo: SERVER_INFO,
           capabilities: CAPABILITIES,
         },
