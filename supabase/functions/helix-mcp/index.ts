@@ -11,8 +11,8 @@ import {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-helix-api-key",
-  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  "Access-Control-Allow-Headers": "x-client-info, apikey, content-type, x-helix-api-key",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 }
 
 // ============================================
@@ -65,7 +65,6 @@ async function hashApiKey(apiKey: string): Promise<string> {
 
 async function authenticateRequest(req: Request): Promise<{ userId: string; supabase: SupabaseClient } | null> {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!
-  const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!
   const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
   console.log("[AUTH] Starting authentication...")
@@ -2259,10 +2258,7 @@ Deno.serve(async (req: Request) => {
   console.log("[REQ] Headers:")
   req.headers.forEach((value, key) => {
     // Mask sensitive values
-    if (key.toLowerCase() === "authorization") {
-      const masked = value.substring(0, 20) + "..." + (value.length > 20 ? `(${value.length} chars)` : "")
-      console.log(`  ${key}: ${masked}`)
-    } else if (key.toLowerCase() === "x-helix-api-key") {
+    if (key.toLowerCase() === "x-helix-api-key") {
       console.log(`  ${key}: ***masked*** (${value.length} chars)`)
     } else {
       console.log(`  ${key}: ${value}`)
@@ -2276,93 +2272,24 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  // Handle Protected Resource Metadata (RFC 9728)
-  // Claude Web uses this for OAuth discovery
-  if (req.method === "GET" && url.pathname.endsWith("/.well-known/oauth-protected-resource")) {
-    console.log("[OAUTH] Protected Resource Metadata request")
-    const response = getProtectedResourceMetadata()
-    console.log("[OAUTH] Returning metadata")
-    return response
-  }
-
-  // Handle OAuth Authorization Server Metadata (RFC 8414)
-  // Claude may request this on our server instead of the actual auth server
-  // We proxy the Supabase Auth metadata
-  if (req.method === "GET" && url.pathname.endsWith("/.well-known/oauth-authorization-server")) {
-    console.log("[OAUTH] Authorization Server Metadata request - proxying from Supabase")
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!
-
-    try {
-      // Fetch the actual OAuth metadata from Supabase Auth
-      const metadataResponse = await fetch(`${supabaseUrl}/auth/v1/.well-known/openid-configuration`)
-      const metadata = await metadataResponse.json()
-
-      console.log("[OAUTH] Proxied Supabase Auth metadata")
-      return new Response(JSON.stringify(metadata, null, 2), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    } catch (error) {
-      console.error("[OAUTH] Failed to fetch Supabase metadata:", error)
-      return new Response(JSON.stringify({
-        error: "Failed to fetch authorization server metadata"
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
-  }
-
-  // Handle non-wellknown GET requests (SSE stream or health check)
-  // Claude Web sends GET with accept: text/event-stream for Streamable HTTP transport (MCP 2025-11-25)
-  if (req.method === "GET" && !url.pathname.includes("/.well-known/")) {
-    const acceptHeader = req.headers.get("accept") || ""
-    const mcpVersion = req.headers.get("mcp-protocol-version") || "none"
-    const hasAuth = !!req.headers.get("authorization") || !!req.headers.get("x-helix-api-key")
-    console.log("[GET] Non-wellknown GET request")
-    console.log("[GET] Accept:", acceptHeader)
-    console.log("[GET] MCP-Protocol-Version:", mcpVersion)
-    console.log("[GET] Has auth headers:", hasAuth)
-
-    // Authenticate first - GET requests also need auth (fixes Claude Web OAuth flow)
-    const auth = await authenticateRequest(req)
-    if (!auth) {
-      console.log("[GET] Authentication failed - returning 401 with OAuth hint")
-      console.log("[GET] This should trigger OAuth discovery on the client")
-      return unauthorizedWithOAuthHint()
-    }
-    console.log("[GET] Authenticated as user:", auth.userId)
-
-    // If client wants SSE (Streamable HTTP transport), we don't support server-to-client streaming
-    if (acceptHeader.includes("text/event-stream")) {
-      console.log("[GET] SSE stream requested by authenticated user - returning 405 (not supported)")
-      return new Response(JSON.stringify({
-        jsonrpc: "2.0",
-        id: null,
-        error: {
-          code: -32000,
-          message: "SSE streaming not supported. Use POST for JSON-RPC requests.",
-        },
-      }), {
-        status: 405,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
-    }
-
-    // Health check (authenticated)
-    console.log("[GET] Authenticated health check - returning 200")
+  // All GET requests return 405 - only POST is supported for JSON-RPC
+  if (req.method === "GET") {
+    console.log("[GET] Returning 405 - only POST supported")
     return new Response(JSON.stringify({
-      status: "ok",
-      server: "helix-mcp",
-      version: "1.0.0"
+      jsonrpc: "2.0",
+      id: null,
+      error: {
+        code: -32000,
+        message: "Method not allowed. Use POST for JSON-RPC requests."
+      }
     }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json", "Allow": "POST, OPTIONS" }
     })
   }
 
   try {
-    // Try to read body for logging
+    // Read and parse request body
     let bodyText = ""
     try {
       bodyText = await req.text()
@@ -2371,20 +2298,52 @@ Deno.serve(async (req: Request) => {
       console.log("[REQ] Body: (could not read)")
     }
 
-    // Authenticate request
-    const auth = await authenticateRequest(req)
-    if (!auth) {
-      console.log("[AUTH] Authentication failed - returning 401 with OAuth hint")
-      return unauthorizedWithOAuthHint()
-    }
-
-    const { userId, supabase } = auth
-    console.log("[AUTH] Authenticated as user:", userId)
-
     // Parse JSON-RPC request
     const body = JSON.parse(bodyText) as JsonRpcRequest
     console.log("[RPC] Method:", body.method)
     console.log("[RPC] ID:", body.id)
+
+    // Allow initialize without authentication (clients can discover server info)
+    if (body.method === "initialize") {
+      console.log("[RPC] Initialize request - no auth required")
+      const response: JsonRpcResponse = {
+        jsonrpc: "2.0",
+        id: body.id,
+        result: {
+          protocolVersion: "2024-11-05",
+          serverInfo: SERVER_INFO,
+          capabilities: CAPABILITIES,
+        },
+      }
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      })
+    }
+
+    // Authenticate request (API key only)
+    const apiKey = req.headers.get("X-Helix-API-Key")
+    const auth = await authenticateRequest(req)
+    if (!auth) {
+      const errorMessage = apiKey
+        ? "Invalid API key. Generate a new key in Helix Settings."
+        : "Missing X-Helix-API-Key header. Set X-Helix-API-Key header. Generate key in Helix Settings."
+      console.log("[AUTH] Authentication failed -", errorMessage)
+      return new Response(JSON.stringify({
+        jsonrpc: "2.0",
+        id: body?.id ?? null,
+        error: {
+          code: -32000,
+          message: errorMessage,
+        }
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    const { userId, supabase } = auth
+    console.log("[AUTH] Authenticated as user:", userId)
 
     // Handle request
     const response = await handleJsonRpc(body, supabase, userId)
