@@ -169,24 +169,6 @@ export function Settings() {
             </pre>
           </div>
 
-          {/* Configuration Instructions - Claude Web */}
-          <div className="border-t pt-4 mt-4">
-            <Label className="text-sm font-medium">Claude Web (claude.ai)</Label>
-            <p className="text-xs text-muted-foreground mt-1 mb-3">
-              Connetti Claude Web tramite OAuth senza bisogno di API key.
-            </p>
-            <ol className="text-xs text-muted-foreground space-y-2 list-decimal list-inside">
-              <li>Vai su <span className="font-medium text-foreground">claude.ai</span> e apri le impostazioni</li>
-              <li>Aggiungi un nuovo <span className="font-medium text-foreground">Custom Connector</span></li>
-              <li>Inserisci l'URL del server MCP:</li>
-            </ol>
-            <pre className="text-xs bg-muted p-2 rounded-md mt-2 overflow-x-auto">
-{`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/helix-mcp`}
-            </pre>
-            <p className="text-xs text-muted-foreground mt-2">
-              Claude Web ti reindirizzerà automaticamente per autorizzare l'accesso.
-            </p>
-          </div>
         </CardContent>
       </Card>
 
