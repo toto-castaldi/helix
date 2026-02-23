@@ -90,20 +90,23 @@ Plans:
   1. Server declares protocol version `2025-03-26` in initialize response and Claude Code accepts the connection
   2. Sending an `initialized` notification (JSON-RPC message without `id`) returns HTTP 202 with no body
   3. GET requests to the MCP endpoint return HTTP 405 Method Not Allowed with correct CORS headers
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 19-01: TBD
+- [ ] 19-01-PLAN.md — Protocol version upgrade, notification handling, GET 405 verification
 
 ### Phase 20: Tool & Resource Quality
 **Goal**: Claude Code can accurately select, invoke, and recover from errors across all tools and resources
 **Depends on**: Phase 19
 **Requirements**: TOOL-01, TOOL-02, TOOL-03, TOOL-04
+**Gap Closure**: Closes integration gaps from v1.6 audit (read resource ownership, inconsistent joins)
 **Success Criteria** (what must be TRUE):
   1. All tool and resource descriptions are in English, following MCP best practices (what it does, when to use it, what it returns)
   2. Every tool error response includes `isError: true` flag so Claude Code can detect and recover from failures
   3. All tools have annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`) and Claude Code shows appropriate confirmation prompts for destructive operations
   4. No duplicate read-only tools that replicate resource functionality -- resources are the read mechanism, tools are for mutations
+  5. Read resources `helix://clients/{id}/goals` and `helix://clients/{id}/sessions` verify coach ownership before returning data
+  6. `list_sessions` tool uses consistent inner join pattern matching other ownership-verified queries
 **Plans**: TBD
 
 Plans:
@@ -156,4 +159,4 @@ Phases execute in numeric order: 18 -> 19 -> 20 -> 21 -> 22
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-21 after v1.6 milestone roadmap created*
+*Last updated: 2026-02-23 after gap closure analysis (integration gaps folded into Phase 20)*
