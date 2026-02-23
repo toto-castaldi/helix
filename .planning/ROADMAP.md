@@ -75,11 +75,12 @@ See `.planning/milestones/v1.5-ROADMAP.md` for details.
   2. Claude Code connects with `X-Helix-API-Key` header without being redirected to OAuth flows
   3. A coach cannot modify another coach's sessions or exercises through any write tool (update_session, delete_session, complete_session, update_session_exercise, remove_session_exercise, reorder_session_exercises)
   4. Unauthenticated requests receive a clear error response (not a redirect or discovery document)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 18-01: TBD
-- [ ] 18-02: TBD
+- [ ] 18-01-PLAN.md — Frontend OAuth removal + CLAUDE.md documentation cleanup
+- [ ] 18-02-PLAN.md — Edge Function OAuth removal + auth error cleanup
+- [ ] 18-03-PLAN.md — Write tool ownership verification (8 tools)
 
 ### Phase 19: Protocol Compliance
 **Goal**: MCP server speaks spec-compliant Streamable HTTP at protocol version 2025-03-26
