@@ -260,6 +260,20 @@ function isNonEmptyString(s: unknown): s is string {
   return typeof s === "string" && s.trim().length > 0
 }
 
+function stripNulls(obj: unknown): unknown {
+  if (obj === null || obj === undefined) return undefined
+  if (Array.isArray(obj)) return obj.map(stripNulls)
+  if (typeof obj === "object" && obj !== null) {
+    const result: Record<string, unknown> = {}
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      const stripped = stripNulls(value)
+      if (stripped !== undefined) result[key] = stripped
+    }
+    return result
+  }
+  return obj
+}
+
 function validateToolInput(name: string, args: Record<string, unknown>): string | null {
   switch (name) {
     case "create_session": {
@@ -806,7 +820,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("last_name")
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://clients/{id}
@@ -821,7 +835,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .single()
 
     if (error) throw new Error(`[not_found] Client ${clientId} not found.`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data)) }]
   }
 
   // helix://clients/{id}/card
@@ -855,7 +869,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("started_at", { ascending: false })
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://clients/{id}/sessions
@@ -880,7 +894,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("session_date", { ascending: false })
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://gyms
@@ -892,7 +906,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("name")
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://gyms/{id}
@@ -907,7 +921,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .single()
 
     if (error) throw new Error(`[not_found] Gym ${gymId} not found.`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data)) }]
   }
 
   // helix://exercises
@@ -922,7 +936,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("name")
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://exercises/tags
@@ -933,7 +947,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
 
     if (error) throw new Error(`[database_error] ${error.message}`)
     const uniqueTags = [...new Set((data || []).map(d => d.tag))].sort()
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(uniqueTags, null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(uniqueTags)) }]
   }
 
   // helix://exercises/tags/{tag}
@@ -951,7 +965,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("name")
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://exercises/{id}
@@ -970,7 +984,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .single()
 
     if (error) throw new Error(`[not_found] Exercise ${exerciseId} not found.`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data)) }]
   }
 
   // helix://exercises/{id}/lumio
@@ -1007,7 +1021,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .limit(50)
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://sessions/planned
@@ -1024,7 +1038,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("session_date", { ascending: true })
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://sessions/date/{date}
@@ -1046,7 +1060,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("session_date", date)
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   // helix://sessions/{id}
@@ -1069,7 +1083,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .single()
 
     if (error) throw new Error(`[not_found] Session ${sessionId} not found.`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data)) }]
   }
 
   // helix://group-templates
@@ -1098,7 +1112,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       updated_at: t.updated_at,
     }))
 
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(templatesWithPreview, null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(templatesWithPreview)) }]
   }
 
   // helix://group-templates/{id}
@@ -1128,7 +1142,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       data.exercises.sort((a, b) => a.order_index - b.order_index)
     }
 
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data)) }]
   }
 
   // helix://coach/summary
@@ -1148,7 +1162,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
         sessions_count: sessionsRes.count || 0,
         gyms_count: gymsRes.count || 0,
         exercises_count: exercisesRes.count || 0,
-      }, null, 2),
+      }),
     }]
   }
 
@@ -1170,7 +1184,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("session_date", today)
 
     if (error) throw new Error(`[database_error] ${error.message}`)
-    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(stripNulls(data || [])) }]
   }
 
   throw new Error(`[not_found] Resource not found: ${uri}`)
