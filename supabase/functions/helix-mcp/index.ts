@@ -233,6 +233,141 @@ function toolError(
 }
 
 // ============================================
+// Validation Helpers
+// ============================================
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+
+function isValidUuid(s: unknown): s is string {
+  return typeof s === "string" && UUID_RE.test(s)
+}
+
+function isValidDate(s: unknown): s is string {
+  if (typeof s !== "string" || !DATE_RE.test(s)) return false
+  return !isNaN(Date.parse(s))
+}
+
+function isPositiveNumber(n: unknown): n is number {
+  return typeof n === "number" && n > 0 && isFinite(n)
+}
+
+function isNonNegativeNumber(n: unknown): n is number {
+  return typeof n === "number" && n >= 0 && isFinite(n)
+}
+
+function isNonEmptyString(s: unknown): s is string {
+  return typeof s === "string" && s.trim().length > 0
+}
+
+function validateToolInput(name: string, args: Record<string, unknown>): string | null {
+  switch (name) {
+    case "create_session": {
+      if (!isValidUuid(args.client_id)) return "client_id must be a valid UUID."
+      if (!isValidDate(args.session_date)) return "session_date must be a valid date (YYYY-MM-DD)."
+      if (args.gym_id !== undefined && !isValidUuid(args.gym_id)) return "gym_id must be a valid UUID."
+      return null
+    }
+    case "update_session": {
+      if (!isValidUuid(args.session_id)) return "session_id must be a valid UUID."
+      if (args.session_date !== undefined && !isValidDate(args.session_date)) return "session_date must be a valid date (YYYY-MM-DD)."
+      if (args.gym_id !== undefined && !isValidUuid(args.gym_id)) return "gym_id must be a valid UUID."
+      if (args.status !== undefined && args.status !== "planned" && args.status !== "completed") return "status must be 'planned' or 'completed'."
+      return null
+    }
+    case "delete_session":
+    case "complete_session": {
+      if (!isValidUuid(args.session_id)) return "session_id must be a valid UUID."
+      return null
+    }
+    case "duplicate_session": {
+      if (!isValidUuid(args.session_id)) return "session_id must be a valid UUID."
+      if (!isValidDate(args.new_date)) return "new_date must be a valid date (YYYY-MM-DD)."
+      if (args.new_client_id !== undefined && !isValidUuid(args.new_client_id)) return "new_client_id must be a valid UUID."
+      return null
+    }
+    case "add_session_exercise": {
+      if (!isValidUuid(args.session_id)) return "session_id must be a valid UUID."
+      if (!isValidUuid(args.exercise_id)) return "exercise_id must be a valid UUID."
+      if (args.sets !== undefined && !isPositiveNumber(args.sets)) return "sets must be a positive number."
+      if (args.reps !== undefined && !isPositiveNumber(args.reps)) return "reps must be a positive number."
+      if (args.weight_kg !== undefined && !isNonNegativeNumber(args.weight_kg)) return "weight_kg must be a non-negative number."
+      if (args.duration_seconds !== undefined && !isPositiveNumber(args.duration_seconds)) return "duration_seconds must be a positive number."
+      if (args.order_index !== undefined && !isNonNegativeNumber(args.order_index)) return "order_index must be a non-negative number."
+      return null
+    }
+    case "update_session_exercise": {
+      if (!isValidUuid(args.session_exercise_id)) return "session_exercise_id must be a valid UUID."
+      if (args.sets !== undefined && !isPositiveNumber(args.sets)) return "sets must be a positive number."
+      if (args.reps !== undefined && !isPositiveNumber(args.reps)) return "reps must be a positive number."
+      if (args.weight_kg !== undefined && !isNonNegativeNumber(args.weight_kg)) return "weight_kg must be a non-negative number."
+      if (args.duration_seconds !== undefined && !isPositiveNumber(args.duration_seconds)) return "duration_seconds must be a positive number."
+      return null
+    }
+    case "remove_session_exercise": {
+      if (!isValidUuid(args.session_exercise_id)) return "session_exercise_id must be a valid UUID."
+      return null
+    }
+    case "reorder_session_exercises": {
+      if (!isValidUuid(args.session_id)) return "session_id must be a valid UUID."
+      if (!Array.isArray(args.exercise_ids)) return "exercise_ids must be an array."
+      if (args.exercise_ids.length === 0) return "exercise_ids must not be empty."
+      for (const id of args.exercise_ids) {
+        if (!isValidUuid(id)) return `exercise_ids contains invalid UUID: ${id}`
+      }
+      return null
+    }
+    case "create_training_plan": {
+      if (!isValidUuid(args.client_id)) return "client_id must be a valid UUID."
+      if (!isValidDate(args.session_date)) return "session_date must be a valid date (YYYY-MM-DD)."
+      if (args.gym_id !== undefined && !isValidUuid(args.gym_id)) return "gym_id must be a valid UUID."
+      if (!Array.isArray(args.exercises)) return "exercises must be an array."
+      if (args.exercises.length === 0) return "exercises must not be empty."
+      for (let i = 0; i < args.exercises.length; i++) {
+        const ex = args.exercises[i]
+        if (!ex || typeof ex !== "object") return `exercises[${i}] must be an object.`
+        if (!isNonEmptyString((ex as Record<string, unknown>).exercise_name)) return `exercises[${i}].exercise_name is required.`
+      }
+      return null
+    }
+    case "create_group_template": {
+      if (!isNonEmptyString(args.name)) return "name is required and must not be empty."
+      return null
+    }
+    case "update_group_template": {
+      if (!isValidUuid(args.template_id)) return "template_id must be a valid UUID."
+      if (!isNonEmptyString(args.name)) return "name is required and must not be empty."
+      return null
+    }
+    case "delete_group_template": {
+      if (!isValidUuid(args.template_id)) return "template_id must be a valid UUID."
+      return null
+    }
+    case "add_template_exercise": {
+      if (!isValidUuid(args.template_id)) return "template_id must be a valid UUID."
+      if (!isValidUuid(args.exercise_id)) return "exercise_id must be a valid UUID."
+      if (args.sets !== undefined && !isPositiveNumber(args.sets)) return "sets must be a positive number."
+      if (args.reps !== undefined && !isPositiveNumber(args.reps)) return "reps must be a positive number."
+      if (args.weight_kg !== undefined && !isNonNegativeNumber(args.weight_kg)) return "weight_kg must be a non-negative number."
+      if (args.duration_seconds !== undefined && !isPositiveNumber(args.duration_seconds)) return "duration_seconds must be a positive number."
+      return null
+    }
+    case "remove_template_exercise": {
+      if (!isValidUuid(args.template_exercise_id)) return "template_exercise_id must be a valid UUID."
+      return null
+    }
+    case "apply_template_to_session": {
+      if (!isValidUuid(args.template_id)) return "template_id must be a valid UUID."
+      if (!isValidUuid(args.session_id)) return "session_id must be a valid UUID."
+      if (args.mode !== "append" && args.mode !== "replace") return "mode must be 'append' or 'replace'."
+      return null
+    }
+    default:
+      return null
+  }
+}
+
+// ============================================
 // MCP Protocol Implementation
 // ============================================
 
@@ -1051,6 +1186,11 @@ async function executeTool(
   supabase: SupabaseClient,
   userId: string
 ): Promise<{ content: Array<{ type: string; text: string }>; isError?: true }> {
+  const validationError = validateToolInput(name, args as Record<string, unknown>)
+  if (validationError) {
+    return toolError('validation_error', validationError)
+  }
+
   switch (name) {
     case "create_session": {
       const { client_id, session_date, gym_id, notes } = args as {
