@@ -5,26 +5,26 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** During group lessons, the coach can manage shared exercises from a single view, completing them once for all participants
-**Current focus:** Phase 18 - Security & Dead Code Removal
+**Current focus:** Phase 19 - Protocol Compliance
 
 ## Current Position
 
-Phase: 18 of 22 (Security & Dead Code Removal) -- COMPLETE
-Plan: 3 of 3 in current phase
+Phase: 19 of 22 (Protocol Compliance) -- COMPLETE
+Plan: 1 of 1 in current phase
 Status: Phase Complete
-Last activity: 2026-02-23 — Completed 18-03 (Write Tool Ownership Verification)
+Last activity: 2026-02-24 — Completed 19-01 (MCP Protocol 2025-03-26 Upgrade)
 
-Progress: [██████████████████████████████] 94% (29/31 plans across all milestones, 3/3 phase 18 plans)
+Progress: [██████████████████████████████] 97% (30/31 plans across all milestones, 1/1 phase 19 plans)
 
 ## Performance Metrics
 
 **Cumulative (v1.0 through v1.5):**
-- Total plans completed: 29 (6 + 10 + 2 + 1 + 5 + 2 + 3)
-- Total phases completed: 17 (4 + 5 + 1 + 1 + 4 + 1 + 1)
+- Total plans completed: 30 (6 + 10 + 2 + 1 + 5 + 2 + 3 + 1)
+- Total phases completed: 18 (4 + 5 + 1 + 1 + 4 + 1 + 1 + 1)
 
 **v1.6 (in progress):**
 - Phases: 18-22 (5 phases, plans TBD)
-- Completed: 1/5 phases (Phase 18 complete)
+- Completed: 2/5 phases (Phase 18, 19 complete)
 
 ## Accumulated Context
 
@@ -39,6 +39,7 @@ Recent decisions affecting current work:
 - [18-01]: Kept Google OAuth refs in CLAUDE.md (Supabase Auth, not MCP); API key is sole MCP auth
 - [18-02]: Removed SUPABASE_ANON_KEY from authenticateRequest; cleaned CORS headers to match API key-only model
 - [18-03]: Inner join ownership verification pattern for write tools; English "not found" error messages; verifyClientOwnership existence check for accurate violation logging
+- [19-01]: Notification detection before auth check (notifications/initialized sent without API key); batch notification support for spec completeness
 
 ### Pending Todos
 
@@ -51,9 +52,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-23
-Stopped at: Completed 18-03-PLAN.md (Write Tool Ownership Verification) -- Phase 18 complete
-Resume file: .planning/phases/18-security-dead-code-removal/18-03-SUMMARY.md
+Last session: 2026-02-24
+Stopped at: Completed 19-01-PLAN.md (MCP Protocol 2025-03-26 Upgrade) -- Phase 19 complete
+Resume file: .planning/phases/19-protocol-compliance/19-01-SUMMARY.md
 
 ---
-*State tracking: v1.6 milestone — phase 18 complete, ready for phase 19*
+*State tracking: v1.6 milestone — phase 19 complete, ready for phase 20*

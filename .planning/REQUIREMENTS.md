@@ -14,9 +14,9 @@ Requirements for MCP Assessment & Fix milestone. Each maps to roadmap phases.
 
 ### Protocol Compliance
 
-- [ ] **PROTO-01**: Server declares MCP protocol version `2025-03-26`
-- [ ] **PROTO-02**: Notifications (`initialized`) receive HTTP 202 response instead of JSON-RPC response
-- [ ] **PROTO-03**: GET requests receive clean 405 response, CORS headers correct for Streamable HTTP
+- [x] **PROTO-01**: Server declares MCP protocol version `2025-03-26`
+- [x] **PROTO-02**: Notifications (`initialized`) receive HTTP 202 response instead of JSON-RPC response
+- [x] **PROTO-03**: GET requests receive clean 405 response, CORS headers correct for Streamable HTTP
 
 ### Tool Quality
 
@@ -55,9 +55,9 @@ None — scope is fix and polish only.
 |-------------|-------|--------|
 | SEC-01 | Phase 18 | Complete |
 | SEC-02 | Phase 18 | Complete |
-| PROTO-01 | Phase 19 | Pending |
-| PROTO-02 | Phase 19 | Pending |
-| PROTO-03 | Phase 19 | Pending |
+| PROTO-01 | Phase 19 | Complete |
+| PROTO-02 | Phase 19 | Complete |
+| PROTO-03 | Phase 19 | Complete |
 | TOOL-01 | Phase 20 | Pending |
 | TOOL-02 | Phase 20 | Pending |
 | TOOL-03 | Phase 20 | Pending |
@@ -72,6 +72,10 @@ None — scope is fix and polish only.
 - Mapped to phases: 13
 - Unmapped: 0
 
+**Integration gaps (from v1.6 audit, no REQ-ID):**
+- Read resource ownership (goals, sessions) → Phase 20
+- Inconsistent list_sessions join pattern → Phase 20
+
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-21 after roadmap creation (traceability added)*
+*Last updated: 2026-02-23 after gap closure analysis (integration gaps assigned to Phase 20)*
