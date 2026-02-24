@@ -120,10 +120,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Invalid tool parameters (missing required fields, wrong types, invalid UUIDs) return clear validation errors before any database query executes
   2. JSON responses omit null fields and unnecessary whitespace, keeping responses compact for Claude Code's context window
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 21-01: TBD
+- [ ] 21-01-PLAN.md — Input validation on all 16 tools + compact JSON responses with null stripping
 
 ### Phase 22: End-to-End Testing & Documentation
 **Goal**: Every MCP capability is verified working with Claude Code and coaches have setup instructions
@@ -154,7 +154,7 @@ Phases execute in numeric order: 18 -> 19 -> 20 -> 21 -> 22
 | 18. Security & Dead Code Removal | 3/3 | Complete    | 2026-02-23 | - |
 | 19. Protocol Compliance | 1/1 | Complete    | 2026-02-24 | - |
 | 20. Tool & Resource Quality | 2/2 | Complete    | 2026-02-24 | - |
-| 21. Response Polish | v1.6 | 0/? | Not started | - |
+| 21. Response Polish | v1.6 | 0/1 | Not started | - |
 | 22. End-to-End Testing & Documentation | v1.6 | 0/? | Not started | - |
 
 ---
