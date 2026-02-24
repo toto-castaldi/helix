@@ -17,6 +17,12 @@ interface Translations {
   }[]
   ctaCoach: string
   ctaLive: string
+  mcpTitle: string
+  mcpSubtitle: string
+  mcpStep1: string
+  mcpStep2: string
+  mcpCommand: string
+  mcpNote: string
 }
 
 const translations: Record<Lang, Translations> = {
@@ -48,6 +54,14 @@ const translations: Record<Lang, Translations> = {
     ],
     ctaCoach: 'Coach App',
     ctaLive: 'Live Tablet',
+    mcpTitle: 'Integrazione Claude Code',
+    mcpSubtitle: 'Usa il tuo assistente AI preferito per pianificare gli allenamenti direttamente con i dati Helix',
+    mcpStep1: '1. Genera la tua API Key nella pagina <strong>Impostazioni</strong> della Coach App',
+    mcpStep2: '2. Esegui questo comando nel terminale:',
+    mcpCommand: `claude mcp add --transport http helix \\
+  --header "X-Helix-API-Key: YOUR_API_KEY" \\
+  YOUR_HELIX_MCP_URL`,
+    mcpNote: 'Trovi il tuo URL MCP personale nella pagina Impostazioni della Coach App.',
   },
   en: {
     tagline: 'Your AI-powered fitness coaching assistant',
@@ -77,6 +91,14 @@ const translations: Record<Lang, Translations> = {
     ],
     ctaCoach: 'Coach App',
     ctaLive: 'Live Tablet',
+    mcpTitle: 'Claude Code Integration',
+    mcpSubtitle: 'Use your favorite AI assistant to plan workouts directly with your Helix data',
+    mcpStep1: '1. Generate your API Key in the <strong>Settings</strong> page of the Coach App',
+    mcpStep2: '2. Run this command in your terminal:',
+    mcpCommand: `claude mcp add --transport http helix \\
+  --header "X-Helix-API-Key: YOUR_API_KEY" \\
+  YOUR_HELIX_MCP_URL`,
+    mcpNote: 'Find your personal MCP URL in the Settings page of the Coach App.',
   },
 }
 
@@ -148,6 +170,28 @@ function render(lang: Lang): void {
             <p class="feature-card-desc">${f.description}</p>
           </div>
         `).join('')}
+      </div>
+    </section>
+
+    <!-- MCP Integration Section -->
+    <section class="mcp-setup">
+      <div class="mcp-content">
+        <div class="mcp-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mcp-icon">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </div>
+        <h2 class="mcp-title">${t.mcpTitle}</h2>
+        <p class="mcp-subtitle">${t.mcpSubtitle}</p>
+        <div class="mcp-steps">
+          <p class="mcp-step">${t.mcpStep1}</p>
+          <p class="mcp-step">${t.mcpStep2}</p>
+          <div class="mcp-code-block">
+            <pre><code>${t.mcpCommand}</code></pre>
+          </div>
+          <p class="mcp-note">${t.mcpNote}</p>
+        </div>
       </div>
     </section>
 

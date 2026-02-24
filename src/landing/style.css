@@ -311,6 +311,116 @@ body {
   margin: 0;
 }
 
+/* --- MCP Integration Section --- */
+
+.mcp-setup {
+  padding: 3rem 1.5rem 4rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.mcp-content {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.mcp-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, var(--helix-violet-light), var(--helix-amber-light));
+  margin-bottom: 1rem;
+}
+
+.mcp-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--helix-violet);
+}
+
+.mcp-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1f2937;
+  margin: 0 0 0.5rem;
+}
+
+.mcp-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  line-height: 1.55;
+  margin: 0 0 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mcp-steps {
+  text-align: left;
+}
+
+.mcp-step {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.mcp-step strong {
+  color: var(--helix-coral);
+}
+
+.mcp-code-block {
+  background: #1f2937;
+  border-radius: 0.625rem;
+  padding: 1.25rem 1.5rem;
+  margin: 0.75rem 0 1.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mcp-code-block pre {
+  margin: 0;
+  padding: 0;
+}
+
+.mcp-code-block code {
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+  font-size: 0.825rem;
+  line-height: 1.65;
+  color: #e5e7eb;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.mcp-note {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  line-height: 1.55;
+  margin: 0;
+  font-style: italic;
+}
+
+@media (min-width: 768px) {
+  .mcp-title {
+    font-size: 1.75rem;
+  }
+
+  .mcp-code-block code {
+    font-size: 0.875rem;
+    white-space: pre;
+    word-break: normal;
+  }
+}
+
 /* --- Bottom CTA Section --- */
 
 .bottom-cta {
