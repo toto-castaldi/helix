@@ -217,6 +217,22 @@ async function verifyClientOwnership(
 }
 
 // ============================================
+// Error Helpers
+// ============================================
+
+type ErrorCategory = 'not_found' | 'access_denied' | 'validation_error' | 'database_error' | 'unknown_tool' | 'template_in_use'
+
+function toolError(
+  category: ErrorCategory,
+  message: string
+): { content: Array<{ type: string; text: string }>; isError: true } {
+  return {
+    content: [{ type: "text", text: `[${category}] ${message}` }],
+    isError: true,
+  }
+}
+
+// ============================================
 // MCP Protocol Implementation
 // ============================================
 
@@ -558,7 +574,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("user_id", userId)
       .order("last_name")
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -573,7 +589,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("user_id", userId)
       .single()
 
-    if (error) throw new Error(`Cliente non trovato: ${clientId}`)
+    if (error) throw new Error(`[not_found] Client ${clientId} not found.`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
   }
 
@@ -582,7 +598,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
   if (clientCardMatch) {
     const clientId = clientCardMatch[1]
     const result = await fetchClientWithDetails(supabase, userId, clientId)
-    if (!result) throw new Error(`Cliente non trovato: ${clientId}`)
+    if (!result) throw new Error(`[not_found] Client ${clientId} not found.`)
 
     const markdown = generateClientCard(
       result.client as Client,
@@ -644,7 +660,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("user_id", userId)
       .order("name")
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -659,7 +675,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("user_id", userId)
       .single()
 
-    if (error) throw new Error(`Palestra non trovata: ${gymId}`)
+    if (error) throw new Error(`[not_found] Gym ${gymId} not found.`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
   }
 
@@ -674,7 +690,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .or(`user_id.eq.${userId},user_id.is.null`)
       .order("name")
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -684,7 +700,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .from("exercise_tags")
       .select("tag")
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     const uniqueTags = [...new Set((data || []).map(d => d.tag))].sort()
     return [{ uri, mimeType: "application/json", text: JSON.stringify(uniqueTags, null, 2) }]
   }
@@ -722,7 +738,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .or(`user_id.eq.${userId},user_id.is.null`)
       .single()
 
-    if (error) throw new Error(`Esercizio non trovato: ${exerciseId}`)
+    if (error) throw new Error(`[not_found] Exercise ${exerciseId} not found.`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
   }
 
@@ -737,11 +753,11 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .or(`user_id.eq.${userId},user_id.is.null`)
       .single()
 
-    if (error) throw new Error(`Esercizio non trovato: ${exerciseId}`)
+    if (error) throw new Error(`[not_found] Exercise ${exerciseId} not found.`)
 
     const lumioCard = exercise?.lumio_card as { content: string } | null
     if (!lumioCard) {
-      return [{ uri, mimeType: "text/plain", text: "Nessuna scheda Lumio associata a questo esercizio." }]
+      return [{ uri, mimeType: "text/plain", text: "No Lumio card linked to this exercise." }]
     }
     return [{ uri, mimeType: "text/markdown", text: lumioCard.content }]
   }
@@ -759,7 +775,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .order("session_date", { ascending: false })
       .limit(50)
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -776,7 +792,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("status", "planned")
       .order("session_date", { ascending: true })
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -798,7 +814,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("client.user_id", userId)
       .eq("session_date", date)
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -821,7 +837,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("client.user_id", userId)
       .single()
 
-    if (error) throw new Error(`Sessione non trovata: ${sessionId}`)
+    if (error) throw new Error(`[not_found] Session ${sessionId} not found.`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }]
   }
 
@@ -839,7 +855,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("user_id", userId)
       .order("name")
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
 
     // Transform for preview: count + first 3 exercise names
     const templatesWithPreview = (data || []).map(t => ({
@@ -874,7 +890,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("user_id", userId)
       .single()
 
-    if (error) throw new Error(`Template non trovato: ${templateId}`)
+    if (error) throw new Error(`[not_found] Template ${templateId} not found.`)
 
     // Sort exercises by order_index
     if (data.exercises) {
@@ -922,11 +938,11 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("client.user_id", userId)
       .eq("session_date", today)
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
-  throw new Error(`Resource not found: ${uri}`)
+  throw new Error(`[not_found] Resource not found: ${uri}`)
 }
 
 // ============================================
@@ -938,7 +954,7 @@ async function executeTool(
   args: Record<string, unknown>,
   supabase: SupabaseClient,
   userId: string
-): Promise<{ content: Array<{ type: string; text: string }> }> {
+): Promise<{ content: Array<{ type: string; text: string }>; isError?: true }> {
   switch (name) {
     case "create_session": {
       const { client_id, session_date, gym_id, notes } = args as {
@@ -957,7 +973,7 @@ async function executeTool(
         .single()
 
       if (clientErr || !client) {
-        return { content: [{ type: "text", text: "Errore: Cliente non trovato o non autorizzato" }] }
+        return toolError('not_found', `Client ${client_id} not found. Use helix://clients resource to find valid client IDs.`)
       }
 
       const { data, error } = await supabase
@@ -973,10 +989,10 @@ async function executeTool(
         .single()
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to create session: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Sessione creata con successo. ID: ${data.id}` }] }
+      return { content: [{ type: "text", text: `Session created successfully. ID: ${data.id}` }] }
     }
 
     case "update_session": {
@@ -991,7 +1007,7 @@ async function executeTool(
       // Verify ownership before mutation
       const ownership = await verifySessionOwnership(supabase, userId, session_id)
       if (!ownership.owned) {
-        return { content: [{ type: "text", text: "Session not found" }] }
+        return toolError('access_denied', `Access denied to session ${session_id}. You can only modify sessions belonging to your clients.`)
       }
 
       const updates: Record<string, unknown> = {}
@@ -1006,10 +1022,10 @@ async function executeTool(
         .eq("id", session_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to update session: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Sessione ${session_id} aggiornata con successo.` }] }
+      return { content: [{ type: "text", text: `Session ${session_id} updated successfully.` }] }
     }
 
     case "delete_session": {
@@ -1018,7 +1034,7 @@ async function executeTool(
       // Verify ownership before mutation
       const ownership = await verifySessionOwnership(supabase, userId, session_id)
       if (!ownership.owned) {
-        return { content: [{ type: "text", text: "Session not found" }] }
+        return toolError('access_denied', `Access denied to session ${session_id}. You can only modify sessions belonging to your clients.`)
       }
 
       const { error } = await supabase
@@ -1027,10 +1043,10 @@ async function executeTool(
         .eq("id", session_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to delete session: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Sessione ${session_id} eliminata con successo.` }] }
+      return { content: [{ type: "text", text: `Session ${session_id} deleted successfully.` }] }
     }
 
     case "complete_session": {
@@ -1039,7 +1055,7 @@ async function executeTool(
       // Verify ownership before mutation
       const ownership = await verifySessionOwnership(supabase, userId, session_id)
       if (!ownership.owned) {
-        return { content: [{ type: "text", text: "Session not found" }] }
+        return toolError('access_denied', `Access denied to session ${session_id}. You can only modify sessions belonging to your clients.`)
       }
 
       const { error } = await supabase
@@ -1048,10 +1064,10 @@ async function executeTool(
         .eq("id", session_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to complete session: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Sessione ${session_id} completata.` }] }
+      return { content: [{ type: "text", text: `Session ${session_id} marked as completed.` }] }
     }
 
     case "duplicate_session": {
@@ -1064,14 +1080,14 @@ async function executeTool(
       // Verify ownership of source session
       const sessionOwnership = await verifySessionOwnership(supabase, userId, session_id)
       if (!sessionOwnership.owned) {
-        return { content: [{ type: "text", text: "Session not found" }] }
+        return toolError('access_denied', `Access denied to session ${session_id}. You can only modify sessions belonging to your clients.`)
       }
 
       // If new_client_id provided, verify ownership of target client
       if (new_client_id) {
         const clientOwnership = await verifyClientOwnership(supabase, userId, new_client_id)
         if (!clientOwnership.owned) {
-          return { content: [{ type: "text", text: "Client not found" }] }
+          return toolError('access_denied', `Access denied to client ${new_client_id}. You can only create sessions for your own clients.`)
         }
       }
 
@@ -1086,7 +1102,7 @@ async function executeTool(
         .single()
 
       if (fetchErr || !original) {
-        return { content: [{ type: "text", text: "Errore: Sessione non trovata" }] }
+        return toolError('not_found', `Session ${session_id} not found.`)
       }
 
       // Create new session
@@ -1103,7 +1119,7 @@ async function executeTool(
         .single()
 
       if (createErr || !newSession) {
-        return { content: [{ type: "text", text: `Errore: ${createErr?.message}` }] }
+        return toolError('database_error', `Failed to duplicate session: ${createErr?.message}`)
       }
 
       // Copy exercises
@@ -1136,7 +1152,7 @@ async function executeTool(
         await supabase.from("session_exercises").insert(newExercises)
       }
 
-      return { content: [{ type: "text", text: `Sessione duplicata con successo. Nuova sessione ID: ${newSession.id}` }] }
+      return { content: [{ type: "text", text: `Session duplicated successfully. New session ID: ${newSession.id}` }] }
     }
 
     case "add_session_exercise": {
@@ -1155,7 +1171,7 @@ async function executeTool(
       // Verify ownership before mutation
       const ownership = await verifySessionOwnership(supabase, userId, session_id)
       if (!ownership.owned) {
-        return { content: [{ type: "text", text: "Session not found" }] }
+        return toolError('access_denied', `Access denied to session ${session_id}. You can only modify sessions belonging to your clients.`)
       }
 
       // Get max order_index if not provided
@@ -1190,10 +1206,10 @@ async function executeTool(
         .single()
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to add exercise: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Esercizio aggiunto alla sessione. ID: ${data.id}` }] }
+      return { content: [{ type: "text", text: `Exercise added to session. ID: ${data.id}` }] }
     }
 
     case "update_session_exercise": {
@@ -1212,7 +1228,7 @@ async function executeTool(
       // Verify ownership before mutation
       const ownership = await verifySessionExerciseOwnership(supabase, userId, session_exercise_id)
       if (!ownership.owned) {
-        return { content: [{ type: "text", text: "Exercise not found" }] }
+        return toolError('access_denied', `Access denied to session exercise ${session_exercise_id}. You can only modify exercises in your clients' sessions.`)
       }
 
       const updates: Record<string, unknown> = {}
@@ -1231,10 +1247,10 @@ async function executeTool(
         .eq("id", session_exercise_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to update exercise: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Esercizio ${session_exercise_id} aggiornato.` }] }
+      return { content: [{ type: "text", text: `Session exercise ${session_exercise_id} updated.` }] }
     }
 
     case "remove_session_exercise": {
@@ -1243,7 +1259,7 @@ async function executeTool(
       // Verify ownership before mutation
       const ownership = await verifySessionExerciseOwnership(supabase, userId, session_exercise_id)
       if (!ownership.owned) {
-        return { content: [{ type: "text", text: "Exercise not found" }] }
+        return toolError('access_denied', `Access denied to session exercise ${session_exercise_id}. You can only modify exercises in your clients' sessions.`)
       }
 
       const { error } = await supabase
@@ -1252,10 +1268,10 @@ async function executeTool(
         .eq("id", session_exercise_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to remove exercise: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: "Esercizio rimosso dalla sessione." }] }
+      return { content: [{ type: "text", text: "Exercise removed from session." }] }
     }
 
     case "reorder_session_exercises": {
@@ -1264,7 +1280,7 @@ async function executeTool(
       // Verify ownership before mutation
       const ownership = await verifySessionOwnership(supabase, userId, session_id)
       if (!ownership.owned) {
-        return { content: [{ type: "text", text: "Session not found" }] }
+        return toolError('access_denied', `Access denied to session ${session_id}. You can only modify sessions belonging to your clients.`)
       }
 
       // Update each exercise with new order_index
@@ -1278,7 +1294,7 @@ async function executeTool(
 
       await Promise.all(updates)
 
-      return { content: [{ type: "text", text: "Esercizi riordinati con successo." }] }
+      return { content: [{ type: "text", text: "Exercises reordered successfully." }] }
     }
 
     case "create_training_plan": {
@@ -1307,7 +1323,7 @@ async function executeTool(
         .single()
 
       if (clientErr || !client) {
-        return { content: [{ type: "text", text: "Errore: Cliente non trovato o non autorizzato" }] }
+        return toolError('not_found', `Client ${client_id} not found. Use helix://clients resource to find valid client IDs.`)
       }
 
       // Create session
@@ -1324,7 +1340,7 @@ async function executeTool(
         .single()
 
       if (sessionErr || !session) {
-        return { content: [{ type: "text", text: `Errore creazione sessione: ${sessionErr?.message}` }] }
+        return toolError('database_error', `Failed to create session: ${sessionErr?.message}`)
       }
 
       // Match exercises by name and create session_exercises
@@ -1359,14 +1375,14 @@ async function executeTool(
             })
           exerciseResults.push(`✓ ${ex.exercise_name}`)
         } else {
-          exerciseResults.push(`✗ ${ex.exercise_name} (non trovato)`)
+          exerciseResults.push(`✗ ${ex.exercise_name} (not found in exercise catalog)`)
         }
       }
 
       return {
         content: [{
           type: "text",
-          text: `Piano creato con successo!\n\nSessione ID: ${session.id}\nData: ${session_date}\n\nEsercizi:\n${exerciseResults.join("\n")}`,
+          text: `Training plan created successfully!\n\nSession ID: ${session.id}\nDate: ${session_date}\n\nExercises:\n${exerciseResults.join("\n")}`,
         }],
       }
     }
@@ -1382,10 +1398,10 @@ async function executeTool(
         .single()
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to create template: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Template "${name}" creato con successo. ID: ${data.id}` }] }
+      return { content: [{ type: "text", text: `Template "${name}" created successfully. ID: ${data.id}` }] }
     }
 
     case "update_group_template": {
@@ -1400,7 +1416,7 @@ async function executeTool(
         .single()
 
       if (checkErr || !existing) {
-        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+        return toolError('not_found', `Template ${template_id} not found. Use helix://group-templates resource to find valid template IDs.`)
       }
 
       const { error } = await supabase
@@ -1409,10 +1425,10 @@ async function executeTool(
         .eq("id", template_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to update template: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Template "${name}" aggiornato con successo.` }] }
+      return { content: [{ type: "text", text: `Template "${name}" updated successfully.` }] }
     }
 
     case "delete_group_template": {
@@ -1427,7 +1443,7 @@ async function executeTool(
         .single()
 
       if (checkErr || !existing) {
-        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+        return toolError('not_found', `Template ${template_id} not found. Use helix://group-templates resource to find valid template IDs.`)
       }
 
       // Check if template is in use (canDeleteTemplate pattern)
@@ -1437,11 +1453,11 @@ async function executeTool(
         .eq("template_id", template_id)
 
       if (countErr) {
-        return { content: [{ type: "text", text: `Errore: ${countErr.message}` }] }
+        return toolError('database_error', `Failed to check template usage: ${countErr.message}`)
       }
 
       if ((count ?? 0) > 0) {
-        return { content: [{ type: "text", text: "Errore: Impossibile eliminare il template perche' e' utilizzato in una o piu' sessioni" }] }
+        return toolError('template_in_use', 'Cannot delete template because it is used in one or more sessions. Remove template exercises from sessions first.')
       }
 
       const { error } = await supabase
@@ -1450,10 +1466,10 @@ async function executeTool(
         .eq("id", template_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to delete template: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Template eliminato con successo.` }] }
+      return { content: [{ type: "text", text: "Template deleted successfully." }] }
     }
 
     case "add_template_exercise": {
@@ -1476,7 +1492,7 @@ async function executeTool(
         .single()
 
       if (templateErr || !template) {
-        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+        return toolError('not_found', `Template ${template_id} not found. Use helix://group-templates resource to find valid template IDs.`)
       }
 
       // Verify exercise exists and is accessible
@@ -1488,7 +1504,7 @@ async function executeTool(
         .single()
 
       if (exerciseErr || !exercise) {
-        return { content: [{ type: "text", text: "Errore: Esercizio non trovato" }] }
+        return toolError('not_found', `Exercise ${exercise_id} not found. Use helix://exercises resource to find valid exercise IDs.`)
       }
 
       // Get next order_index
@@ -1518,10 +1534,10 @@ async function executeTool(
         .single()
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to add exercise to template: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: `Esercizio "${exercise.name}" aggiunto al template. ID: ${data.id}` }] }
+      return { content: [{ type: "text", text: `Exercise "${exercise.name}" added to template. ID: ${data.id}` }] }
     }
 
     case "remove_template_exercise": {
@@ -1535,12 +1551,12 @@ async function executeTool(
         .single()
 
       if (checkErr || !existing) {
-        return { content: [{ type: "text", text: "Errore: Esercizio nel template non trovato" }] }
+        return toolError('not_found', `Template exercise ${template_exercise_id} not found.`)
       }
 
       const templateData = existing.template as { user_id: string }
       if (templateData.user_id !== userId) {
-        return { content: [{ type: "text", text: "Errore: Non autorizzato" }] }
+        return toolError('access_denied', `Access denied to template exercise ${template_exercise_id}.`)
       }
 
       const { error } = await supabase
@@ -1549,10 +1565,10 @@ async function executeTool(
         .eq("id", template_exercise_id)
 
       if (error) {
-        return { content: [{ type: "text", text: `Errore: ${error.message}` }] }
+        return toolError('database_error', `Failed to remove exercise from template: ${error.message}`)
       }
 
-      return { content: [{ type: "text", text: "Esercizio rimosso dal template." }] }
+      return { content: [{ type: "text", text: "Exercise removed from template." }] }
     }
 
     case "apply_template_to_session": {
@@ -1576,7 +1592,7 @@ async function executeTool(
         .single()
 
       if (templateErr || !template) {
-        return { content: [{ type: "text", text: "Errore: Template non trovato o non autorizzato" }] }
+        return toolError('not_found', `Template ${template_id} not found. Use helix://group-templates resource to find valid template IDs.`)
       }
 
       const templateExercises = template.exercises as Array<{
@@ -1591,7 +1607,7 @@ async function executeTool(
       }>
 
       if (!templateExercises?.length) {
-        return { content: [{ type: "text", text: "Errore: Il template non contiene esercizi" }] }
+        return toolError('validation_error', 'Template has no exercises. Add exercises to the template first.')
       }
 
       // 2. Verify session exists and belongs to user
@@ -1602,12 +1618,12 @@ async function executeTool(
         .single()
 
       if (sessionErr || !session) {
-        return { content: [{ type: "text", text: "Errore: Sessione non trovata" }] }
+        return toolError('not_found', `Session ${session_id} not found. Use helix://sessions resource to find valid session IDs.`)
       }
 
       const clientData = session.client as { user_id: string }
       if (clientData.user_id !== userId) {
-        return { content: [{ type: "text", text: "Errore: Non autorizzato per questa sessione" }] }
+        return toolError('access_denied', `Access denied to session ${session_id}.`)
       }
 
       // 3. If replace mode, delete existing group exercises ONLY
@@ -1619,7 +1635,7 @@ async function executeTool(
           .eq("is_group", true) // CRITICAL: Only group exercises!
 
         if (deleteErr) {
-          return { content: [{ type: "text", text: `Errore durante la rimozione: ${deleteErr.message}` }] }
+          return toolError('database_error', `Failed to remove existing group exercises: ${deleteErr.message}`)
         }
       }
 
@@ -1656,20 +1672,19 @@ async function executeTool(
         .insert(exercisesToInsert)
 
       if (insertErr) {
-        return { content: [{ type: "text", text: `Errore durante l'inserimento: ${insertErr.message}` }] }
+        return toolError('database_error', `Failed to apply template exercises: ${insertErr.message}`)
       }
 
-      const modeText = mode === "append" ? "aggiunto" : "sostituito"
       return {
         content: [{
           type: "text",
-          text: `Template "${template.name}" ${modeText} alla sessione con ${exercisesToInsert.length} esercizi di gruppo.`,
+          text: `Template "${template.name}" applied to session (${mode} mode) with ${exercisesToInsert.length} group exercises.`,
         }],
       }
     }
 
     default:
-      return { content: [{ type: "text", text: `Tool sconosciuto: ${name}` }] }
+      return toolError('unknown_tool', `Unknown tool: ${name}. Use tools/list to see available tools.`)
   }
 }
 
@@ -1692,7 +1707,7 @@ async function getPrompt(
       }
 
       const result = await fetchClientWithDetails(supabase, userId, client_id)
-      if (!result) throw new Error(`Cliente non trovato: ${client_id}`)
+      if (!result) throw new Error(`[not_found] Client ${client_id} not found.`)
 
       const clientCard = generateClientCard(
         result.client as Client,
@@ -1795,7 +1810,7 @@ Se il cliente partecipa a sessioni di gruppo, considera di usare un template esi
       }
 
       const result = await fetchClientWithDetails(supabase, userId, client_id)
-      if (!result) throw new Error(`Cliente non trovato: ${client_id}`)
+      if (!result) throw new Error(`[not_found] Client ${client_id} not found.`)
 
       const clientCard = generateClientCard(
         result.client as Client,
@@ -1855,7 +1870,7 @@ Per ogni sessione specifica: data, esercizi, serie, ripetizioni, pesi e note.`,
         .eq("client.user_id", userId)
         .single()
 
-      if (error || !session) throw new Error(`Sessione non trovata: ${session_id}`)
+      if (error || !session) throw new Error(`[not_found] Session ${session_id} not found.`)
 
       const exerciseDetails = (session.exercises as Array<{
         sets: number | null
@@ -2027,7 +2042,7 @@ Fornisci:
     }
 
     default:
-      throw new Error(`Prompt sconosciuto: ${name}`)
+      throw new Error(`[not_found] Prompt not found: ${name}`)
   }
 }
 
