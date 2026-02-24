@@ -20,9 +20,9 @@ Requirements for MCP Assessment & Fix milestone. Each maps to roadmap phases.
 
 ### Tool Quality
 
-- [ ] **TOOL-01**: All tool and resource descriptions translated to English
-- [ ] **TOOL-02**: Error responses include `isError: true` flag
-- [ ] **TOOL-03**: Tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`) added to all tools
+- [x] **TOOL-01**: All tool and resource descriptions translated to English
+- [x] **TOOL-02**: Error responses include `isError: true` flag
+- [x] **TOOL-03**: Tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`) added to all tools
 - [x] **TOOL-04**: Duplicate read-only tools removed (keep resources as the read mechanism)
 
 ### Polish
@@ -58,9 +58,9 @@ None — scope is fix and polish only.
 | PROTO-01 | Phase 19 | Complete |
 | PROTO-02 | Phase 19 | Complete |
 | PROTO-03 | Phase 19 | Complete |
-| TOOL-01 | Phase 20 | Pending |
-| TOOL-02 | Phase 20 | Pending |
-| TOOL-03 | Phase 20 | Pending |
+| TOOL-01 | Phase 20 | Complete |
+| TOOL-02 | Phase 20 | Complete |
+| TOOL-03 | Phase 20 | Complete |
 | TOOL-04 | Phase 20 | Complete |
 | POL-01 | Phase 21 | Pending |
 | POL-02 | Phase 21 | Pending |

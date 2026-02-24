@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 
 ## Current Position
 
-Phase: 20 of 22 (Tool & Resource Quality)
-Plan: 1 of 2 in current phase -- COMPLETE
-Status: Executing Phase 20
-Last activity: 2026-02-24 — Completed 20-01 (Remove Read Tools & Close Resource Gaps)
+Phase: 20 of 22 (Tool & Resource Quality) -- COMPLETE
+Plan: 2 of 2 in current phase -- COMPLETE
+Status: Phase 20 Complete
+Last activity: 2026-02-24 — Completed 20-02 (Translate Descriptions, isError Flags & Tool Annotations)
 
-Progress: [██████████████████████████████] 97% (31/33 plans across all milestones, 1/2 phase 20 plans)
+Progress: [██████████████████████████████] 97% (32/33 plans across all milestones, 2/2 phase 20 plans)
 
 ## Performance Metrics
 
@@ -24,7 +24,7 @@ Progress: [███████████████████████
 
 **v1.6 (in progress):**
 - Phases: 18-22 (5 phases, plans TBD)
-- Completed: 2/5 phases (Phase 18, 19 complete; Phase 20 in progress)
+- Completed: 3/5 phases (Phase 18, 19, 20 complete; Phase 21 next)
 
 ## Accumulated Context
 
@@ -41,6 +41,7 @@ Recent decisions affecting current work:
 - [18-03]: Inner join ownership verification pattern for write tools; English "not found" error messages; verifyClientOwnership existence check for accurate violation logging
 - [19-01]: Notification detection before auth check (notifications/initialized sent without API key); batch notification support for spec completeness
 - [20-01]: Removed 7 duplicate read-only tools; ownership verification on client sub-resources; exercises-by-tag resource with inner join filtering
+- [20-02]: toolError() helper with isError: true on all error paths; English descriptions on all tools/resources/prompts; tool annotations on all 16 tools; destructiveHint: true on 4 destructive tools
 
 ### Pending Todos
 
@@ -54,8 +55,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 20-01-PLAN.md (Remove Read Tools & Close Resource Gaps)
-Resume file: .planning/phases/20-tool-resource-quality/20-01-SUMMARY.md
+Stopped at: Completed 20-02-PLAN.md (Translate Descriptions, isError Flags & Tool Annotations)
+Resume file: .planning/phases/20-tool-resource-quality/20-02-SUMMARY.md
 
 ---
-*State tracking: v1.6 milestone — phase 20 plan 1 complete, ready for 20-02*
+*State tracking: v1.6 milestone — phase 20 complete, ready for phase 21*
