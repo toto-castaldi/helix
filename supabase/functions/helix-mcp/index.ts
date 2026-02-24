@@ -245,6 +245,7 @@ function getResourceTemplates() {
     { uriTemplate: "helix://exercises/{exerciseId}", name: "exercise-detail", description: "Dettaglio esercizio", mimeType: "application/json" },
     { uriTemplate: "helix://exercises/{exerciseId}/lumio", name: "exercise-lumio", description: "Scheda Lumio", mimeType: "text/markdown" },
     { uri: "helix://exercises/tags", name: "exercise-tags", description: "Lista tag esercizi", mimeType: "application/json" },
+    { uriTemplate: "helix://exercises/tags/{tag}", name: "exercises-by-tag", description: "Esercizi filtrati per tag", mimeType: "application/json" },
     { uri: "helix://sessions", name: "sessions-list", description: "Lista sessioni", mimeType: "application/json" },
     { uri: "helix://sessions/planned", name: "sessions-planned", description: "Sessioni pianificate", mimeType: "application/json" },
     { uriTemplate: "helix://sessions/date/{date}", name: "sessions-by-date", description: "Sessioni per data", mimeType: "application/json" },
@@ -596,13 +597,17 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
   const clientGoalsMatch = uri.match(/^helix:\/\/clients\/([^\/]+)\/goals$/)
   if (clientGoalsMatch) {
     const clientId = clientGoalsMatch[1]
+    const ownership = await verifyClientOwnership(supabase, userId, clientId)
+    if (!ownership.owned) {
+      throw new Error("[access_denied] Client not found or you do not have access.")
+    }
     const { data, error } = await supabase
       .from("goal_history")
       .select("*")
       .eq("client_id", clientId)
       .order("started_at", { ascending: false })
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -610,6 +615,10 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
   const clientSessionsMatch = uri.match(/^helix:\/\/clients\/([^\/]+)\/sessions$/)
   if (clientSessionsMatch) {
     const clientId = clientSessionsMatch[1]
+    const ownership = await verifyClientOwnership(supabase, userId, clientId)
+    if (!ownership.owned) {
+      throw new Error("[access_denied] Client not found or you do not have access.")
+    }
     const { data, error } = await supabase
       .from("sessions")
       .select(`
@@ -623,7 +632,7 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
       .eq("client_id", clientId)
       .order("session_date", { ascending: false })
 
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`[database_error] ${error.message}`)
     return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
@@ -678,6 +687,24 @@ async function readResource(uri: string, supabase: SupabaseClient, userId: strin
     if (error) throw new Error(error.message)
     const uniqueTags = [...new Set((data || []).map(d => d.tag))].sort()
     return [{ uri, mimeType: "application/json", text: JSON.stringify(uniqueTags, null, 2) }]
+  }
+
+  // helix://exercises/tags/{tag}
+  const exercisesByTagMatch = uri.match(/^helix:\/\/exercises\/tags\/([^\/]+)$/)
+  if (exercisesByTagMatch) {
+    const tag = decodeURIComponent(exercisesByTagMatch[1])
+    const { data, error } = await supabase
+      .from("exercises")
+      .select(`
+        id, name, description, lumio_card_id,
+        exercise_tags!inner(tag)
+      `)
+      .eq("exercise_tags.tag", tag)
+      .or(`user_id.eq.${userId},user_id.is.null`)
+      .order("name")
+
+    if (error) throw new Error(`[database_error] ${error.message}`)
+    return [{ uri, mimeType: "application/json", text: JSON.stringify(data || [], null, 2) }]
   }
 
   // helix://exercises/{id}
