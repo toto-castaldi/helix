@@ -132,11 +132,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. All tools, resources, and prompts have been systematically tested end-to-end with Claude Code and confirmed working
   2. The landing page includes a section explaining how to configure Claude Code to use Helix MCP (with `claude mcp add` command and configuration example)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 22-01: TBD
-- [ ] 22-02: TBD
+- [ ] 22-01-PLAN.md — E2E test script for all MCP resources, tools, and prompts via curl
+- [ ] 22-02-PLAN.md — Landing page MCP integration section with bilingual setup instructions
 
 ## Progress
 
