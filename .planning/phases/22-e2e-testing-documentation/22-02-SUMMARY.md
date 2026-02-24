@@ -72,7 +72,7 @@ Each task was committed atomically:
 2. **Task 2: Build landing page and commit dist-landing output** - `97b8a2a` (chore)
 3. **Task 3: Verify landing page MCP section in browser** - Checkpoint approved (human-verify, no commit)
 
-**Plan metadata:** TBD (docs: complete plan)
+**Plan metadata:** `9516230` (docs: complete phase 22 execution), `d6e7427` (docs: mark TEST-02 complete)
 
 ## Files Created/Modified
 - `src/landing/main.ts` - Added mcpTitle, mcpSubtitle, mcpStep1, mcpStep2, mcpCommand, mcpNote translations for IT/EN and MCP section HTML
