@@ -123,7 +123,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 21-01-PLAN.md — Input validation on all 16 tools + compact JSON responses with null stripping
+- [x] 21-01-PLAN.md — Input validation on all 16 tools + compact JSON responses with null stripping
 
 ### Phase 22: End-to-End Testing & Documentation
 **Goal**: Every MCP capability is verified working with Claude Code and coaches have setup instructions
@@ -135,8 +135,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 22-01-PLAN.md — E2E test script for all MCP resources, tools, and prompts via curl
-- [ ] 22-02-PLAN.md — Landing page MCP integration section with bilingual setup instructions
+- [x] 22-01-PLAN.md — E2E test script for all MCP resources, tools, and prompts via curl
+- [x] 22-02-PLAN.md — Landing page MCP integration section with bilingual setup instructions
 
 ## Progress
 
@@ -155,8 +155,8 @@ Phases execute in numeric order: 18 -> 19 -> 20 -> 21 -> 22
 | 19. Protocol Compliance | 1/1 | Complete    | 2026-02-24 | - |
 | 20. Tool & Resource Quality | 2/2 | Complete    | 2026-02-24 | - |
 | 21. Response Polish | 1/1 | Complete    | 2026-02-24 | - |
-| 22. End-to-End Testing & Documentation | 2/2 | Complete   | 2026-02-24 | - |
+| 22. End-to-End Testing & Documentation | v1.6 | 2/2 | Complete | 2026-02-24 |
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-23 after gap closure analysis (integration gaps folded into Phase 20)*
+*Last updated: 2026-02-24 — v1.6 milestone complete (all 12 plans across 5 phases shipped)*
