@@ -107,11 +107,11 @@ Plans:
   4. No duplicate read-only tools that replicate resource functionality -- resources are the read mechanism, tools are for mutations
   5. Read resources `helix://clients/{id}/goals` and `helix://clients/{id}/sessions` verify coach ownership before returning data
   6. `list_sessions` tool uses consistent inner join pattern matching other ownership-verified queries
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 20-01: TBD
-- [ ] 20-02: TBD
+- [ ] 20-01-PLAN.md — Remove 7 duplicate read-only tools, add resource ownership verification, implement exercises/tags/{tag} resource
+- [ ] 20-02-PLAN.md — English descriptions, isError flags via toolError helper, tool annotations on all 16 mutation tools
 
 ### Phase 21: Response Polish
 **Goal**: Tool parameters are validated before execution and responses are compact for efficient token usage
