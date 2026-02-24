@@ -33,7 +33,7 @@ Requirements for MCP Assessment & Fix milestone. Each maps to roadmap phases.
 ### Testing & Documentation
 
 - [x] **TEST-01**: Systematic end-to-end testing of all tools, resources, and prompts with Claude Code
-- [ ] **TEST-02**: Landing page section explaining how to configure Claude Code to use Helix MCP
+- [x] **TEST-02**: Landing page section explaining how to configure Claude Code to use Helix MCP
 
 ## Future Requirements
 
@@ -65,7 +65,7 @@ None — scope is fix and polish only.
 | POL-01 | Phase 21 | Complete |
 | POL-02 | Phase 21 | Complete |
 | TEST-01 | Phase 22 | Complete |
-| TEST-02 | Phase 22 | Pending |
+| TEST-02 | Phase 22 | Complete |
 
 **Coverage:**
 - v1.6 requirements: 13 total
@@ -78,4 +78,4 @@ None — scope is fix and polish only.
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-23 after gap closure analysis (integration gaps assigned to Phase 20)*
+*Last updated: 2026-02-24 — all 13 v1.6 requirements complete*
