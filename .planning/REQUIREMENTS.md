@@ -27,8 +27,8 @@ Requirements for MCP Assessment & Fix milestone. Each maps to roadmap phases.
 
 ### Polish
 
-- [ ] **POL-01**: Input validation on tool parameters before executing queries
-- [ ] **POL-02**: Compact JSON responses, reduced token usage
+- [x] **POL-01**: Input validation on tool parameters before executing queries
+- [x] **POL-02**: Compact JSON responses, reduced token usage
 
 ### Testing & Documentation
 
@@ -62,8 +62,8 @@ None — scope is fix and polish only.
 | TOOL-02 | Phase 20 | Complete |
 | TOOL-03 | Phase 20 | Complete |
 | TOOL-04 | Phase 20 | Complete |
-| POL-01 | Phase 21 | Pending |
-| POL-02 | Phase 21 | Pending |
+| POL-01 | Phase 21 | Complete |
+| POL-02 | Phase 21 | Complete |
 | TEST-01 | Phase 22 | Pending |
 | TEST-02 | Phase 22 | Pending |
 

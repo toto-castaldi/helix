@@ -61,7 +61,7 @@ See `.planning/milestones/v1.5-ROADMAP.md` for details.
 - [x] **Phase 18: Security & Dead Code Removal** - Remove OAuth dead code and fix ownership verification on write tools (completed 2026-02-23)
 - [x] **Phase 19: Protocol Compliance** - Upgrade to MCP 2025-03-26 with correct HTTP semantics (completed 2026-02-24)
 - [x] **Phase 20: Tool & Resource Quality** - English descriptions, error flags, annotations, and deduplication (completed 2026-02-24)
-- [ ] **Phase 21: Response Polish** - Input validation and compact JSON responses
+- [x] **Phase 21: Response Polish** - Input validation and compact JSON responses (completed 2026-02-24)
 - [ ] **Phase 22: End-to-End Testing & Documentation** - Systematic verification with Claude Code and setup guide on landing page
 
 ## Phase Details
@@ -154,7 +154,7 @@ Phases execute in numeric order: 18 -> 19 -> 20 -> 21 -> 22
 | 18. Security & Dead Code Removal | 3/3 | Complete    | 2026-02-23 | - |
 | 19. Protocol Compliance | 1/1 | Complete    | 2026-02-24 | - |
 | 20. Tool & Resource Quality | 2/2 | Complete    | 2026-02-24 | - |
-| 21. Response Polish | v1.6 | 0/1 | Not started | - |
+| 21. Response Polish | 1/1 | Complete   | 2026-02-24 | - |
 | 22. End-to-End Testing & Documentation | v1.6 | 0/? | Not started | - |
 
 ---

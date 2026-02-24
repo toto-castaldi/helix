@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** During group lessons, the coach can manage shared exercises from a single view, completing them once for all participants
-**Current focus:** Phase 20 - Tool & Resource Quality
+**Current focus:** Phase 21 - Response Polish
 
 ## Current Position
 
-Phase: 20 of 22 (Tool & Resource Quality) -- COMPLETE
-Plan: 2 of 2 in current phase -- COMPLETE
-Status: Phase 20 Complete
-Last activity: 2026-02-24 — Completed 20-02 (Translate Descriptions, isError Flags & Tool Annotations)
+Phase: 21 of 22 (Response Polish) -- COMPLETE
+Plan: 1 of 1 in current phase -- COMPLETE
+Status: Phase 21 Complete
+Last activity: 2026-02-24 — Completed 21-01 (Input Validation & Compact JSON Responses)
 
-Progress: [██████████████████████████████] 97% (32/33 plans across all milestones, 2/2 phase 20 plans)
+Progress: [██████████████████████████████] 100% (33/33 plans across all milestones, 1/1 phase 21 plans)
 
 ## Performance Metrics
 
@@ -24,7 +24,7 @@ Progress: [███████████████████████
 
 **v1.6 (in progress):**
 - Phases: 18-22 (5 phases, plans TBD)
-- Completed: 3/5 phases (Phase 18, 19, 20 complete; Phase 21 next)
+- Completed: 4/5 phases (Phase 18, 19, 20, 21 complete; Phase 22 next)
 
 ## Accumulated Context
 
@@ -42,6 +42,7 @@ Recent decisions affecting current work:
 - [19-01]: Notification detection before auth check (notifications/initialized sent without API key); batch notification support for spec completeness
 - [20-01]: Removed 7 duplicate read-only tools; ownership verification on client sub-resources; exercises-by-tag resource with inner join filtering
 - [20-02]: toolError() helper with isError: true on all error paths; English descriptions on all tools/resources/prompts; tool annotations on all 16 tools; destructiveHint: true on 4 destructive tools
+- [21-01]: Hand-rolled validateToolInput() for all 16 tools (47 param checks); stripNulls() + compact JSON on all resource responses; isNonNegativeNumber for order_index (0 valid)
 
 ### Pending Todos
 
@@ -55,8 +56,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 20-02-PLAN.md (Translate Descriptions, isError Flags & Tool Annotations)
-Resume file: .planning/phases/20-tool-resource-quality/20-02-SUMMARY.md
+Stopped at: Completed 21-01-PLAN.md (Input Validation & Compact JSON Responses)
+Resume file: .planning/phases/21-response-polish/21-01-SUMMARY.md
 
 ---
-*State tracking: v1.6 milestone — phase 20 complete, ready for phase 21*
+*State tracking: v1.6 milestone — phase 21 complete, ready for phase 22*
