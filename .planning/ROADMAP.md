@@ -8,7 +8,7 @@
 - ✅ **v1.3 Image Auto-Play** — Phase 11 (shipped 2026-02-13)
 - ✅ **v1.4 Landing Page + Domini** — Phases 12-15 (shipped 2026-02-18)
 - ✅ **v1.5 Versioning GSD** — Phases 16-17 (shipped 2026-02-21)
-- 🚧 **v1.6 MCP Assessment & Fix** — Phases 18-22 (in progress)
+- ✅ **v1.6 MCP Assessment & Fix** — Phases 18-22 (shipped 2026-02-24)
 
 ## Phases
 
@@ -54,7 +54,7 @@ See `.planning/milestones/v1.5-ROADMAP.md` for details.
 
 </details>
 
-### 🚧 v1.6 MCP Assessment & Fix (In Progress)
+### ✅ v1.6 MCP Assessment & Fix (Shipped 2026-02-24)
 
 **Milestone Goal:** Audit, fix, and polish the MCP server for reliable Claude Code integration, removing dead OAuth code and fixing security gaps.
 
@@ -62,7 +62,7 @@ See `.planning/milestones/v1.5-ROADMAP.md` for details.
 - [x] **Phase 19: Protocol Compliance** - Upgrade to MCP 2025-03-26 with correct HTTP semantics (completed 2026-02-24)
 - [x] **Phase 20: Tool & Resource Quality** - English descriptions, error flags, annotations, and deduplication (completed 2026-02-24)
 - [x] **Phase 21: Response Polish** - Input validation and compact JSON responses (completed 2026-02-24)
-- [ ] **Phase 22: End-to-End Testing & Documentation** - Systematic verification with Claude Code and setup guide on landing page
+- [x] **Phase 22: End-to-End Testing & Documentation** - Systematic verification with Claude Code and setup guide on landing page (completed 2026-02-24)
 
 ## Phase Details
 
@@ -93,7 +93,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 19-01-PLAN.md — Protocol version upgrade, notification handling, GET 405 verification
+- [x] 19-01-PLAN.md — Protocol version upgrade, notification handling, GET 405 verification
 
 ### Phase 20: Tool & Resource Quality
 **Goal**: Claude Code can accurately select, invoke, and recover from errors across all tools and resources
@@ -110,8 +110,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 20-01-PLAN.md — Remove 7 duplicate read-only tools, add resource ownership verification, implement exercises/tags/{tag} resource
-- [ ] 20-02-PLAN.md — English descriptions, isError flags via toolError helper, tool annotations on all 16 mutation tools
+- [x] 20-01-PLAN.md — Remove 7 duplicate read-only tools, add resource ownership verification, implement exercises/tags/{tag} resource
+- [x] 20-02-PLAN.md — English descriptions, isError flags via toolError helper, tool annotations on all 16 mutation tools
 
 ### Phase 21: Response Polish
 **Goal**: Tool parameters are validated before execution and responses are compact for efficient token usage
@@ -155,7 +155,7 @@ Phases execute in numeric order: 18 -> 19 -> 20 -> 21 -> 22
 | 19. Protocol Compliance | 1/1 | Complete    | 2026-02-24 | - |
 | 20. Tool & Resource Quality | 2/2 | Complete    | 2026-02-24 | - |
 | 21. Response Polish | 1/1 | Complete    | 2026-02-24 | - |
-| 22. End-to-End Testing & Documentation | v1.6 | 0/? | Not started | - |
+| 22. End-to-End Testing & Documentation | 2/2 | Complete   | 2026-02-24 | - |
 
 ---
 *Roadmap created: 2026-01-28*

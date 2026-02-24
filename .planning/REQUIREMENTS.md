@@ -32,7 +32,7 @@ Requirements for MCP Assessment & Fix milestone. Each maps to roadmap phases.
 
 ### Testing & Documentation
 
-- [ ] **TEST-01**: Systematic end-to-end testing of all tools, resources, and prompts with Claude Code
+- [x] **TEST-01**: Systematic end-to-end testing of all tools, resources, and prompts with Claude Code
 - [ ] **TEST-02**: Landing page section explaining how to configure Claude Code to use Helix MCP
 
 ## Future Requirements
@@ -64,7 +64,7 @@ None — scope is fix and polish only.
 | TOOL-04 | Phase 20 | Complete |
 | POL-01 | Phase 21 | Complete |
 | POL-02 | Phase 21 | Complete |
-| TEST-01 | Phase 22 | Pending |
+| TEST-01 | Phase 22 | Complete |
 | TEST-02 | Phase 22 | Pending |
 
 **Coverage:**

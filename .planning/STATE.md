@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** During group lessons, the coach can manage shared exercises from a single view, completing them once for all participants
-**Current focus:** Phase 21 - Response Polish
+**Current focus:** v1.6 Milestone Complete
 
 ## Current Position
 
-Phase: 21 of 22 (Response Polish) -- COMPLETE
-Plan: 1 of 1 in current phase -- COMPLETE
-Status: Phase 21 Complete
-Last activity: 2026-02-24 — Completed 21-01 (Input Validation & Compact JSON Responses)
+Phase: 22 of 22 (E2E Testing & Documentation) -- COMPLETE
+Plan: 2 of 2 in current phase -- COMPLETE
+Status: Phase 22 Complete, v1.6 Milestone Complete
+Last activity: 2026-02-24 — Completed 22-02 (Landing Page MCP Integration Section)
 
-Progress: [██████████████████████████████] 100% (33/33 plans across all milestones, 1/1 phase 21 plans)
+Progress: [██████████████████████████████] 100% (35/35 plans across all milestones, 2/2 phase 22 plans)
 
 ## Performance Metrics
 
@@ -22,9 +22,9 @@ Progress: [███████████████████████
 - Total plans completed: 30 (6 + 10 + 2 + 1 + 5 + 2 + 3 + 1)
 - Total phases completed: 18 (4 + 5 + 1 + 1 + 4 + 1 + 1 + 1)
 
-**v1.6 (in progress):**
-- Phases: 18-22 (5 phases, plans TBD)
-- Completed: 4/5 phases (Phase 18, 19, 20, 21 complete; Phase 22 next)
+**v1.6 (complete):**
+- Phases: 18-22 (5 phases, 12 plans total)
+- Completed: 5/5 phases (Phase 18, 19, 20, 21, 22 all complete)
 
 ## Accumulated Context
 
@@ -43,6 +43,8 @@ Recent decisions affecting current work:
 - [20-01]: Removed 7 duplicate read-only tools; ownership verification on client sub-resources; exercises-by-tag resource with inner join filtering
 - [20-02]: toolError() helper with isError: true on all error paths; English descriptions on all tools/resources/prompts; tool annotations on all 16 tools; destructiveHint: true on 4 destructive tools
 - [21-01]: Hand-rolled validateToolInput() for all 16 tools (47 param checks); stripNulls() + compact JSON on all resource responses; isNonNegativeNumber for order_index (0 valid)
+- [22-01]: E2E test script assumes local Supabase already running; fixed UUID test user for deterministic cleanup; ~53 assertions covering all MCP capabilities
+- [22-02]: MCP section between features and footer; placeholder values (YOUR_API_KEY, YOUR_HELIX_MCP_URL) for security; bilingual IT/EN translations
 
 ### Pending Todos
 
@@ -56,8 +58,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 21-01-PLAN.md (Input Validation & Compact JSON Responses)
-Resume file: .planning/phases/21-response-polish/21-01-SUMMARY.md
+Stopped at: Completed 22-02-PLAN.md (Landing Page MCP Integration Section)
+Resume file: .planning/phases/22-e2e-testing-documentation/22-02-SUMMARY.md
 
 ---
-*State tracking: v1.6 milestone — phase 21 complete, ready for phase 22*
+*State tracking: v1.6 milestone complete — all 5 phases (18-22) shipped*
