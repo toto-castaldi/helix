@@ -154,3 +154,31 @@
 
 ---
 
+
+## v1.6 MCP Assessment & Fix (Shipped: 2026-02-25)
+
+**Delivered:** Audited, fixed, and polished the MCP server for reliable Claude Code integration — removed OAuth dead code, secured all write tools, upgraded protocol, improved tool quality, and added E2E testing with documentation.
+
+**Phases completed:** 18-22 (9 plans total)
+
+**Key accomplishments:**
+- Removed all OAuth 2.1 dead code (~150 lines) and secured MCP with API key-only authentication
+- Added ownership verification on all 8 write tools with check-then-mutate pattern (prevents cross-coach mutations)
+- Upgraded MCP protocol to 2025-03-26 with HTTP 202 notification handling and GET 405 compliance
+- Removed 7 duplicate read-only tools; added English descriptions, isError flags, and annotations on all 16 mutation tools
+- Added input validation for all 16 tool parameters (47 checks) and compact JSON responses with null stripping
+- Created E2E test script (53 assertions) and bilingual MCP setup documentation on landing page
+
+**Stats:**
+- 65 files modified
+- +10,027 / -2,278 lines (TypeScript)
+- 5 phases, 9 plans
+- 4 days (2026-02-21 → 2026-02-24)
+- MCP server: 2,564 LOC (helix-mcp/index.ts)
+
+**Git range:** `05780fe` -> `44d9e0c`
+
+**What's next:** TBD — next milestone goals
+
+---
+

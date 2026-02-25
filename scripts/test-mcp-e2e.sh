@@ -223,7 +223,12 @@ assert_http_status() {
 }
 
 run_sql() {
-  PGPASSWORD=postgres psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -A -c "$1" 2>/dev/null
+  PGPASSWORD=postgres psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -A -c "$1" 2>/dev/null | head -1
+}
+
+# Extract UUID from tool response text like "Session created successfully. ID: <uuid>"
+extract_id() {
+  echo "$1" | jq -r '.result.content[0].text' | grep -oP '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' | head -1
 }
 
 # ============================================
@@ -366,13 +371,13 @@ echo -e "${YELLOW}--- Tool Tests (16 tools) ---${NC}"
 # create_session
 RESP=$(mcp_call "tools/call" "{\"name\":\"create_session\",\"arguments\":{\"client_id\":\"$CLIENT_ID\",\"session_date\":\"2026-03-01\",\"gym_id\":\"$GYM_ID\"}}" "$(next_id)")
 assert_tool_result "create_session" "$RESP"
-SESSION_ID=$(echo "$RESP" | jq -r '.result.content[0].text' | jq -r '.id')
+SESSION_ID=$(extract_id "$RESP")
 echo -e "  ${BLUE}INFO${NC} Created session: $SESSION_ID"
 
 # add_session_exercise
 RESP=$(mcp_call "tools/call" "{\"name\":\"add_session_exercise\",\"arguments\":{\"session_id\":\"$SESSION_ID\",\"exercise_id\":\"$EXERCISE_ID\",\"sets\":3,\"reps\":10}}" "$(next_id)")
 assert_tool_result "add_session_exercise" "$RESP"
-SESSION_EXERCISE_ID=$(echo "$RESP" | jq -r '.result.content[0].text' | jq -r '.id')
+SESSION_EXERCISE_ID=$(extract_id "$RESP")
 echo -e "  ${BLUE}INFO${NC} Created session exercise: $SESSION_EXERCISE_ID"
 
 # update_session
@@ -386,7 +391,7 @@ assert_tool_result "update_session_exercise" "$RESP"
 # duplicate_session
 RESP=$(mcp_call "tools/call" "{\"name\":\"duplicate_session\",\"arguments\":{\"session_id\":\"$SESSION_ID\",\"new_date\":\"2026-03-02\"}}" "$(next_id)")
 assert_tool_result "duplicate_session" "$RESP"
-DUPLICATE_SESSION_ID=$(echo "$RESP" | jq -r '.result.content[0].text' | jq -r '.id // .session_id // empty')
+DUPLICATE_SESSION_ID=$(extract_id "$RESP")
 echo -e "  ${BLUE}INFO${NC} Duplicated session: $DUPLICATE_SESSION_ID"
 
 # complete_session (on duplicate)
@@ -400,13 +405,13 @@ assert_tool_result "reorder_session_exercises" "$RESP"
 # create_training_plan
 RESP=$(mcp_call "tools/call" "{\"name\":\"create_training_plan\",\"arguments\":{\"client_id\":\"$CLIENT_ID\",\"session_date\":\"2026-03-03\",\"exercises\":[{\"exercise_name\":\"$EXERCISE_NAME\",\"sets\":4,\"reps\":8}]}}" "$(next_id)")
 assert_tool_result "create_training_plan" "$RESP"
-PLAN_SESSION_ID=$(echo "$RESP" | jq -r '.result.content[0].text' | jq -r '.session_id // .id // empty')
+PLAN_SESSION_ID=$(extract_id "$RESP")
 echo -e "  ${BLUE}INFO${NC} Training plan session: $PLAN_SESSION_ID"
 
 # create_group_template
 RESP=$(mcp_call "tools/call" "{\"name\":\"create_group_template\",\"arguments\":{\"name\":\"Test Template\"}}" "$(next_id)")
 assert_tool_result "create_group_template" "$RESP"
-TEMPLATE_ID=$(echo "$RESP" | jq -r '.result.content[0].text' | jq -r '.id')
+TEMPLATE_ID=$(extract_id "$RESP")
 echo -e "  ${BLUE}INFO${NC} Created template: $TEMPLATE_ID"
 
 # update_group_template
@@ -416,7 +421,7 @@ assert_tool_result "update_group_template" "$RESP"
 # add_template_exercise
 RESP=$(mcp_call "tools/call" "{\"name\":\"add_template_exercise\",\"arguments\":{\"template_id\":\"$TEMPLATE_ID\",\"exercise_id\":\"$EXERCISE_ID\",\"sets\":3,\"reps\":12}}" "$(next_id)")
 assert_tool_result "add_template_exercise" "$RESP"
-TEMPLATE_EXERCISE_ID=$(echo "$RESP" | jq -r '.result.content[0].text' | jq -r '.id')
+TEMPLATE_EXERCISE_ID=$(extract_id "$RESP")
 echo -e "  ${BLUE}INFO${NC} Created template exercise: $TEMPLATE_EXERCISE_ID"
 
 # apply_template_to_session

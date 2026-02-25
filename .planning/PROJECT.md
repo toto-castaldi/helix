@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, un server MCP per pianificazione AI via Claude, una landing page multilingua che presenta il prodotto su tre domini separati, e versioning basato su milestone GSD visibile su tutte le app.
+Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, un server MCP sicuro e polished per pianificazione AI via Claude Code, una landing page multilingua con documentazione MCP, e versioning basato su milestone GSD visibile su tutte le app.
 
 ## Core Value
 
@@ -42,19 +42,16 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 - ✓ CI/CD versioning basato su milestone GSD (no date-time stamps) — v1.5
 - ✓ Version display su coach, live tablet, e landing page — v1.5
 - ✓ Landing page link al repository GitHub — v1.5
+- ✓ OAuth 2.1 dead code rimosso, MCP solo API key auth — v1.6
+- ✓ Ownership verification su tutti i write tools MCP — v1.6
+- ✓ MCP protocol 2025-03-26 con notification handling e HTTP semantics — v1.6
+- ✓ English descriptions, isError flags, tool annotations su tutti i tools — v1.6
+- ✓ Input validation su 16 tool parameters e compact JSON responses — v1.6
+- ✓ E2E test script (53 assertions) e documentazione MCP su landing page — v1.6
 
 ### Active
 
-## Current Milestone: v1.6 MCP Assessment & Fix
-
-**Goal:** Audit completo, fix e polish del server MCP per farlo funzionare bene con Claude Code, rimuovendo il codice OAuth/Claude Web non funzionante.
-
-**Target features:**
-- Audit completo del server MCP (codice, tools, resources, prompts)
-- Test sistematico di tutti i tool/resources/prompts con Claude Code
-- Fix di tutto quello che è rotto o non funziona
-- Rimozione codice OAuth/Claude Web (dead code)
-- Polish per esperienza fluida con Claude Code
+(None — planning next milestone)
 
 ### Out of Scope
 
@@ -69,15 +66,16 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ## Context
 
-**Shipped v1.5 Versioning GSD** (2026-02-21):
-- Milestone-based versioning replacing date-time stamps in CI/CD
-- Version display across all three apps with GitHub link on landing page
-- Cleaner deploy pipeline (no auto-commits, no write permissions)
+**Shipped v1.6 MCP Assessment & Fix** (2026-02-25):
+- Full MCP server audit, security hardening, and polish for Claude Code integration
+- OAuth dead code removed, API key-only auth, ownership verification on all write tools
+- Protocol upgraded to 2025-03-26, English descriptions, tool annotations, input validation
+- E2E test script and bilingual MCP setup docs on landing page
 
 **Current codebase:**
-- ~13,550 LOC TypeScript
+- ~14,000 LOC TypeScript
 - Three entry points: coach app (index.html) + live tablet PWA (live.html) + landing page (landing.html)
-- MCP server with 23 tools, 19 resources, 5 prompts
+- MCP server: 2,564 LOC with 16 mutation tools, 20 resources, 5 prompts (helix-mcp/index.ts)
 - Vite multi-entry config: vite.config.ts + vite.config.live.ts + vite.config.landing.ts
 - Deploy: GitHub Actions → Digital Ocean (3 domains, Nginx + HTTPS, milestone versioning)
 - Domains: helix.toto-castaldi.com (landing), coach.helix.toto-castaldi.com (app), live.helix.toto-castaldi.com (tablet)
@@ -116,6 +114,14 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | IT/EN toggle with browser auto-detection | Detects navigator.language, Italian fallback default | ✓ Good — smooth multilingual UX |
 | Version from PROJECT.md with MILESTONES.md fallback | Active milestone is primary source, shipped milestones as fallback, "dev" default | ✓ Good — works for both in-progress and shipped states |
 | Version on date-select screen (not TabletLive) | Avoids cluttering compact coaching interface | ✓ Good — visible but non-intrusive |
+| Hand-rolled JSON-RPC, no MCP SDK | 2,500 lines of business logic not worth rewriting | ✓ Good — maintained without SDK overhead |
+| API key-only auth, remove all OAuth 2.1 | OAuth was broken with Claude Code header bugs | ✓ Good — clean auth, no redirect loops |
+| Inner join ownership verification on write tools | Check-then-mutate with "not found" for violations | ✓ Good — secure without leaking existence |
+| MCP protocol 2025-03-26 (skip 2025-06-18) | Latest supported by Claude Code at time of work | ✓ Good — spec compliant |
+| Remove 7 duplicate read-only tools | Resources are the read mechanism, tools for mutations | ✓ Good — cleaner API surface |
+| toolError() helper with isError flag | Consistent error handling across all tools | ✓ Good — Claude Code can detect failures |
+| Hand-rolled validateToolInput() | 47 param checks before any DB query | ✓ Good — clear validation errors |
+| stripNulls() + compact JSON | Reduce token usage in Claude Code context | ✓ Good — smaller responses |
 
 ---
-*Last updated: 2026-02-21 after v1.6 milestone started*
+*Last updated: 2026-02-25 after v1.6 milestone*
