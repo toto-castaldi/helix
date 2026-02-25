@@ -1,6 +1,8 @@
 import './style.css'
 
 const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'dev'
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
+const MCP_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/helix-mcp` : 'YOUR_HELIX_MCP_URL'
 
 // --- I18N System ---
 
@@ -60,8 +62,8 @@ const translations: Record<Lang, Translations> = {
     mcpStep2: '2. Esegui questo comando nel terminale:',
     mcpCommand: `claude mcp add --transport http helix \\
   --header "X-Helix-API-Key: YOUR_API_KEY" \\
-  YOUR_HELIX_MCP_URL`,
-    mcpNote: 'Trovi il tuo URL MCP personale nella pagina Impostazioni della Coach App.',
+  ${MCP_URL}`,
+    mcpNote: 'Sostituisci YOUR_API_KEY con la chiave generata nella pagina Impostazioni.',
   },
   en: {
     tagline: 'Your AI-powered fitness coaching assistant',
@@ -97,8 +99,8 @@ const translations: Record<Lang, Translations> = {
     mcpStep2: '2. Run this command in your terminal:',
     mcpCommand: `claude mcp add --transport http helix \\
   --header "X-Helix-API-Key: YOUR_API_KEY" \\
-  YOUR_HELIX_MCP_URL`,
-    mcpNote: 'Find your personal MCP URL in the Settings page of the Coach App.',
+  ${MCP_URL}`,
+    mcpNote: 'Replace YOUR_API_KEY with the key generated in the Settings page.',
   },
 }
 

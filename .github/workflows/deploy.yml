@@ -52,6 +52,7 @@ jobs:
       - name: Build landing app
         run: npm run build:landing
         env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_APP_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Deploy main app to server
