@@ -149,26 +149,6 @@ export function Settings() {
             </Button>
           )}
 
-          {/* Configuration Instructions - Claude Desktop */}
-          <div className="border-t pt-4 mt-4">
-            <Label className="text-sm font-medium">Claude Desktop</Label>
-            <p className="text-xs text-muted-foreground mt-1 mb-2">
-              Aggiungi questa configurazione al file <code className="bg-muted px-1 rounded">claude_desktop_config.json</code>
-            </p>
-            <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto">
-{`{
-  "mcpServers": {
-    "helix": {
-      "url": "${import.meta.env.VITE_SUPABASE_URL}/functions/v1/helix-mcp",
-      "headers": {
-        "X-Helix-API-Key": "<tua-api-key>"
-      }
-    }
-  }
-}`}
-            </pre>
-          </div>
-
         </CardContent>
       </Card>
 
