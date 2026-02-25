@@ -38,10 +38,16 @@ None.
 
 None active.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Add actual MCP URL to landing page setup docs | 2026-02-25 | 6ce7817 | [1-add-actual-mcp-url-to-landing-page-setup](./quick/1-add-actual-mcp-url-to-landing-page-setup/) |
+
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Archived v1.6 milestone
+Last activity: 2026-02-25 - Completed quick task 1: Add actual MCP URL to landing page setup docs
 Resume file: N/A — start with `/gsd:new-milestone`
 
 ---
