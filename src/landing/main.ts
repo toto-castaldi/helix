@@ -60,9 +60,9 @@ const translations: Record<Lang, Translations> = {
     mcpSubtitle: 'Usa il tuo assistente AI preferito per pianificare gli allenamenti direttamente con i dati Helix',
     mcpStep1: '1. Genera la tua API Key nella pagina <strong>Impostazioni</strong> della Coach App',
     mcpStep2: '2. Esegui questo comando nel terminale:',
-    mcpCommand: `claude mcp add --transport http helix \\
-  --header "X-Helix-API-Key: YOUR_API_KEY" \\
-  ${MCP_URL}`,
+    mcpCommand: `claude mcp add helix \\
+  --transport http ${MCP_URL} \\
+  --header "X-Helix-API-Key: YOUR_API_KEY"`,
     mcpNote: 'Sostituisci YOUR_API_KEY con la chiave generata nella pagina Impostazioni.',
   },
   en: {
@@ -97,9 +97,9 @@ const translations: Record<Lang, Translations> = {
     mcpSubtitle: 'Use your favorite AI assistant to plan workouts directly with your Helix data',
     mcpStep1: '1. Generate your API Key in the <strong>Settings</strong> page of the Coach App',
     mcpStep2: '2. Run this command in your terminal:',
-    mcpCommand: `claude mcp add --transport http helix \\
-  --header "X-Helix-API-Key: YOUR_API_KEY" \\
-  ${MCP_URL}`,
+    mcpCommand: `claude mcp add helix \\
+  --transport http ${MCP_URL} \\
+  --header "X-Helix-API-Key: YOUR_API_KEY"`,
     mcpNote: 'Replace YOUR_API_KEY with the key generated in the Settings page.',
   },
 }
