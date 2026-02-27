@@ -51,7 +51,15 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ### Active
 
-(None — planning next milestone)
+## Current Milestone: v1.7 Sync Recovery
+
+**Goal:** Handle Docora sync failures (e.g., expired PAT tokens) by receiving sync_failed webhooks, showing errors on repository cards, and allowing coaches to update tokens via a dedicated dialog.
+
+**Target features:**
+- Handle Docora `sync_failed` webhook and store failure status
+- Show simple error message on repository card when sync fails
+- "Update token" button on error card opens focused dialog
+- Token update calls Docora PATCH API and resets status to 'pending'
 
 ### Out of Scope
 
@@ -124,4 +132,4 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | stripNulls() + compact JSON | Reduce token usage in Claude Code context | ✓ Good — smaller responses |
 
 ---
-*Last updated: 2026-02-25 after v1.6 milestone*
+*Last updated: 2026-02-27 after v1.7 milestone start*

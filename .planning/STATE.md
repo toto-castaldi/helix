@@ -2,19 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-25)
+See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** During group lessons, the coach can manage shared exercises from a single view, completing them once for all participants
-**Current focus:** Planning next milestone
+**Current focus:** v1.7 Sync Recovery
 
 ## Current Position
 
-Phase: All v1.6 phases complete (18-22)
-Plan: N/A — between milestones
-Status: v1.6 shipped, planning next milestone
-Last activity: 2026-02-25 — Archived v1.6 milestone
-
-Progress: [██████████████████████████████] 100% (all v1.0-v1.6 milestones shipped)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-27 — Milestone v1.7 started
 
 ## Performance Metrics
 
@@ -46,9 +44,9 @@ None active.
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Last activity: 2026-02-25 - Completed quick task 1: Add actual MCP URL to landing page setup docs
-Resume file: N/A — start with `/gsd:new-milestone`
+Last session: 2026-02-27
+Last activity: 2026-02-27 - Started milestone v1.7 Sync Recovery
+Resume file: N/A
 
 ---
-*State tracking: v1.6 archived — ready for next milestone*
+*State tracking: v1.7 milestone started — defining requirements*
