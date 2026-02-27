@@ -32,29 +32,29 @@ None deferred for this milestone.
 
 | Feature | Reason |
 |---------|--------|
-| Global notification banner for sync failures | Coach manages repos from Repositories page — card-level display sufficient |
-| Circuit breaker details display | Too technical for coaches — simple message + action is better UX |
-| Manual re-sync button | Docora auto-retries after cooldown — no need for manual trigger |
+| Global notification banner for sync failures | Coach manages repos from Repositories page -- card-level display sufficient |
+| Circuit breaker details display | Too technical for coaches -- simple message + action is better UX |
+| Manual re-sync button | Docora auto-retries after cooldown -- no need for manual trigger |
 | Other error types beyond token expiry | sync_failed webhook covers all git failures; token is most common cause |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HOOK-01 | TBD | Pending |
-| HOOK-02 | TBD | Pending |
-| DISP-01 | TBD | Pending |
-| DISP-02 | TBD | Pending |
-| TOKN-01 | TBD | Pending |
-| TOKN-02 | TBD | Pending |
-| TOKN-03 | TBD | Pending |
-| TOKN-04 | TBD | Pending |
+| HOOK-01 | Phase 23 | Pending |
+| HOOK-02 | Phase 23 | Pending |
+| DISP-01 | Phase 24 | Pending |
+| DISP-02 | Phase 24 | Pending |
+| TOKN-01 | Phase 25 | Pending |
+| TOKN-02 | Phase 25 | Pending |
+| TOKN-03 | Phase 25 | Pending |
+| TOKN-04 | Phase 25 | Pending |
 
 **Coverage:**
 - v1.7 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8 ⚠️
+- Mapped to phases: 8
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-27*
-*Last updated: 2026-02-27 after initial definition*
+*Last updated: 2026-02-27 after roadmap creation*
