@@ -80,7 +80,7 @@ See `.planning/milestones/v1.6-ROADMAP.md` for details.
   1. When Docora sends a sync_failed webhook with valid HMAC signature, Helix accepts it and returns success
   2. After receiving a sync_failed webhook, the repository's sync_status in the database is 'sync_failed' and the error message is stored
   3. Invalid or tampered webhooks are rejected (signature verification works)
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [x] 23-01-PLAN.md — Webhook handler, database migration, and type updates for sync_failed ingestion
 
@@ -120,7 +120,7 @@ Phases execute in numeric order: 23 -> 24 -> 25
 | 12-15 | v1.4 | 5/5 | Complete | 2026-02-18 |
 | 16-17 | v1.5 | 2/2 | Complete | 2026-02-21 |
 | 18-22 | v1.6 | 9/9 | Complete | 2026-02-25 |
-| 23. Failure Ingestion | v1.7 | 1/1 | Complete | 2026-03-06 |
+| 23. Failure Ingestion | v1.7 | Complete    | 2026-03-06 | 2026-03-06 |
 | 24. Error Display | v1.7 | 0/TBD | Not started | - |
 | 25. Token Recovery | v1.7 | 0/TBD | Not started | - |
 
