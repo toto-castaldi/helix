@@ -295,7 +295,7 @@ export interface LumioCard {
 
 // Lumio Repository Types (Local sync)
 
-export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'error'
+export type SyncStatus = 'pending' | 'syncing' | 'synced' | 'error' | 'sync_failed'
 
 export interface LumioRepository {
   id: string
@@ -310,6 +310,8 @@ export interface LumioRepository {
   last_sync_at: string | null
   sync_status: SyncStatus
   sync_error: string | null
+  sync_error_message: string | null
+  sync_failed_at: string | null
   cards_count: number
   last_sync_added: number
   last_sync_updated: number

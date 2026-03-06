@@ -37,6 +37,28 @@ export interface DocoraWebhookPayload {
 }
 
 /**
+ * Docora sync_failed webhook types
+ */
+export interface DocoraSyncFailedError {
+  type: string
+  message: string
+}
+
+export interface DocoraSyncFailedPayload {
+  event: "sync_failed"
+  repository: DocoraRepository
+  error: DocoraSyncFailedError
+  circuit_breaker: {
+    status: string
+    consecutive_failures: number
+    threshold: number
+    cooldown_until: string
+  }
+  retry_count: number
+  timestamp: string
+}
+
+/**
  * Docora API response types
  */
 export interface DocoraRegisterResponse {
@@ -51,7 +73,7 @@ export interface DocoraRegisterResponse {
 /**
  * Webhook action types
  */
-export type DocoraAction = "create" | "update" | "delete"
+export type DocoraAction = "create" | "update" | "delete" | "sync_failed"
 
 /**
  * Verify HMAC-SHA256 signature from Docora webhook

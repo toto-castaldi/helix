@@ -32,6 +32,11 @@ const statusConfig: Record<SyncStatus, {
     variant: 'destructive',
     icon: AlertCircle,
   },
+  sync_failed: {
+    label: 'Errore sync',
+    variant: 'destructive',
+    icon: AlertCircle,
+  },
 }
 
 export function SyncStatusBadge({ status, lastSyncAt }: SyncStatusBadgeProps) {
