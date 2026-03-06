@@ -9,8 +9,8 @@ Requirements for milestone v1.7 Sync Recovery. Each maps to roadmap phases.
 
 ### Webhook Handling
 
-- [ ] **HOOK-01**: Helix receives and validates Docora `sync_failed` webhook with HMAC signature
-- [ ] **HOOK-02**: Sync failure updates repository status to 'sync_failed' with error message stored
+- [x] **HOOK-01**: Helix receives and validates Docora `sync_failed` webhook with HMAC signature
+- [x] **HOOK-02**: Sync failure updates repository status to 'sync_failed' with error message stored
 
 ### Error Display
 
@@ -41,8 +41,8 @@ None deferred for this milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HOOK-01 | Phase 23 | Pending |
-| HOOK-02 | Phase 23 | Pending |
+| HOOK-01 | Phase 23 | Complete |
+| HOOK-02 | Phase 23 | Complete |
 | DISP-01 | Phase 24 | Pending |
 | DISP-02 | Phase 24 | Pending |
 | TOKN-01 | Phase 25 | Pending |
@@ -57,4 +57,4 @@ None deferred for this milestone.
 
 ---
 *Requirements defined: 2026-02-27*
-*Last updated: 2026-02-27 after roadmap creation*
+*Last updated: 2026-03-06 after Phase 23 completion*
