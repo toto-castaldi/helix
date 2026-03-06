@@ -12,6 +12,7 @@ import {
   hashBinaryContent,
   type DocoraWebhookPayload,
   type DocoraAction,
+  type DocoraSyncFailedPayload,
 } from "../_shared/docora.ts"
 import {
   parseLumioIgnore,
@@ -123,7 +124,7 @@ function extractAction(url: string): DocoraAction | null {
   // Expected format: /docora-webhook/{action} or /functions/v1/docora-webhook/{action}
   const lastPart = pathParts[pathParts.length - 1]
 
-  if (["create", "update", "delete"].includes(lastPart)) {
+  if (["create", "update", "delete", "sync_failed"].includes(lastPart)) {
     return lastPart as DocoraAction
   }
 
@@ -149,7 +150,7 @@ Deno.serve(async (req: Request) => {
     const action = extractAction(req.url)
     if (!action) {
       return new Response(
-        JSON.stringify({ error: "Invalid action. Use /create, /update, or /delete" }),
+        JSON.stringify({ error: "Invalid action. Use /create, /update, /delete, or /sync_failed" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
@@ -196,14 +197,20 @@ Deno.serve(async (req: Request) => {
       )
     }
 
-    // Parse payload
-    const payload: DocoraWebhookPayload = JSON.parse(bodyText)
-    const { repository: docoraRepo, file, commit_sha, timestamp: payloadTimestamp, previous_sha } = payload
-
     // Create Supabase client with service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Early branch for sync_failed -- payload shape is completely different from file webhooks
+    if (action === "sync_failed") {
+      const syncFailedPayload: DocoraSyncFailedPayload = JSON.parse(bodyText)
+      return await handleSyncFailed(supabase, syncFailedPayload)
+    }
+
+    // Parse payload
+    const payload: DocoraWebhookPayload = JSON.parse(bodyText)
+    const { repository: docoraRepo, file, commit_sha, timestamp: payloadTimestamp, previous_sha } = payload
 
     // Find repository by docora_repository_id
     const { data: repo, error: repoError } = await supabase
@@ -307,6 +314,8 @@ Deno.serve(async (req: Request) => {
         .update({
           last_sync_at: new Date().toISOString(),
           sync_status: "synced",
+          sync_error_message: null,
+          sync_failed_at: null,
         })
         .eq("id", repository.id)
 
@@ -375,6 +384,8 @@ Deno.serve(async (req: Request) => {
         last_sync_at: new Date().toISOString(),
         sync_status: "synced",
         cards_count: cardsCount || 0,
+        sync_error_message: null,
+        sync_failed_at: null,
       })
       .eq("id", repository.id)
 
@@ -397,6 +408,50 @@ Deno.serve(async (req: Request) => {
     )
   }
 })
+
+/**
+ * Handle sync_failed webhook - record failure status for a repository
+ */
+async function handleSyncFailed(
+  supabase: ReturnType<typeof createClient>,
+  payload: DocoraSyncFailedPayload
+): Promise<Response> {
+  const { repository: docoraRepo, error: syncError } = payload
+
+  // Find repository by docora_repository_id
+  const { data: repo, error: repoError } = await supabase
+    .from("lumio_repositories")
+    .select("id")
+    .eq("docora_repository_id", docoraRepo.repository_id)
+    .single()
+
+  if (repoError || !repo) {
+    console.warn("sync_failed: Repository not found for Docora ID:", docoraRepo.repository_id)
+    return new Response(
+      JSON.stringify({ error: "Repository not registered", docoraId: docoraRepo.repository_id }),
+      { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    )
+  }
+
+  // Update repository with failure status
+  await supabase
+    .from("lumio_repositories")
+    .update({
+      sync_status: "sync_failed",
+      sync_error_message: syncError.message,
+      sync_failed_at: new Date().toISOString(),
+    })
+    .eq("id", repo.id)
+
+  console.warn(
+    `sync_failed: repo=${repo.id}, error_type=${syncError.type}, message=${syncError.message}`
+  )
+
+  return new Response(
+    JSON.stringify({ success: true, message: "Sync failure recorded" }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  )
+}
 
 /**
  * Process a markdown file (create/update/delete)
