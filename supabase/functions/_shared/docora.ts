@@ -148,7 +148,7 @@ export async function verifyDocoraSignature(
  */
 export async function docoraApiCall<T = unknown>(
   endpoint: string,
-  method: "GET" | "POST" | "DELETE",
+  method: "GET" | "POST" | "DELETE" | "PATCH",
   body?: object
 ): Promise<{ data: T | null; error: string | null; status: number }> {
   const apiUrl = Deno.env.get("DOCORA_API_URL")
