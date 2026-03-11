@@ -123,7 +123,7 @@ Phases execute in numeric order: 23 -> 24 -> 25
 | 16-17 | v1.5 | 2/2 | Complete | 2026-02-21 |
 | 18-22 | v1.6 | 9/9 | Complete | 2026-02-25 |
 | 23. Failure Ingestion | v1.7 | Complete    | 2026-03-06 | 2026-03-06 |
-| 24. Error Display | 1/1 | Complete   | 2026-03-11 | - |
+| 24. Error Display | 1/1 | Complete    | 2026-03-11 | - |
 | 25. Token Recovery | v1.7 | 0/TBD | Not started | - |
 
 ---
