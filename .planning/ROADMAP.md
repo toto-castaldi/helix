@@ -68,7 +68,7 @@ See `.planning/milestones/v1.6-ROADMAP.md` for details.
 
 - [x] **Phase 23: Failure Ingestion** - Receive and store Docora sync failure events
 - [x] **Phase 24: Error Display** - Show sync failure status on repository cards with recovery action (completed 2026-03-11)
-- [ ] **Phase 25: Token Recovery** - Update PAT token via dialog, push to Docora, and reset sync status
+- [x] **Phase 25: Token Recovery** - Update PAT token via dialog, push to Docora, and reset sync status (completed 2026-03-11)
 
 ## Phase Details
 
@@ -106,7 +106,7 @@ Plans:
   3. The token update is pushed to Docora via their PATCH API
   4. After successful update, the repository's sync_status resets to 'pending' and Docora auto-retries sync
   5. The error state on the repository card disappears after successful token update
-**Plans:** 1/2 plans complete
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 25-01-PLAN.md — Edge Function for token update (Docora PATCH API + DB update + sync reset)
 - [ ] 25-02-PLAN.md — UpdateTokenDialog component + wiring into Repositories page
@@ -127,7 +127,7 @@ Phases execute in numeric order: 23 -> 24 -> 25
 | 18-22 | v1.6 | 9/9 | Complete | 2026-02-25 |
 | 23. Failure Ingestion | v1.7 | Complete    | 2026-03-06 | 2026-03-06 |
 | 24. Error Display | 1/1 | Complete    | 2026-03-11 | - |
-| 25. Token Recovery | v1.7 | 1/2 | In progress | - |
+| 25. Token Recovery | 2/2 | Complete   | 2026-03-11 | - |
 
 ---
 *Roadmap created: 2026-01-28*

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Sync Recovery
-status: in-progress
-stopped_at: Completed 25-01-PLAN.md
-last_updated: "2026-03-11T12:43:00Z"
-last_activity: 2026-03-11 -- Completed 25-01 Token Recovery Edge Function plan
+status: complete
+stopped_at: Completed 25-02-PLAN.md
+last_updated: "2026-03-11T12:48:28Z"
+last_activity: 2026-03-11 -- Completed 25-02 UpdateTokenDialog plan (Phase 25 complete)
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 2
   completed_plans: 2
-  percent: 97
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 
 ## Current Position
 
-Phase: 25 of 25 (Token Recovery)
-Plan: 1 of 2 in current phase (COMPLETE)
-Status: Phase 25 in progress -- Plan 01 complete, Plan 02 remaining
-Last activity: 2026-03-11 -- Completed 25-01 Token Recovery Edge Function plan
+Phase: 25 of 25 (Token Recovery) -- COMPLETE
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase 25 complete -- all plans executed, v1.7 milestone complete
+Last activity: 2026-03-11 -- Completed 25-02 UpdateTokenDialog plan
 
-Progress: [====================================] 97% (38/39 plans total -- counting 25-01 done, 25-02 pending)
+Progress: [========================================] 100% (39/39 plans total)
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ See MILESTONES.md for per-milestone history.
 - [Phase 24-error-display]: Kept error and sync_failed blocks as separate conditionals (different source fields, different behavior)
 - [Phase 24-error-display]: Used standard outline button variant inside destructive container without extra styling overrides
 - **Phase 25-01:** Docora-first, DB-second ordering: fail fast if Docora rejects token before writing to database
+- **Phase 25-02:** Centered Card dialog (not full-screen) for simple token form -- different from RepositoryCardsDialog pattern
 
 ### Pending Todos
 
@@ -69,13 +70,14 @@ None active.
 | 1 | Add actual MCP URL to landing page setup docs | 2026-02-25 | 6ce7817 | [1-add-actual-mcp-url-to-landing-page-setup](./quick/1-add-actual-mcp-url-to-landing-page-setup/) |
 | Phase 24-error-display P01 | 3min | 2 tasks | 3 files |
 | Phase 25-token-recovery P01 | 2min | 2 tasks | 3 files |
+| Phase 25-token-recovery P02 | 3min | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-11T12:43:00Z
-Last activity: Completed 25-01-PLAN.md (Token Recovery Edge Function)
-Stopped at: Completed 25-01-PLAN.md
+Last session: 2026-03-11T12:48:28Z
+Last activity: Completed 25-02-PLAN.md (UpdateTokenDialog)
+Stopped at: Completed 25-02-PLAN.md
 Resume file: None
 
 ---
-*State tracking: v1.7 milestone -- Phase 25 in progress, Plan 01 complete*
+*State tracking: v1.7 milestone -- Phase 25 complete, all plans executed*
