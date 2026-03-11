@@ -1,5 +1,6 @@
 import { FolderGit2, Lock, FileText, Clock } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { CardActions } from '@/components/shared'
 import { SyncStatusBadge } from './SyncStatusBadge'
 import type { LumioRepository } from '@/types'
@@ -58,6 +59,7 @@ interface RepositoryCardProps {
   onEdit: (repository: LumioRepository) => void
   onDelete: (repository: LumioRepository) => void
   onViewCards: (repository: LumioRepository) => void
+  onUpdateToken: (repository: LumioRepository) => void
 }
 
 export function RepositoryCard({
@@ -65,6 +67,7 @@ export function RepositoryCard({
   onEdit,
   onDelete,
   onViewCards,
+  onUpdateToken,
 }: RepositoryCardProps) {
   const githubUrl = `https://github.com/${repository.github_owner}/${repository.github_repo}`
   const isPrivate = !!repository.access_token
@@ -136,6 +139,20 @@ export function RepositoryCard({
         {repository.sync_status === 'error' && repository.sync_error && (
           <div className="mt-2 p-2 bg-destructive/10 rounded text-sm text-destructive break-words">
             {repository.sync_error}
+          </div>
+        )}
+
+        {repository.sync_status === 'sync_failed' && repository.sync_error_message && (
+          <div className="mt-2 p-2 bg-destructive/10 rounded text-sm text-destructive break-words">
+            <p>{repository.sync_error_message}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={() => onUpdateToken(repository)}
+            >
+              Aggiorna token
+            </Button>
           </div>
         )}
       </CardContent>
