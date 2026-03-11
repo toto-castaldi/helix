@@ -30,6 +30,7 @@ Deno.serve(async (req: Request) => {
     // Get authorization header
     const authHeader = req.headers.get("Authorization")
     if (!authHeader) {
+      console.error("Missing authorization header")
       return new Response(
         JSON.stringify({ error: "Missing authorization header" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -46,6 +47,7 @@ Deno.serve(async (req: Request) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser(token)
 
     if (userError || !user) {
+      console.error("JWT validation failed:", userError?.message || "no user")
       return new Response(
         JSON.stringify({ error: "Invalid token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -23,6 +23,13 @@ export function UpdateTokenDialog({ repository, onClose }: UpdateTokenDialogProp
     setIsSubmitting(true)
 
     try {
+      // Ensure fresh session token before invoking edge function
+      const { error: refreshError } = await supabase.auth.refreshSession()
+      if (refreshError) {
+        setError('Sessione scaduta. Effettua nuovamente il login.')
+        return
+      }
+
       const { data, error: invokeError } = await supabase.functions.invoke('docora-update-token', {
         body: {
           repositoryId: repository.id,
@@ -31,13 +38,9 @@ export function UpdateTokenDialog({ repository, onClose }: UpdateTokenDialogProp
       })
 
       if (invokeError) {
-        setError(invokeError.message || 'Errore durante l\'aggiornamento del token')
-        return
-      }
-
-      // Check for application-level error in response
-      if (data?.error) {
-        setError(data.error)
+        // Extract actual error from response body if available
+        const detail = data?.error || invokeError.message
+        setError(detail || 'Errore durante l\'aggiornamento del token')
         return
       }
 
