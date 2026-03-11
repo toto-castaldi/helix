@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Sync Recovery
-status: complete
+status: completed
 stopped_at: Completed 25-02-PLAN.md
-last_updated: "2026-03-11T12:48:28Z"
-last_activity: 2026-03-11 -- Completed 25-02 UpdateTokenDialog plan (Phase 25 complete)
+last_updated: "2026-03-11T12:53:21.359Z"
+last_activity: 2026-03-11 -- Completed 25-02 UpdateTokenDialog plan
 progress:
   total_phases: 3
   completed_phases: 3
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 4
   percent: 100
 ---
 

@@ -127,7 +127,7 @@ Phases execute in numeric order: 23 -> 24 -> 25
 | 18-22 | v1.6 | 9/9 | Complete | 2026-02-25 |
 | 23. Failure Ingestion | v1.7 | Complete    | 2026-03-06 | 2026-03-06 |
 | 24. Error Display | 1/1 | Complete    | 2026-03-11 | - |
-| 25. Token Recovery | 2/2 | Complete   | 2026-03-11 | - |
+| 25. Token Recovery | 2/2 | Complete    | 2026-03-11 | - |
 
 ---
 *Roadmap created: 2026-01-28*
