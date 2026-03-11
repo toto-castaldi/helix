@@ -7,6 +7,7 @@ interface RepositoryListProps {
   onEdit: (repository: LumioRepository) => void
   onDelete: (repository: LumioRepository) => void
   onViewCards: (repository: LumioRepository) => void
+  onUpdateToken: (repository: LumioRepository) => void
 }
 
 export function RepositoryList({
@@ -14,6 +15,7 @@ export function RepositoryList({
   onEdit,
   onDelete,
   onViewCards,
+  onUpdateToken,
 }: RepositoryListProps) {
   if (repositories.length === 0) {
     return (
@@ -39,6 +41,7 @@ export function RepositoryList({
             onEdit={onEdit}
             onDelete={onDelete}
             onViewCards={onViewCards}
+            onUpdateToken={onUpdateToken}
           />
         ))}
       </div>

@@ -102,6 +102,7 @@ export function Repositories() {
           onEdit={openEditForm}
           onDelete={openDeleteConfirm}
           onViewCards={setViewingCardsRepo}
+          onUpdateToken={() => {}} /* Phase 25 will replace with dialog-opening logic */
         />
       )}
 
