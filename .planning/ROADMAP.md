@@ -94,7 +94,7 @@ Plans:
   3. Repositories with normal sync status show no error state (no false alarms)
 **Plans:** 1/1 plans complete
 Plans:
-- [ ] 24-01-PLAN.md — Error display on RepositoryCard with "Aggiorna token" button and callback wiring
+- [x] 24-01-PLAN.md — Error display on RepositoryCard with "Aggiorna token" button and callback wiring
 
 ### Phase 25: Token Recovery
 **Goal**: Coaches can resolve sync failures by updating their PAT token through a focused dialog, which updates both Helix and Docora and resets the sync pipeline
@@ -106,7 +106,10 @@ Plans:
   3. The token update is pushed to Docora via their PATCH API
   4. After successful update, the repository's sync_status resets to 'pending' and Docora auto-retries sync
   5. The error state on the repository card disappears after successful token update
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 25-01-PLAN.md — Edge Function for token update (Docora PATCH API + DB update + sync reset)
+- [ ] 25-02-PLAN.md — UpdateTokenDialog component + wiring into Repositories page
 
 ## Progress
 
@@ -124,8 +127,8 @@ Phases execute in numeric order: 23 -> 24 -> 25
 | 18-22 | v1.6 | 9/9 | Complete | 2026-02-25 |
 | 23. Failure Ingestion | v1.7 | Complete    | 2026-03-06 | 2026-03-06 |
 | 24. Error Display | 1/1 | Complete    | 2026-03-11 | - |
-| 25. Token Recovery | v1.7 | 0/TBD | Not started | - |
+| 25. Token Recovery | v1.7 | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-03-11 -- Phase 24 planned (1 plan)*
+*Last updated: 2026-03-11 -- Phase 25 planned (2 plans)*
