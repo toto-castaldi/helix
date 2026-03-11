@@ -90,7 +90,7 @@ Deno.serve(async (req: Request) => {
 
     // Call Docora PATCH API to update token (Docora-first, fail fast)
     const docoraResult = await docoraApiCall(
-      `/api/repositories/${repo.docora_repository_id}`,
+      `/api/repositories/${repo.docora_repository_id}/token`,
       "PATCH",
       { github_token: newToken }
     )
