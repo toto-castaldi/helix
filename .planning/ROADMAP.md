@@ -67,7 +67,7 @@ See `.planning/milestones/v1.6-ROADMAP.md` for details.
 **Milestone Goal:** Handle Docora sync failures by receiving sync_failed webhooks, showing errors on repository cards, and allowing coaches to update tokens via a dedicated dialog.
 
 - [x] **Phase 23: Failure Ingestion** - Receive and store Docora sync failure events
-- [ ] **Phase 24: Error Display** - Show sync failure status on repository cards with recovery action
+- [x] **Phase 24: Error Display** - Show sync failure status on repository cards with recovery action (completed 2026-03-11)
 - [ ] **Phase 25: Token Recovery** - Update PAT token via dialog, push to Docora, and reset sync status
 
 ## Phase Details
@@ -92,7 +92,7 @@ Plans:
   1. When a repository has sync_status 'sync_failed', its card on the Repositories page shows a visible error message
   2. The error card includes an "Update token" button that is clearly actionable
   3. Repositories with normal sync status show no error state (no false alarms)
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 24-01-PLAN.md — Error display on RepositoryCard with "Aggiorna token" button and callback wiring
 
@@ -123,7 +123,7 @@ Phases execute in numeric order: 23 -> 24 -> 25
 | 16-17 | v1.5 | 2/2 | Complete | 2026-02-21 |
 | 18-22 | v1.6 | 9/9 | Complete | 2026-02-25 |
 | 23. Failure Ingestion | v1.7 | Complete    | 2026-03-06 | 2026-03-06 |
-| 24. Error Display | v1.7 | 0/1 | Not started | - |
+| 24. Error Display | 1/1 | Complete   | 2026-03-11 | - |
 | 25. Token Recovery | v1.7 | 0/TBD | Not started | - |
 
 ---

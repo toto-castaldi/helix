@@ -14,8 +14,8 @@ Requirements for milestone v1.7 Sync Recovery. Each maps to roadmap phases.
 
 ### Error Display
 
-- [ ] **DISP-01**: Repository card shows simple error message when sync status is 'sync_failed'
-- [ ] **DISP-02**: Error state includes "Update token" action button on the repository card
+- [x] **DISP-01**: Repository card shows simple error message when sync status is 'sync_failed'
+- [x] **DISP-02**: Error state includes "Update token" action button on the repository card
 
 ### Token Recovery
 
@@ -43,8 +43,8 @@ None deferred for this milestone.
 |-------------|-------|--------|
 | HOOK-01 | Phase 23 | Complete |
 | HOOK-02 | Phase 23 | Complete |
-| DISP-01 | Phase 24 | Pending |
-| DISP-02 | Phase 24 | Pending |
+| DISP-01 | Phase 24 | Complete |
+| DISP-02 | Phase 24 | Complete |
 | TOKN-01 | Phase 25 | Pending |
 | TOKN-02 | Phase 25 | Pending |
 | TOKN-03 | Phase 25 | Pending |
