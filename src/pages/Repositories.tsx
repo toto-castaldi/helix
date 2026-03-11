@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RepositoryForm, RepositoryList, RepositoryCardsDialog } from '@/components/repositories'
+import { RepositoryForm, RepositoryList, RepositoryCardsDialog, UpdateTokenDialog } from '@/components/repositories'
 import {
   LoadingSpinner,
   ErrorAlert,
@@ -13,6 +13,7 @@ import type { LumioRepository, LumioRepositoryInsert } from '@/types'
 
 export function Repositories() {
   const [viewingCardsRepo, setViewingCardsRepo] = useState<LumioRepository | null>(null)
+  const [updatingTokenRepo, setUpdatingTokenRepo] = useState<LumioRepository | null>(null)
   // Realtime updates are handled automatically by useRepositories hook
   const {
     repositories,
@@ -102,7 +103,7 @@ export function Repositories() {
           onEdit={openEditForm}
           onDelete={openDeleteConfirm}
           onViewCards={setViewingCardsRepo}
-          onUpdateToken={() => {}} /* Phase 25 will replace with dialog-opening logic */
+          onUpdateToken={setUpdatingTokenRepo}
         />
       )}
 
@@ -110,6 +111,13 @@ export function Repositories() {
         <RepositoryCardsDialog
           repository={viewingCardsRepo}
           onClose={() => setViewingCardsRepo(null)}
+        />
+      )}
+
+      {updatingTokenRepo && (
+        <UpdateTokenDialog
+          repository={updatingTokenRepo}
+          onClose={() => setUpdatingTokenRepo(null)}
         />
       )}
     </div>
