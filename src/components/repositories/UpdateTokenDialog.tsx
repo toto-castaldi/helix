@@ -38,8 +38,10 @@ export function UpdateTokenDialog({ repository, onClose }: UpdateTokenDialogProp
       })
 
       if (invokeError) {
-        // Extract actual error from response body if available
-        const detail = data?.error || invokeError.message
+        // supabase-js puts the parsed response body in error.context on non-2xx
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const ctx = (invokeError as any).context
+        const detail = ctx?.error || data?.error || invokeError.message
         setError(detail || 'Errore durante l\'aggiornamento del token')
         return
       }
