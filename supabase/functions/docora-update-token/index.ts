@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { createClient } from "jsr:@supabase/supabase-js@2"
-import { docoraApiCall } from "../_shared/docora.ts"
+import { docoraApiCall, registerRepository } from "../_shared/docora.ts"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -95,23 +95,48 @@ Deno.serve(async (req: Request) => {
       { github_token: newToken }
     )
 
+    let newDocoraRepoId: string | null = null
+
     if (docoraResult.error) {
-      console.error("Docora token update failed:", docoraResult.error)
-      return new Response(
-        JSON.stringify({ error: `Failed to update token on Docora: ${docoraResult.error}` }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
+      // If repository no longer exists on Docora, re-register it
+      if (docoraResult.status === 404 || docoraResult.status === 422) {
+        console.warn("Repository not found on Docora, re-registering...")
+        const githubUrl = `https://github.com/${repo.github_owner}/${repo.github_repo}`
+        const registerResult = await registerRepository(githubUrl, newToken)
+
+        if (registerResult.error) {
+          console.error("Docora re-registration failed:", registerResult.error)
+          return new Response(
+            JSON.stringify({ error: `Failed to re-register with Docora: ${registerResult.error}` }),
+            { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          )
+        }
+
+        newDocoraRepoId = registerResult.repositoryId
+        console.log("Re-registered with Docora, new ID:", newDocoraRepoId)
+      } else {
+        console.error("Docora token update failed:", docoraResult.error)
+        return new Response(
+          JSON.stringify({ error: `Failed to update token on Docora: ${docoraResult.error}` }),
+          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
     }
 
     // Docora succeeded -- now update database
+    const updatePayload: Record<string, unknown> = {
+      access_token: newToken,
+      sync_status: "pending",
+      sync_error_message: null,
+      sync_failed_at: null,
+    }
+    if (newDocoraRepoId) {
+      updatePayload.docora_repository_id = newDocoraRepoId
+    }
+
     const { error: updateError } = await supabase
       .from("lumio_repositories")
-      .update({
-        access_token: newToken,
-        sync_status: "pending",
-        sync_error_message: null,
-        sync_failed_at: null,
-      })
+      .update(updatePayload)
       .eq("id", repositoryId)
 
     if (updateError) {
