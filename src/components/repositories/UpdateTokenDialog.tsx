@@ -30,7 +30,7 @@ export function UpdateTokenDialog({ repository, onClose }: UpdateTokenDialogProp
         return
       }
 
-      const { data, error: invokeError } = await supabase.functions.invoke('docora-update-token', {
+      const { error: invokeError } = await supabase.functions.invoke('docora-update-token', {
         body: {
           repositoryId: repository.id,
           newToken: token.trim(),
