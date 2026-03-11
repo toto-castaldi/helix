@@ -1,5 +1,29 @@
 # Project Milestones: Helix
 
+## v1.7 Sync Recovery (Shipped: 2026-03-11)
+
+**Delivered:** End-to-end sync failure recovery — Docora webhook ingestion, error display on repository cards, and token update dialog with automatic sync retry.
+
+**Phases completed:** 23-25 (4 plans, 8 tasks)
+
+**Key accomplishments:**
+- Webhook handler receives and validates Docora `sync_failed` events with HMAC signature, persists failure status with auto-clear on recovery
+- Repository cards display sync failure error with "Aggiorna token" action button for coaches
+- `docora-update-token` Edge Function with Docora-first fail-fast ordering, PATCH API call, and sync status reset
+- UpdateTokenDialog component with PAT input, loading/error states, and realtime UI recovery after successful update
+
+**Stats:**
+- 27 files modified
+- +2,880 / -44 lines (TypeScript)
+- 3 phases, 4 plans
+- 5 days (2026-03-06 → 2026-03-11)
+
+**Git range:** `feat(23-01)` → `feat(25-02)`
+
+**What's next:** TBD — next milestone goals
+
+---
+
 ## v1.1 Group Exercise Improvements (Shipped: 2026-02-02)
 
 **Delivered:** Reusable group exercise templates with full UI and MCP integration, client view separation in tablet (individual vs group exercises), and mobile app cleanup.

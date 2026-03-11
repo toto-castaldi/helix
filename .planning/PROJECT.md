@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, un server MCP sicuro e polished per pianificazione AI via Claude Code, una landing page multilingua con documentazione MCP, e versioning basato su milestone GSD visibile su tutte le app.
+Helix e un'app web per fitness coach che gestisce clienti, sessioni di allenamento e esercizi. Include una PWA tablet per il live coaching in palestra con supporto per esercizi di gruppo e template riutilizzabili, un server MCP sicuro e polished per pianificazione AI via Claude Code, una landing page multilingua con documentazione MCP, versioning basato su milestone GSD visibile su tutte le app, e recovery automatico dei sync failure con Docora (webhook ingestion, error display, token update dialog).
 
 ## Core Value
 
@@ -48,18 +48,14 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 - ✓ English descriptions, isError flags, tool annotations su tutti i tools — v1.6
 - ✓ Input validation su 16 tool parameters e compact JSON responses — v1.6
 - ✓ E2E test script (53 assertions) e documentazione MCP su landing page — v1.6
+- ✓ Ricezione e validazione webhook Docora sync_failed con HMAC signature — v1.7
+- ✓ Persistenza stato sync_failed con error message e auto-clear on recovery — v1.7
+- ✓ Error display su repository card con messaggio e bottone "Aggiorna token" — v1.7
+- ✓ UpdateTokenDialog con PAT input, Docora PATCH API, e reset sync status — v1.7
 
 ### Active
 
-## Current Milestone: v1.7 Sync Recovery
-
-**Goal:** Handle Docora sync failures (e.g., expired PAT tokens) by receiving sync_failed webhooks, showing errors on repository cards, and allowing coaches to update tokens via a dedicated dialog.
-
-**Target features:**
-- Handle Docora `sync_failed` webhook and store failure status
-- Show simple error message on repository card when sync fails
-- "Update token" button on error card opens focused dialog
-- Token update calls Docora PATCH API and resets status to 'pending'
+(No active requirements — next milestone not yet defined)
 
 ### Out of Scope
 
@@ -74,16 +70,18 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 
 ## Context
 
-**Shipped v1.6 MCP Assessment & Fix** (2026-02-25):
-- Full MCP server audit, security hardening, and polish for Claude Code integration
-- OAuth dead code removed, API key-only auth, ownership verification on all write tools
-- Protocol upgraded to 2025-03-26, English descriptions, tool annotations, input validation
-- E2E test script and bilingual MCP setup docs on landing page
+**Shipped v1.7 Sync Recovery** (2026-03-11):
+- End-to-end sync failure recovery for Docora repositories
+- Webhook ingestion with HMAC validation, DB persistence, auto-clear on recovery
+- Error display on repository cards with actionable "Aggiorna token" button
+- Token update dialog calling Docora PATCH API with fail-fast ordering
+- Realtime UI recovery via Supabase subscription after successful token update
 
 **Current codebase:**
-- ~14,000 LOC TypeScript
+- ~19,700 LOC TypeScript
 - Three entry points: coach app (index.html) + live tablet PWA (live.html) + landing page (landing.html)
 - MCP server: 2,564 LOC with 16 mutation tools, 20 resources, 5 prompts (helix-mcp/index.ts)
+- Edge Functions: docora-webhook (file sync + sync_failed), docora-register, docora-update-token
 - Vite multi-entry config: vite.config.ts + vite.config.live.ts + vite.config.landing.ts
 - Deploy: GitHub Actions → Digital Ocean (3 domains, Nginx + HTTPS, milestone versioning)
 - Domains: helix.toto-castaldi.com (landing), coach.helix.toto-castaldi.com (app), live.helix.toto-castaldi.com (tablet)
@@ -130,6 +128,11 @@ Durante le lezioni di gruppo, il coach puo gestire gli esercizi condivisi da un'
 | toolError() helper with isError flag | Consistent error handling across all tools | ✓ Good — Claude Code can detect failures |
 | Hand-rolled validateToolInput() | 47 param checks before any DB query | ✓ Good — clear validation errors |
 | stripNulls() + compact JSON | Reduce token usage in Claude Code context | ✓ Good — smaller responses |
+| Early branch for sync_failed in webhook | Different payload shape than file webhooks | ✓ Good — clean separation |
+| Auto-clear error fields on successful sync | Both update paths clear sync_error_message/sync_failed_at | ✓ Good — automatic recovery |
+| Separate error vs sync_failed conditionals | Different source fields, different behavior (button vs no button) | ✓ Good — clear distinction |
+| Docora-first, DB-second for token update | Fail fast if Docora rejects before writing to DB | ✓ Good — no orphaned state |
+| Centered Card dialog for token form | Simple form doesn't need full-screen overlay | ✓ Good — focused UX |
 
 ---
-*Last updated: 2026-02-27 after v1.7 milestone start*
+*Last updated: 2026-03-11 after v1.7 milestone*
