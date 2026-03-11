@@ -38,11 +38,17 @@ export function UpdateTokenDialog({ repository, onClose }: UpdateTokenDialogProp
       })
 
       if (invokeError) {
-        // supabase-js puts the parsed response body in error.context on non-2xx
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const ctx = (invokeError as any).context
-        const detail = ctx?.error || data?.error || invokeError.message
-        setError(detail || 'Errore durante l\'aggiornamento del token')
+        // supabase-js puts the raw Response in error.context on non-2xx
+        let detail = invokeError.message
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const res = (invokeError as any).context
+          if (res && typeof res.json === 'function') {
+            const body = await res.json()
+            detail = body.error || detail
+          }
+        } catch { /* ignore parse errors */ }
+        setError(detail)
         return
       }
 
