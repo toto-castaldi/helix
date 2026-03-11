@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Sync Recovery
-status: completed
-stopped_at: Completed 24-01-PLAN.md
-last_updated: "2026-03-11T12:28:56.358Z"
-last_activity: 2026-03-11 -- Completed 24-01 Error Display plan
+status: in-progress
+stopped_at: Completed 25-01-PLAN.md
+last_updated: "2026-03-11T12:43:00Z"
+last_activity: 2026-03-11 -- Completed 25-01 Token Recovery Edge Function plan
 progress:
   total_phases: 3
   completed_phases: 2
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** During group lessons, the coach can manage shared exercises from a single view, completing them once for all participants
-**Current focus:** Phase 24 - Error Display (v1.7 Sync Recovery)
+**Current focus:** Phase 25 - Token Recovery (v1.7 Sync Recovery)
 
 ## Current Position
 
-Phase: 24 of 25 (Error Display)
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: Phase 24 complete
-Last activity: 2026-03-11 -- Completed 24-01 Error Display plan
+Phase: 25 of 25 (Token Recovery)
+Plan: 1 of 2 in current phase (COMPLETE)
+Status: Phase 25 in progress -- Plan 01 complete, Plan 02 remaining
+Last activity: 2026-03-11 -- Completed 25-01 Token Recovery Edge Function plan
 
-Progress: [====================================] 97% (37/38 plans total, 37 complete)
+Progress: [====================================] 97% (38/39 plans total -- counting 25-01 done, 25-02 pending)
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ See MILESTONES.md for per-milestone history.
 - **Phase 24-01:** Used standard outline button variant inside destructive container without extra styling overrides
 - [Phase 24-error-display]: Kept error and sync_failed blocks as separate conditionals (different source fields, different behavior)
 - [Phase 24-error-display]: Used standard outline button variant inside destructive container without extra styling overrides
+- **Phase 25-01:** Docora-first, DB-second ordering: fail fast if Docora rejects token before writing to database
 
 ### Pending Todos
 
@@ -67,13 +68,14 @@ None active.
 |---|-------------|------|--------|-----------|
 | 1 | Add actual MCP URL to landing page setup docs | 2026-02-25 | 6ce7817 | [1-add-actual-mcp-url-to-landing-page-setup](./quick/1-add-actual-mcp-url-to-landing-page-setup/) |
 | Phase 24-error-display P01 | 3min | 2 tasks | 3 files |
+| Phase 25-token-recovery P01 | 2min | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-11T08:47:45.800Z
-Last activity: Completed 24-01-PLAN.md (Error Display)
-Stopped at: Completed 24-01-PLAN.md
+Last session: 2026-03-11T12:43:00Z
+Last activity: Completed 25-01-PLAN.md (Token Recovery Edge Function)
+Stopped at: Completed 25-01-PLAN.md
 Resume file: None
 
 ---
-*State tracking: v1.7 milestone -- Phase 24 complete, ready for Phase 25*
+*State tracking: v1.7 milestone -- Phase 25 in progress, Plan 01 complete*

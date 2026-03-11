@@ -20,9 +20,9 @@ Requirements for milestone v1.7 Sync Recovery. Each maps to roadmap phases.
 ### Token Recovery
 
 - [ ] **TOKN-01**: "Update token" button opens a focused dialog with PAT input field
-- [ ] **TOKN-02**: Token update saves new token to Helix database (encrypted)
-- [ ] **TOKN-03**: Token update calls Docora PATCH API to update token on their side
-- [ ] **TOKN-04**: After successful update, sync status resets to 'pending' (Docora auto-retries)
+- [x] **TOKN-02**: Token update saves new token to Helix database (encrypted)
+- [x] **TOKN-03**: Token update calls Docora PATCH API to update token on their side
+- [x] **TOKN-04**: After successful update, sync status resets to 'pending' (Docora auto-retries)
 
 ## Future Requirements
 
@@ -46,9 +46,9 @@ None deferred for this milestone.
 | DISP-01 | Phase 24 | Complete |
 | DISP-02 | Phase 24 | Complete |
 | TOKN-01 | Phase 25 | Pending |
-| TOKN-02 | Phase 25 | Pending |
-| TOKN-03 | Phase 25 | Pending |
-| TOKN-04 | Phase 25 | Pending |
+| TOKN-02 | Phase 25 | Complete |
+| TOKN-03 | Phase 25 | Complete |
+| TOKN-04 | Phase 25 | Complete |
 
 **Coverage:**
 - v1.7 requirements: 8 total

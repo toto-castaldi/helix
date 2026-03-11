@@ -106,9 +106,9 @@ Plans:
   3. The token update is pushed to Docora via their PATCH API
   4. After successful update, the repository's sync_status resets to 'pending' and Docora auto-retries sync
   5. The error state on the repository card disappears after successful token update
-**Plans:** 2 plans
+**Plans:** 1/2 plans complete
 Plans:
-- [ ] 25-01-PLAN.md — Edge Function for token update (Docora PATCH API + DB update + sync reset)
+- [x] 25-01-PLAN.md — Edge Function for token update (Docora PATCH API + DB update + sync reset)
 - [ ] 25-02-PLAN.md — UpdateTokenDialog component + wiring into Repositories page
 
 ## Progress
@@ -127,8 +127,8 @@ Phases execute in numeric order: 23 -> 24 -> 25
 | 18-22 | v1.6 | 9/9 | Complete | 2026-02-25 |
 | 23. Failure Ingestion | v1.7 | Complete    | 2026-03-06 | 2026-03-06 |
 | 24. Error Display | 1/1 | Complete    | 2026-03-11 | - |
-| 25. Token Recovery | v1.7 | 0/2 | Not started | - |
+| 25. Token Recovery | v1.7 | 1/2 | In progress | - |
 
 ---
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-03-11 -- Phase 25 planned (2 plans)*
+*Last updated: 2026-03-11 -- Phase 25 plan 01 complete*
