@@ -155,8 +155,8 @@ function render(lang: Lang): void {
         <h1 class="hero-title">Helix</h1>
         <p class="hero-tagline">${t.tagline}</p>
         <div class="cta-group">
-          <a href="https://coach.helix.toto-castaldi.com" class="btn btn-primary">${t.ctaCoach}</a>
-          <a href="https://live.helix.toto-castaldi.com" class="btn btn-secondary">${t.ctaLive}</a>
+          <a href="https://coach-helix.toto-castaldi.com" class="btn btn-primary">${t.ctaCoach}</a>
+          <a href="https://live-helix.toto-castaldi.com" class="btn btn-secondary">${t.ctaLive}</a>
         </div>
       </div>
     </section>
