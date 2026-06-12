@@ -1,181 +1,112 @@
-name: Deploy to Digital Ocean
+# helix-deploy.example.yml — TEMPLATE SANITIZZATO del workflow di build+deploy delle TRE
+# frontend Helix su jarvis (MIG-02). Il file VERO vive nel repo sorgente
+# `toto-castaldi/helix` come `.github/workflows/deploy.yml` — NON in questo repo — e
+# RIMPIAZZA il vecchio deploy via SSH verso il droplet. Qui è committato solo il template con
+# placeholder (repo pubblico vivo).
+#
+# > ⚠️ Placeholder-only. Identificatori reali (owner/repo GitHub, domini, valori
+# >    VITE_SUPABASE_*, SHA pinnato dell'action) vivono SOLO nel repo sorgente / nei secrets
+# >    del repo helix / on-host. Placeholder usati: `toto-castaldi/helix` (repo sorgente),
+# >    `<pinned-sha>` (commit SHA di actions/checkout), `helix-landing-www`/`helix-coach-www`/
+# >    `helix-live-www` (le tre webroot host-side su jarvis, sotto /srv/site-1-frontend).
+# >    I valori VITE_SUPABASE_* sono i secrets ESISTENTI del repo helix (mai inline qui).
+#
+# COSA FA (e cosa NON fa):
+#   FA: npm ci + i TRE build Vite (build:landing -> dist-landing/, build -> dist/,
+#       build:live -> dist-live/) con env di build dai secrets, poi un deploy ATOMICO di
+#       ciascun dist nella PROPRIA webroot (releases/<sha>/ + flip `mv -T` di current).
+#   NON FA: il vecchio deploy via SSH verso il droplet, né alcun passo Supabase (dump/push,
+#       deploy delle functions, project link) o reload nginx via SSH. Il BACKEND Helix resta INTOCCATO su
+#       Supabase Cloud (fuori scope). Niente rsync --delete in-place su una webroot viva.
+#
+# SICUREZZA (runner self-hosted su repo PUBBLICO = vettore RCE — T-10-06):
+#   - Trigger SOLO `on: push: branches: [main]`. MAI trigger basati su PR-da-fork (i due
+#     eventi PR di GitHub, standard e *_target) — un push da un fork atterra sul fork, non a
+#     monte → non raggiunge il runner.
+#   - Job guard `if: github.repository == 'toto-castaldi/helix'` (defense-in-depth).
+#   - Repo Setting "Require approval for all outside collaborators" ON (host-only, control-plane).
+#   - `permissions: contents: read` (least privilege); `actions/checkout` pinnato a un commit SHA.
+#   - Il runner gira come utente `nologin` dedicato, NO sudo, NON nel gruppo `docker`,
+#     DISTINTO dal runner dum-e (lumio). node 20 è user-local sul PATH del runner (drop-in).
+
+name: Deploy Helix to jarvis
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]          # SOLO push su main — MAI trigger PR-da-fork (guard RCE repo pubblico)
+
+permissions:
+  contents: read              # least privilege
+
+concurrency:
+  group: deploy-jarvis-helix  # serializza i deploy Helix (separato dal gruppo di site-1/lumio)
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-
+  deploy:
+    # defense-in-depth: il job NON gira su fork (solo sul repo canonico)
+    if: github.repository == 'toto-castaldi/helix'
+    runs-on: [self-hosted, jarvis, helix]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Pin a commit SHA (NON un tag) — igiene supply-chain (T-10-08).
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - name: Extract milestone version
-        id: version
-        run: |
-          VERSION=$(grep -oP 'Current Milestone: \Kv\d+\.\d+' .planning/PROJECT.md 2>/dev/null || true)
-          if [ -z "$VERSION" ]; then
-            VERSION=$(grep -oP '## \Kv\d+\.\d+' .planning/MILESTONES.md 2>/dev/null | sort -rV | head -1 || true)
-          fi
-          if [ -z "$VERSION" ]; then
-            VERSION="dev"
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Milestone version: $VERSION"
+      # VITE_APP_VERSION derivata da git (host/repo-only) — short SHA del commit deployato.
+      - name: Derive app version
+        id: ver
+        run: echo "version=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
+      # Install lockfile-exact (T-10-SC: npm ci, nessun drift). node 20 sul PATH (drop-in).
       - name: Install dependencies
         run: npm ci
 
-      - name: Build main app
-        run: npm run build
+      # --- I TRE build Vite, ciascuno con la sua env di build dai secrets ESISTENTI -----
+      # Vite INLINA VITE_* nel bundle: l'anon key è una chiave client PUBBLICA per design
+      # (RLS impone l'auth), NON un secret profondo. Solo VITE_SUPABASE_URL + anon key +
+      # VITE_APP_VERSION vengono passati (T-10-09: nessun service-role/secret server nel build).
+      - name: Build landing (helix.<domain>)
+        run: npm run build:landing          # -> dist-landing/
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_APP_VERSION: ${{ steps.ver.outputs.version }}
+
+      - name: Build coach (coach.helix.<domain>)
+        run: npm run build                   # -> dist/
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_APP_VERSION: ${{ steps.version.outputs.version }}
+          VITE_APP_VERSION: ${{ steps.ver.outputs.version }}
 
-      - name: Build live app
-        run: npm run build:live
+      - name: Build live (live.helix.<domain>)
+        run: npm run build:live              # -> dist-live/
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_APP_VERSION: ${{ steps.version.outputs.version }}
+          VITE_APP_VERSION: ${{ steps.ver.outputs.version }}
 
-      - name: Build landing app
-        run: npm run build:landing
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_APP_VERSION: ${{ steps.version.outputs.version }}
-
-      - name: Deploy main app to server
-        uses: easingthemes/ssh-deploy@v5.1.0
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          SOURCE: dist/
-          TARGET: ${{ secrets.DEPLOY_PATH }}
-          ARGS: "-avz --delete"
-
-      - name: Deploy live app to server
-        uses: easingthemes/ssh-deploy@v5.1.0
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          SOURCE: dist-live/
-          TARGET: ${{ secrets.DEPLOY_PATH_LIVE }}
-          ARGS: "-avz --delete"
-
-      - name: Deploy landing app to server
-        uses: easingthemes/ssh-deploy@v5.1.0
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          SOURCE: dist-landing/
-          TARGET: ${{ secrets.DEPLOY_PATH_LANDING }}
-          ARGS: "-avz --delete"
-
-      - name: Deploy Nginx configs to server
-        uses: easingthemes/ssh-deploy@v5.1.0
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          SOURCE: config/
-          TARGET: /tmp/helix-nginx-config/
-          ARGS: "-avz --delete"
-
-      - name: Apply Nginx configs and reload
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            # Copy landing and coach configs (NOT live - managed separately)
-            sudo cp /tmp/helix-nginx-config/nginx-helix-landing.conf /etc/nginx/sites-available/
-            sudo cp /tmp/helix-nginx-config/nginx-helix-coach.conf /etc/nginx/sites-available/
-
-            # Ensure symlinks exist in sites-enabled
-            sudo ln -sf /etc/nginx/sites-available/nginx-helix-landing.conf /etc/nginx/sites-enabled/
-            sudo ln -sf /etc/nginx/sites-available/nginx-helix-coach.conf /etc/nginx/sites-enabled/
-
-            # Configs ship with SSL enabled. If certs don't exist yet (first deploy),
-            # disable the 443 block so nginx -t passes. Certbot will add SSL later.
-            for CONF in nginx-helix-landing.conf nginx-helix-coach.conf; do
-              CONF_PATH="/etc/nginx/sites-available/$CONF"
-              DOMAIN=$(grep -m1 'server_name' "$CONF_PATH" | awk '{print $2}' | tr -d ';')
-              CERT_PATH="/etc/letsencrypt/live/$DOMAIN/fullchain.pem"
-              if [ ! -f "$CERT_PATH" ]; then
-                echo "SSL cert not found for $DOMAIN — disabling SSL for first-time setup"
-                # Comment out SSL directives
-                sudo sed -i 's|^\(\s*ssl_certificate\)|    # \1|' "$CONF_PATH"
-                sudo sed -i 's|^\(\s*ssl_certificate_key\)|    # \1|' "$CONF_PATH"
-                sudo sed -i 's|^\(\s*include /etc/letsencrypt\)|    # \1|' "$CONF_PATH"
-                sudo sed -i 's|^\(\s*ssl_dhparam\)|    # \1|' "$CONF_PATH"
-                # Comment out HTTPS redirect so port 80 serves content
-                sudo sed -i 's|^\(\s*return 301 https://\)|    # \1|' "$CONF_PATH"
-              else
-                echo "SSL cert found for $DOMAIN — config ready"
-              fi
-            done
-
-            # Test and reload
-            sudo nginx -t && sudo systemctl reload nginx
-
-            # Cleanup
-            rm -rf /tmp/helix-nginx-config
-
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Link Supabase Project
-        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Backup Database
+      # --- Deploy ATOMICO per-target: ogni dist nella SUA webroot (T-10-10) --------------
+      # Mai rsync --delete in-place su una webroot viva: build una release dir versionata,
+      # poi flip ATOMICO del symlink `current` con `mv -T` (rename(2)). Tre target indipendenti.
+      - name: Deploy 3 Helix frontends (atomic per-target)
         run: |
-          BACKUP_FILE="backup-${{ steps.version.outputs.version }}.sql"
-          supabase db dump -f "$BACKUP_FILE" --data-only false
-          echo "backup_file=$BACKUP_FILE" >> $GITHUB_OUTPUT
-        id: backup
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Upload Backup Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: db-backup-${{ steps.version.outputs.version }}
-          path: ${{ steps.backup.outputs.backup_file }}
-          retention-days: 90
-
-      - name: Run Database Migrations
-        run: supabase db push
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Deploy Edge Functions
-        run: |
-          supabase functions deploy client-export --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase functions deploy lumio-card --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase functions deploy lumio-sync-repo --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase functions deploy docora-webhook --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase functions deploy docora-register --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase functions deploy docora-update-token --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase functions deploy helix-mcp --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          set -euo pipefail
+          BASE=/srv/site-1-frontend
+          # mapping: <webroot>  <dist-dir>
+          deploy_one() {
+            local webroot="$1" src="$2"
+            local WEBROOT="$BASE/$webroot"
+            local DEST="$WEBROOT/releases/$GITHUB_SHA"
+            mkdir -p "$DEST"
+            # release fresca e completa in una dir versionata
+            rsync -a --delete "$src/" "$DEST/"
+            # link nuovo ACCANTO a current, poi flip ATOMICO (rename(2))
+            ln -sfn "releases/$GITHUB_SHA" "$WEBROOT/.current.tmp"
+            mv -T "$WEBROOT/.current.tmp" "$WEBROOT/current"
+            # prune: tieni le ultime 5 release (rollback)
+            ls -1dt "$WEBROOT"/releases/*/ | tail -n +6 | xargs -r rm -rf
+            # log di deploy lato jarvis (l'altra metà dell'osservabilità è il tab Actions)
+            printf '%s  %-18s deployed %s\n' "$(date -u +%FT%TZ)" "$webroot" "$GITHUB_SHA" >> "$HOME/deploy.log"
+          }
+          deploy_one helix-landing-www dist-landing
+          deploy_one helix-coach-www   dist
+          deploy_one helix-live-www    dist-live
