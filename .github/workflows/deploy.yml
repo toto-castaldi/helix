@@ -51,12 +51,18 @@ jobs:
       # Pin a commit SHA (NON un tag) — igiene supply-chain (T-10-08).
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
+      # node 20 user-local sul PATH degli step. L'Environment=PATH del drop-in systemd vale
+      # per il DAEMON del runner ma NON viene ereditato nella shell degli step `run:` (il
+      # runner ricostruisce l'env del job): va esportato via $GITHUB_PATH.
+      - name: Setup node 20 on PATH
+        run: echo "/opt/helix-runner/node/bin" >> "$GITHUB_PATH"
+
       # VITE_APP_VERSION derivata da git (host/repo-only) — short SHA del commit deployato.
       - name: Derive app version
         id: ver
         run: echo "version=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      # Install lockfile-exact (T-10-SC: npm ci, nessun drift). node 20 sul PATH (drop-in).
+      # Install lockfile-exact (T-10-SC: npm ci, nessun drift). node 20 sul PATH (step sopra).
       - name: Install dependencies
         run: npm ci
 
